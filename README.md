@@ -79,6 +79,18 @@ npx prisma studio
 
 ---
 
+## Algolia Such-Index
+
+```bash
+# Alle aktiven Anzeigen aus der Datenbank in den Algolia-Index schreiben
+# (einmalig beim Setup oder nach einem Datenimport ausführen)
+npm run algolia:index
+```
+
+Voraussetzung: `ALGOLIA_APP_ID` und `ALGOLIA_ADMIN_KEY` müssen in `.env` gesetzt sein.
+
+---
+
 ## Build
 
 ```bash
