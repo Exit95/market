@@ -1,0 +1,267 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import ListingCard from "../components/ListingCard.astro";
+import { categories } from "../data/listings";
+
+// Server-side: fetch first page from our own API
+const url = new URL("/api/listings", Astro.url.origin);
+url.searchParams.set("pageSize", "20");
+url.searchParams.set("page", "1");
+
+// Forward search params from URL
+for (const [k, v] of Astro.url.searchParams) {
+    if (
+        [
+            "query",
+            "category",
+            "minPrice",
+            "maxPrice",
+            "city",
+            "page",
+            "pageSize",
+        ].includes(k)
+    ) {
+        url.searchParams.set(k, v);
+    }
+}
+
+const res = await fetch(url.toString());
+const data = res.ok
+    ? await res.json()
+    : { listings: [], pagination: { total: 0, totalPages: 1, page: 1 } };
+const { listings, pagination } = data;
+
+const currentPage = pagination.page ?? 1;
+const totalPages = pagination.totalPages ?? 1;
+const currentQuery = Astro.url.searchParams.get("query") ?? "";
+const currentCat = Astro.url.searchParams.get("category") ?? "";
+---
+
+<BaseLayout title="Novamarkt – Sicher kaufen & verkaufen">
+    <Header />
+    <main class="container" style="padding-top:2rem;padding-bottom:4rem;">
+        <!-- Search Bar -->
+        <form method="GET" class="search-row">
+            <input
+                name="query"
+                value={currentQuery}
+                placeholder="Suche…"
+                class="input search-input"
+            />
+            <select name="category" class="input">
+                <option value="">Alle Kategorien</option>
+                {
+                    categories.map((c) => (
+                        <option
+                            value={c.slug.toUpperCase()}
+                            selected={currentCat === c.slug.toUpperCase()}
+                        >
+                            {c.label}
+                        </option>
+                    ))
+                }
+            </select>
+            <input
+                name="minPrice"
+                type="number"
+                placeholder="Min €"
+                class="input price-input"
+                value={Astro.url.searchParams.get("minPrice") ?? ""}
+            />
+            <input
+                name="maxPrice"
+                type="number"
+                placeholder="Max €"
+                class="input price-input"
+                value={Astro.url.searchParams.get("maxPrice") ?? ""}
+            />
+            <button type="submit" class="btn btn-primary">Suchen</button>
+        </form>
+
+        <!-- Result summary -->
+        <p class="result-info">
+            {pagination.total} Anzeige{pagination.total !== 1 ? "n" : ""} gefunden
+            {
+                currentQuery && (
+                    <>
+                        {" "}
+                        für „<strong>{currentQuery}</strong>"
+                    </>
+                )
+            }
+        </p>
+
+        <!-- Listings Grid -->
+        {
+            listings.length > 0 ? (
+                <div class="listings-grid">
+                    {listings.map((l: any) => (
+                        <a href={`/listing/${l.id}`} class="listing-card-link">
+                            <div class="lcard">
+                                {l.images[0] && (
+                                    <img
+                                        src={l.images[0].url}
+                                        alt={l.title}
+                                        class="lcard-img"
+                                        loading="lazy"
+                                    />
+                                )}
+                                {!l.images[0] && (
+                                    <div class="lcard-img lcard-placeholder">
+                                        🖼
+                                    </div>
+                                )}
+                                <div class="lcard-body">
+                                    <div class="lcard-price">
+                                        {(l.price / 100).toLocaleString(
+                                            "de-DE",
+                                            {
+                                                style: "currency",
+                                                currency: "EUR",
+                                            },
+                                        )}
+                                    </div>
+                                    <div class="lcard-title">{l.title}</div>
+                                    <div class="lcard-meta">
+                                        {l.city} · {l.category}
+                                    </div>
+                                    {l.treuhand && (
+                                        <span class="badge badge-success">
+                                            Treuhand
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                        </a>
+                    ))}
+                </div>
+            ) : (
+                <p class="empty-state">Keine Anzeigen gefunden.</p>
+            )
+        }
+
+        <!-- Pagination -->
+        {
+            totalPages > 1 && (
+                <nav class="pagination">
+                    {currentPage > 1 && (
+                        <a
+                            href={`?${new URLSearchParams({ ...Object.fromEntries(Astro.url.searchParams), page: String(currentPage - 1) })}`}
+                            class="btn btn-secondary"
+                        >
+                            ← Zurück
+                        </a>
+                    )}
+                    <span class="page-info">
+                        Seite {currentPage} / {totalPages}
+                    </span>
+                    {currentPage < totalPages && (
+                        <a
+                            href={`?${new URLSearchParams({ ...Object.fromEntries(Astro.url.searchParams), page: String(currentPage + 1) })}`}
+                            class="btn btn-secondary"
+                        >
+                            Weiter →
+                        </a>
+                    )}
+                </nav>
+            )
+        }
+    </main>
+    <Footer />
+</BaseLayout>
+
+<style>
+    .search-row {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+    }
+    .search-input {
+        flex: 1;
+        min-width: 200px;
+    }
+    .price-input {
+        width: 100px;
+    }
+    .result-info {
+        color: var(--color-text-muted);
+        font-size: var(--text-sm);
+        margin-bottom: 1.5rem;
+    }
+    .listings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1.25rem;
+    }
+    .listing-card-link {
+        text-decoration: none;
+        color: inherit;
+    }
+    .lcard {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        transition:
+            transform 0.15s,
+            box-shadow 0.15s;
+    }
+    .lcard:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+    }
+    .lcard-img {
+        width: 100%;
+        aspect-ratio: 4/3;
+        object-fit: cover;
+        display: block;
+        font-size: 3rem;
+        text-align: center;
+        background: var(--color-surface-2);
+    }
+    .lcard-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .lcard-body {
+        padding: 1rem;
+    }
+    .lcard-price {
+        font-size: var(--text-xl);
+        font-weight: 800;
+        color: var(--color-primary);
+        margin-bottom: 0.25rem;
+    }
+    .lcard-title {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .lcard-meta {
+        font-size: var(--text-xs);
+        color: var(--color-text-muted);
+        margin-bottom: 0.5rem;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 4rem;
+        color: var(--color-text-muted);
+    }
+    .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 2.5rem;
+    }
+    .page-info {
+        color: var(--color-text-muted);
+        font-size: var(--text-sm);
+    }
+</style>

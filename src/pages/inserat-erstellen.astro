@@ -1,0 +1,1057 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { categories } from "../data/listings";
+---
+
+<BaseLayout title="Anzeige aufgeben – Novamarkt">
+    <Header />
+    <main class="create-main">
+        <div class="container-sm">
+            <div class="create-header">
+                <a
+                    href="/"
+                    class="btn btn-ghost btn-sm"
+                    style="margin-bottom:var(--space-4);">← Zurück</a
+                >
+                <h1 class="section-title">Anzeige aufgeben</h1>
+                <p class="section-subtitle">
+                    Inseriere deine Waren sicher und erreiche tausende
+                    verifizierte Käufer.
+                </p>
+            </div>
+
+            <!-- Progress Steps -->
+            <div class="progress-steps">
+                <div class="progress-step active" data-step="1">
+                    <div class="step-circle">1</div>
+                    <span>Kategorie</span>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step" data-step="2">
+                    <div class="step-circle">2</div>
+                    <span>Details</span>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step" data-step="3">
+                    <div class="step-circle">3</div>
+                    <span>Fotos</span>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step" data-step="4">
+                    <div class="step-circle">4</div>
+                    <span>Prüfung</span>
+                </div>
+            </div>
+
+            <!-- Step 1: Category -->
+            <div class="step-content" id="step1">
+                <div class="card">
+                    <h2 class="card-title">Kategorie auswählen</h2>
+                    <div class="cat-select-grid">
+                        {
+                            categories.map((cat) => (
+                                <button
+                                    class="cat-select-btn"
+                                    data-cat={cat.slug}
+                                >
+                                    <img
+                                        src={cat.icon}
+                                        alt={cat.label}
+                                        class="cat-icon"
+                                        loading="lazy"
+                                    />
+                                    <span class="cat-label">{cat.label}</span>
+                                </button>
+                            ))
+                        }
+                    </div>
+                    <div class="step-nav">
+                        <div></div>
+                        <button class="btn btn-primary" id="toStep2" disabled
+                            >Weiter →</button
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Details -->
+            <div class="step-content hidden" id="step2">
+                <div class="card">
+                    <h2 class="card-title">Anzeigen-Details</h2>
+                    <form id="detailsForm">
+                        <div class="form-group">
+                            <label class="label" for="title"
+                                >Titel der Anzeige *</label
+                            >
+                            <input
+                                type="text"
+                                id="title"
+                                class="input"
+                                placeholder="z.B. iPhone 15 Pro Max 256GB, unbenutzt"
+                                required
+                                maxlength="80"
+                            />
+                            <div class="char-count">0 / 80</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="label" for="desc"
+                                >Beschreibung *</label
+                            >
+                            <textarea
+                                id="desc"
+                                class="input"
+                                rows="6"
+                                placeholder="Beschreibe deine Ware so genau wie möglich – Zustand, Mängel, Zubehör..."
+                                required></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1;">
+                                <label class="label" for="price"
+                                    >Preis (€) *</label
+                                >
+                                <input
+                                    type="number"
+                                    id="price"
+                                    class="input"
+                                    placeholder="0,00"
+                                    min="0"
+                                    step="0.01"
+                                    required
+                                />
+                                <div
+                                    id="priceWarning"
+                                    class="price-warning hidden"
+                                >
+                                    <svg
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        ><path
+                                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                                        ></path><line
+                                            x1="12"
+                                            y1="9"
+                                            x2="12"
+                                            y2="13"></line><line
+                                            x1="12"
+                                            y1="17"
+                                            x2="12.01"
+                                            y2="17"></line></svg
+                                    >
+                                    Ungewöhnlich niedriger Preis – könnte Betrug sein
+                                </div>
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label class="label" for="condition"
+                                    >Zustand *</label
+                                >
+                                <select id="condition" class="input">
+                                    <option value="">Bitte wählen</option>
+                                    <option value="neu"
+                                        >Neu (unbenutzt, mit OVP)</option
+                                    >
+                                    <option value="sehr_gut"
+                                        >Sehr gut (kaum benutzt)</option
+                                    >
+                                    <option value="gut"
+                                        >Gut (leichte Gebrauchsspuren)</option
+                                    >
+                                    <option value="akzeptabel"
+                                        >Akzeptabel (sichtbare Mängel)</option
+                                    >
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1;">
+                                <label class="label" for="plz">PLZ *</label>
+                                <input
+                                    type="text"
+                                    id="plz"
+                                    class="input"
+                                    placeholder="z.B. 10115"
+                                    maxlength="5"
+                                    pattern="[0-9]{5}"
+                                    required
+                                />
+                            </div>
+                            <div class="form-group" style="flex:2;">
+                                <label class="label" for="city">Ort</label>
+                                <input
+                                    type="text"
+                                    id="city"
+                                    class="input"
+                                    placeholder="wird automatisch ermittelt"
+                                    readonly
+                                />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Versand & Übergabe</label>
+                            <div class="toggle-group">
+                                <label class="toggle-option">
+                                    <input
+                                        type="checkbox"
+                                        name="shipping"
+                                        value="abholung"
+                                        checked
+                                        class="toggle-check"
+                                    />
+                                    <span>Selbstabholung</span>
+                                </label>
+                                <label class="toggle-option">
+                                    <input
+                                        type="checkbox"
+                                        name="shipping"
+                                        value="versand"
+                                        class="toggle-check"
+                                    />
+                                    <span>Versand möglich</span>
+                                </label>
+                                <label class="toggle-option">
+                                    <input
+                                        type="checkbox"
+                                        name="shipping"
+                                        value="treuhand"
+                                        class="toggle-check"
+                                    />
+                                    <span>Treuhand-Kauf anbieten</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="step-nav">
+                            <button
+                                type="button"
+                                class="btn btn-secondary"
+                                id="backToStep1">← Zurück</button
+                            >
+                            <button
+                                type="button"
+                                class="btn btn-primary"
+                                id="toStep3">Weiter →</button
+                            >
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Step 3: Photos -->
+            <div class="step-content hidden" id="step3">
+                <div class="card">
+                    <h2 class="card-title">Fotos hinzufügen</h2>
+                    <p
+                        class="text-muted"
+                        style="font-size:var(--text-sm); margin-bottom:var(--space-6);"
+                    >
+                        Bis zu 12 Fotos, max. 10 MB pro Bild. Klare, gut
+                        beleuchtete Fotos erhöhen deine Chancen erheblich.
+                    </p>
+
+                    <!-- Upload Drop Zone -->
+                    <div class="upload-area" id="uploadArea">
+                        <svg
+                            width="40"
+                            height="40"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            style="color:var(--color-text-faint);"
+                            ><rect x="3" y="3" width="18" height="18" rx="2"
+                            ></rect><circle cx="8.5" cy="8.5" r="1.5"
+                            ></circle><polyline points="21 15 16 10 5 21"
+                            ></polyline></svg
+                        >
+                        <p>Fotos hierher ziehen oder klicken</p>
+                        <span
+                            >JPEG / PNG / WEBP · max. 10 MB pro Bild · bis zu 12
+                            Fotos</span
+                        >
+                        <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            multiple
+                            class="hidden"
+                            id="photoInput"
+                        />
+                    </div>
+
+                    <!-- Upload Progress -->
+                    <div
+                        id="uploadProgress"
+                        class="hidden"
+                        style="margin-top:var(--space-4);"
+                    >
+                        <div
+                            style="display:flex; align-items:center; gap:var(--space-3); font-size:var(--text-sm);"
+                        >
+                            <div class="upload-spinner"></div>
+                            <span id="uploadProgressText"
+                                >Wird hochgeladen…</span
+                            >
+                        </div>
+                        <div
+                            class="upload-progress-bar-wrap"
+                            style="margin-top:var(--space-2);"
+                        >
+                            <div
+                                class="upload-progress-bar"
+                                id="uploadProgressBar"
+                                style="width:0%"
+                            >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upload Error -->
+                    <div
+                        id="uploadError"
+                        class="hidden"
+                        style="margin-top:var(--space-3); padding:var(--space-3); background:rgba(239,68,68,0.07); border:1px solid rgba(239,68,68,0.25); border-radius:var(--radius); font-size:var(--text-sm); color:#f87171;"
+                    >
+                    </div>
+
+                    <!-- Photo Thumbnails Grid -->
+                    <div
+                        id="photoGrid"
+                        class="photo-thumb-grid"
+                        style="margin-top:var(--space-5);"
+                    >
+                    </div>
+
+                    <div class="photo-upload-grid" style="display:none">
+                        <div class="photo-upload-main">
+                            <div class="upload-area" id="uploadAreaOld"></div>
+                        </div>
+                    </div>
+
+                    <div class="photo-info-box">
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            ><circle cx="12" cy="12" r="10"></circle><line
+                                x1="12"
+                                y1="8"
+                                x2="12"
+                                y2="12"></line><line
+                                x1="12"
+                                y1="16"
+                                x2="12.01"
+                                y2="16"></line></svg
+                        >
+                        <div>
+                            <strong>Foto-Tipps für mehr Vertrauen:</strong>
+                            <ul>
+                                <li>
+                                    Fotografiere alle Seiten und etwaige Mängel
+                                    offen
+                                </li>
+                                <li>
+                                    Verwende keine Stockfotos – das ist verboten
+                                </li>
+                                <li>
+                                    Fotos werden automatisch auf bekannte
+                                    Stockfotos geprüft
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="step-nav">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            id="backToStep2">← Zurück</button
+                        >
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            id="toStep4">Weiter →</button
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Review & Submit -->
+            <div class="step-content hidden" id="step4">
+                <div class="card">
+                    <h2 class="card-title">Vorschau & Veröffentichen</h2>
+                    <div class="review-card">
+                        <div class="review-img-placeholder"></div>
+                        <div class="review-body">
+                            <div
+                                class="badge badge-neutral"
+                                style="margin-bottom:var(--space-2);"
+                            >
+                                Kategorie
+                            </div>
+                            <div class="review-title" id="previewTitle">
+                                Deine Anzeige
+                            </div>
+                            <div class="review-price" id="previewPrice">
+                                0 €
+                            </div>
+                            <div class="review-location">
+                                <svg
+                                    width="13"
+                                    height="13"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    ><path
+                                        d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
+                                    ></path><circle cx="12" cy="10" r="3"
+                                    ></circle></svg
+                                >
+                                Dein Ort
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checklist-section">
+                        <h3
+                            style="font-size:var(--text-sm); font-weight:700; margin-bottom:var(--space-4);"
+                        >
+                            Vor der Veröffentlichung prüfen:
+                        </h3>
+                        <div class="checklist-items">
+                            <label class="checklist-item">
+                                <input type="checkbox" id="check1" />
+                                <span
+                                    >Ich habe alle Angaben wahrheitsgemäß
+                                    gemacht</span
+                                >
+                            </label>
+                            <label class="checklist-item">
+                                <input type="checkbox" id="check2" />
+                                <span
+                                    >Ich akzeptiere die <a
+                                        href="/agb"
+                                        style="color:var(--color-primary);"
+                                        >AGB</a
+                                    > und die <a
+                                        href="/datenschutz"
+                                        style="color:var(--color-primary);"
+                                        >Datenschutzerklärung</a
+                                    ></span
+                                >
+                            </label>
+                            <label class="checklist-item">
+                                <input type="checkbox" id="check3" />
+                                <span
+                                    >Ich bestätige, dass ich Eigentümer der
+                                    angebotenen Ware bin</span
+                                >
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="final-actions">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            id="backToStep3">← Zurück</button
+                        >
+                        <button
+                            type="button"
+                            class="btn btn-primary btn-lg"
+                            id="submitBtn"
+                            disabled
+                        >
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                ><polyline points="20 6 9 17 4 12"
+                                ></polyline></svg
+                            >
+                            Anzeige kostenfrei veröffentlichen
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success State (hidden initially) -->
+            <div class="step-content hidden" id="successState">
+                <div class="card text-center" style="padding:var(--space-12);">
+                    <div class="success-icon">
+                        <svg
+                            width="40"
+                            height="40"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            ><polyline points="20 6 9 17 4 12"></polyline></svg
+                        >
+                    </div>
+                    <h2
+                        style="font-size:var(--text-2xl); font-weight:800; margin-bottom:var(--space-3);"
+                    >
+                        Anzeige aufgegeben!
+                    </h2>
+                    <p class="text-muted" style="margin-bottom:var(--space-8);">
+                        Deine Anzeige wird innerhalb von 15 Minuten geprüft und
+                        dann veröffentlicht. Du erhältst eine
+                        Bestätigungs-Email.
+                    </p>
+                    <div
+                        style="display:flex; gap:var(--space-4); justify-content:center; flex-wrap:wrap;"
+                    >
+                        <a href="/" class="btn btn-primary btn-lg"
+                            >Zur Startseite</a
+                        >
+                        <a href="/profil" class="btn btn-secondary btn-lg"
+                            >Meine Anzeigen</a
+                        >
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <Footer />
+</BaseLayout>
+
+<style>
+    .create-main {
+        padding: var(--space-10) 0 var(--space-16);
+    }
+    .create-header {
+        margin-bottom: var(--space-8);
+    }
+
+    /* Progress Steps */
+    .progress-steps {
+        display: flex;
+        align-items: center;
+        margin-bottom: var(--space-8);
+    }
+    .progress-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-2);
+    }
+    .step-circle {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--color-surface-2);
+        border: 2px solid var(--color-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: var(--text-sm);
+        font-weight: 700;
+        color: var(--color-text-faint);
+        transition: all var(--transition);
+    }
+    .progress-step.active .step-circle {
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+        color: #0b1120;
+    }
+    .progress-step.done .step-circle {
+        background: var(--color-success);
+        border-color: var(--color-success);
+        color: white;
+    }
+    .progress-step span {
+        font-size: var(--text-xs);
+        font-weight: 600;
+        color: var(--color-text-faint);
+    }
+    .progress-step.active span {
+        color: var(--color-primary);
+    }
+    .progress-line {
+        flex: 1;
+        height: 2px;
+        background: var(--color-border);
+        margin: 0 var(--space-2);
+        margin-bottom: var(--space-6);
+    }
+
+    /* Card */
+    .card-title {
+        font-size: var(--text-xl);
+        font-weight: 800;
+        margin-bottom: var(--space-6);
+    }
+    .step-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: var(--space-8);
+        padding-top: var(--space-6);
+        border-top: 1px solid var(--color-border);
+    }
+    .hidden {
+        display: none !important;
+    }
+
+    /* Category Select */
+    .cat-select-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--space-3);
+        margin-bottom: var(--space-6);
+    }
+    .cat-select-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-4);
+        border: 2px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        background: var(--color-surface-2);
+        cursor: pointer;
+        transition: all var(--transition);
+    }
+    .cat-select-btn:hover {
+        border-color: var(--color-primary);
+    }
+    .cat-select-btn.selected {
+        border-color: var(--color-primary);
+        background: rgba(6, 182, 212, 0.08);
+    }
+    .cat-select-btn .cat-icon {
+        width: 32px;
+        height: 32px;
+        opacity: 0.8;
+        filter: invert(1) brightness(2);
+    }
+    .cat-select-btn .cat-label {
+        font-size: var(--text-xs);
+        font-weight: 600;
+        color: var(--color-text-muted);
+        text-align: center;
+    }
+
+    /* Form */
+    .form-row {
+        display: flex;
+        gap: var(--space-4);
+    }
+    .char-count {
+        font-size: var(--text-xs);
+        color: var(--color-text-faint);
+        text-align: right;
+        margin-top: var(--space-1);
+    }
+    .price-warning {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        margin-top: var(--space-2);
+        font-size: var(--text-xs);
+        color: var(--color-warning);
+        background: rgba(245, 158, 11, 0.08);
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius);
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+    .toggle-group {
+        display: flex;
+        gap: var(--space-4);
+        flex-wrap: wrap;
+    }
+    .toggle-option {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: var(--text-sm);
+        cursor: pointer;
+    }
+    .toggle-check {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--color-primary);
+    }
+
+    /* Photo Upload */
+    .upload-area {
+        border: 2px dashed var(--color-border);
+        border-radius: var(--radius-xl);
+        padding: var(--space-12);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-3);
+        text-align: center;
+        cursor: pointer;
+        transition: all var(--transition);
+        position: relative;
+    }
+    .upload-area:hover {
+        border-color: var(--color-primary);
+        background: rgba(6, 182, 212, 0.04);
+    }
+    .upload-area p {
+        font-weight: 600;
+    }
+    .upload-area span {
+        font-size: var(--text-xs);
+        color: var(--color-text-faint);
+    }
+    .upload-area input {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+    .photo-info-box {
+        display: flex;
+        gap: var(--space-3);
+        padding: var(--space-4);
+        background: rgba(59, 130, 246, 0.06);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: var(--radius);
+        margin-top: var(--space-5);
+        font-size: var(--text-sm);
+        color: var(--color-primary);
+    }
+    .photo-info-box strong {
+        display: block;
+        margin-bottom: var(--space-2);
+        color: var(--color-text);
+    }
+    .photo-info-box ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+    .photo-info-box li {
+        font-size: var(--text-xs);
+        color: var(--color-text-muted);
+        padding-left: var(--space-3);
+        position: relative;
+    }
+    .photo-info-box li::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: var(--color-accent);
+    }
+
+    /* Review Card */
+    .review-card {
+        display: flex;
+        gap: var(--space-4);
+        background: var(--color-surface-2);
+        border-radius: var(--radius-lg);
+        padding: var(--space-4);
+        margin-bottom: var(--space-6);
+    }
+    .review-img-placeholder {
+        width: 100px;
+        height: 80px;
+        background: var(--color-surface-3);
+        border-radius: var(--radius);
+        flex-shrink: 0;
+    }
+    .review-title {
+        font-weight: 700;
+        font-size: var(--text-base);
+        margin-bottom: var(--space-1);
+    }
+    .review-price {
+        font-size: var(--text-2xl);
+        font-weight: 800;
+        color: var(--color-primary);
+    }
+    .review-location {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: var(--text-sm);
+        color: var(--color-text-muted);
+        margin-top: var(--space-2);
+    }
+
+    /* Checklist */
+    .checklist-section {
+        background: var(--color-surface-2);
+        border-radius: var(--radius-lg);
+        padding: var(--space-5);
+        margin-bottom: var(--space-6);
+    }
+    .checklist-items {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+    .checklist-item {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-3);
+        font-size: var(--text-sm);
+        cursor: pointer;
+        color: var(--color-text-muted);
+    }
+    .checklist-item input {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--color-primary);
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+    .final-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-4);
+    }
+
+    /* Success Icon */
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--color-success), #34d399);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        margin: 0 auto var(--space-6);
+        box-shadow: 0 0 40px rgba(16, 185, 129, 0.3);
+    }
+
+    @media (max-width: 768px) {
+        .cat-select-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        .form-row {
+            flex-direction: column;
+        }
+        .final-actions {
+            flex-direction: column-reverse;
+        }
+        .final-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+    @media (max-width: 480px) {
+        .cat-select-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .progress-step span {
+            display: none;
+        }
+    }
+
+    /* Photo Thumbnail Grid */
+    .photo-thumb-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--space-3);
+    }
+    .photo-thumb {
+        position: relative;
+        aspect-ratio: 4/3;
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 2px solid var(--color-border);
+    }
+    .photo-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .photo-thumb-del {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 24px;
+        height: 24px;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        color: white;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background var(--transition);
+    }
+    .photo-thumb-del:hover {
+        background: rgba(239, 68, 68, 0.9);
+    }
+    .photo-thumb-add {
+        aspect-ratio: 4/3;
+        border: 2px dashed var(--color-border);
+        border-radius: var(--radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: border-color var(--transition);
+        color: var(--color-text-faint);
+        font-size: var(--text-xl);
+    }
+    .photo-thumb-add:hover {
+        border-color: var(--color-primary);
+    }
+
+    /* Upload progress bar */
+    .upload-progress-bar-wrap {
+        background: var(--color-surface-2);
+        border-radius: var(--radius-full);
+        height: 6px;
+        overflow: hidden;
+    }
+    .upload-progress-bar {
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            var(--color-primary),
+            var(--color-accent)
+        );
+        border-radius: var(--radius-full);
+        transition: width 0.3s ease;
+    }
+    .upload-spinner {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--color-surface-2);
+        border-top-color: var(--color-primary);
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        flex-shrink: 0;
+    }
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
+<script>
+    // Step navigation
+    let currentStep = 1;
+    let selectedCategory: string | null = null;
+
+    function goToStep(step: number) {
+        document
+            .querySelectorAll(".step-content")
+            .forEach((el) => el.classList.add("hidden"));
+        const target = document.getElementById(`step${step}`);
+        if (target) {
+            target.classList.remove("hidden");
+        }
+
+        document.querySelectorAll(".progress-step").forEach((el, idx) => {
+            el.classList.remove("active", "done");
+            if (idx + 1 < step) el.classList.add("done");
+            if (idx + 1 === step) el.classList.add("active");
+        });
+        currentStep = step;
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // Category selection
+    document.querySelectorAll(".cat-select-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            document
+                .querySelectorAll(".cat-select-btn")
+                .forEach((b) => b.classList.remove("selected"));
+            btn.classList.add("selected");
+            selectedCategory = btn.getAttribute("data-cat");
+            (document.getElementById("toStep2") as HTMLButtonElement).disabled =
+                false;
+        });
+    });
+
+    document
+        .getElementById("toStep2")
+        ?.addEventListener("click", () => goToStep(2));
+    document
+        .getElementById("backToStep1")
+        ?.addEventListener("click", () => goToStep(1));
+    document
+        .getElementById("toStep3")
+        ?.addEventListener("click", () => goToStep(3));
+    document
+        .getElementById("backToStep2")
+        ?.addEventListener("click", () => goToStep(2));
+    document.getElementById("toStep4")?.addEventListener("click", () => {
+        // Update preview
+        const titleVal =
+            (document.getElementById("title") as HTMLInputElement)?.value ||
+            "Deine Anzeige";
+        const priceVal =
+            (document.getElementById("price") as HTMLInputElement)?.value ||
+            "0";
+        const previewTitle = document.getElementById("previewTitle");
+        const previewPrice = document.getElementById("previewPrice");
+        if (previewTitle) previewTitle.textContent = titleVal;
+        if (previewPrice)
+            previewPrice.textContent = `${parseFloat(priceVal).toLocaleString("de-DE")} €`;
+        goToStep(4);
+    });
+    document
+        .getElementById("backToStep3")
+        ?.addEventListener("click", () => goToStep(3));
+
+    // Price warning
+    document.getElementById("price")?.addEventListener("input", (e) => {
+        const val = parseFloat((e.target as HTMLInputElement).value);
+        const warn = document.getElementById("priceWarning");
+        if (warn) {
+            if (val > 0 && val < 5) {
+                warn.classList.remove("hidden");
+            } else {
+                warn.classList.add("hidden");
+            }
+        }
+    });
+
+    // Char count
+    document.getElementById("title")?.addEventListener("input", (e) => {
+        const len = (e.target as HTMLInputElement).value.length;
+        const counter = document.querySelector(".char-count");
+        if (counter) counter.textContent = `${len} / 80`;
+    });
+
+    // Checkbox submit enable
+    const checks = ["check1", "check2", "check3"];
+    checks.forEach((id) => {
+        document.getElementById(id)?.addEventListener("change", () => {
+            const allChecked = checks.every(
+                (c) =>
+                    (document.getElementById(c) as HTMLInputElement)?.checked,
+            );
+            (
+                document.getElementById("submitBtn") as HTMLButtonElement
+            ).disabled = !allChecked;
+        });
+    });
+
+    // Submit
+    document.getElementById("submitBtn")?.addEventListener("click", () => {
+        document
+            .querySelectorAll(".step-content")
+            .forEach((el) => el.classList.add("hidden"));
+        document.getElementById("successState")?.classList.remove("hidden");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+</script>

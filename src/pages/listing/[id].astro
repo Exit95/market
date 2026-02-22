@@ -1,0 +1,251 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+
+const { id } = Astro.params;
+
+const res = await fetch(`${Astro.url.origin}/api/listings/${id}`);
+if (!res.ok) return Astro.redirect("/");
+const listing = await res.json();
+
+const priceEur = (listing.price / 100).toLocaleString("de-DE", {
+    style: "currency",
+    currency: "EUR",
+});
+const seller = listing.seller ?? {};
+---
+
+<BaseLayout title={`${listing.title} – Novamarkt`}>
+    <Header />
+    <main class="container detail-wrap">
+        <!-- Images -->
+        <div class="images-section">
+            {
+                listing.images?.length > 0 ? (
+                    listing.images.map((img: any, i: number) => (
+                        <img
+                            src={img.url}
+                            alt={`${listing.title} Bild ${i + 1}`}
+                            class={`detail-img ${i === 0 ? "main-img" : "thumb"}`}
+                            loading={i === 0 ? "eager" : "lazy"}
+                        />
+                    ))
+                ) : (
+                    <div class="no-img">Kein Bild vorhanden</div>
+                )
+            }
+        </div>
+
+        <div class="detail-body">
+            <!-- Main info -->
+            <div class="detail-main">
+                <div class="badge-row">
+                    <span class="badge">{listing.category}</span>
+                    {
+                        listing.treuhand && (
+                            <span class="badge badge-success">🔒 Treuhand</span>
+                        )
+                    }
+                    {
+                        listing.condition && (
+                            <span class="badge">{listing.condition}</span>
+                        )
+                    }
+                </div>
+                <h1 class="detail-title">{listing.title}</h1>
+                <div class="detail-price">{priceEur}</div>
+                <p class="detail-loc">
+                    📍 {listing.city}, {listing.postalCode}
+                </p>
+                <div class="detail-desc">{listing.description}</div>
+
+                <a
+                    href={`/nachrichten?listing=${listing.id}&seller=${seller.id}`}
+                    class="btn btn-primary btn-lg cta-btn"
+                >
+                    Verkäufer kontaktieren
+                </a>
+                {
+                    listing.treuhand && (
+                        <a
+                            href={`/checkout/${listing.id}`}
+                            class="btn btn-secondary btn-lg cta-btn"
+                        >
+                            Sicher kaufen (Treuhand)
+                        </a>
+                    )
+                }
+            </div>
+
+            <!-- Seller card -->
+            <aside class="seller-card">
+                <div class="seller-header">Verkäufer</div>
+                <div class="seller-name">
+                    {seller.firstName}
+                    {seller.lastName?.[0]}.
+                    {
+                        seller.idVerified && (
+                            <span
+                                class="badge badge-primary"
+                                title="KYC verifiziert"
+                            >
+                                ✓ Verifiziert
+                            </span>
+                        )
+                    }
+                </div>
+                <div class="seller-meta">
+                    Dabei seit {
+                        new Date(seller.createdAt).toLocaleDateString("de-DE", {
+                            month: "long",
+                            year: "numeric",
+                        })
+                    }
+                </div>
+                <div class="seller-stats">
+                    {
+                        seller.emailVerified && (
+                            <span class="verify-chip">✉ E-Mail</span>
+                        )
+                    }
+                    {
+                        seller.idVerified && (
+                            <span class="verify-chip verified">🪪 ID</span>
+                        )
+                    }
+                </div>
+            </aside>
+        </div>
+    </main>
+    <Footer />
+</BaseLayout>
+
+<style>
+    .detail-wrap {
+        padding-top: 2rem;
+        padding-bottom: 4rem;
+    }
+    .images-section {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+    }
+    .detail-img {
+        border-radius: var(--radius-lg);
+        object-fit: cover;
+    }
+    .main-img {
+        width: 100%;
+        max-height: 480px;
+    }
+    .thumb {
+        width: 120px;
+        height: 90px;
+        cursor: pointer;
+        opacity: 0.85;
+        transition: opacity 0.15s;
+    }
+    .thumb:hover {
+        opacity: 1;
+    }
+    .no-img {
+        width: 100%;
+        height: 300px;
+        background: var(--color-surface-2);
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--color-text-faint);
+    }
+    .detail-body {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 2rem;
+        align-items: start;
+    }
+    @media (max-width: 768px) {
+        .detail-body {
+            grid-template-columns: 1fr;
+        }
+    }
+    .badge-row {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+    .detail-title {
+        font-size: clamp(1.5rem, 3vw, 2.25rem);
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+    }
+    .detail-price {
+        font-size: 2rem;
+        font-weight: 900;
+        color: var(--color-primary);
+        margin-bottom: 0.5rem;
+    }
+    .detail-loc {
+        color: var(--color-text-muted);
+        margin-bottom: 1.5rem;
+    }
+    .detail-desc {
+        color: var(--color-text-muted);
+        line-height: 1.8;
+        white-space: pre-wrap;
+        margin-bottom: 2rem;
+    }
+    .cta-btn {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 0.75rem;
+    }
+    .seller-card {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        position: sticky;
+        top: 5rem;
+    }
+    .seller-header {
+        font-size: var(--text-xs);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--color-text-muted);
+        margin-bottom: 0.75rem;
+    }
+    .seller-name {
+        font-weight: 700;
+        font-size: var(--text-lg);
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .seller-meta {
+        font-size: var(--text-xs);
+        color: var(--color-text-muted);
+        margin-bottom: 1rem;
+    }
+    .seller-stats {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    .verify-chip {
+        font-size: var(--text-xs);
+        padding: 0.2rem 0.6rem;
+        border-radius: var(--radius-full);
+        background: var(--color-surface-2);
+        border: 1px solid var(--color-border);
+    }
+    .verify-chip.verified {
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+    }
+</style>

@@ -1,0 +1,112 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: novamarkt_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: novamarkt
+      POSTGRES_USER: novamarkt
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U novamarkt -d novamarkt" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  minio:
+    image: minio/minio:latest
+    container_name: novamarkt_minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-minioadmin}
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000" # S3 API
+      - "9001:9001" # MinIO Console
+    healthcheck:
+      test: [ "CMD", "mc", "ready", "local" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # One-shot job: create bucket + set public read policy
+  minio-init:
+    image: minio/mc:latest
+    container_name: novamarkt_minio_init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+        mc alias set local http://minio:9000 $${S3_ACCESS_KEY:-minioadmin} $${S3_SECRET_KEY:-minioadmin};
+        mc mb --ignore-existing local/${S3_BUCKET_PUBLIC:-marketplace-public};
+        mc anonymous set download local/${S3_BUCKET_PUBLIC:-marketplace-public};
+        echo 'Bucket ready.';
+      "
+    environment:
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minioadmin}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin}
+      S3_BUCKET_PUBLIC: ${S3_BUCKET_PUBLIC:-marketplace-public}
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: novamarkt_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    ports:
+      - "4321:4321"
+    environment:
+      DATABASE_URL: postgresql://novamarkt:${DB_PASSWORD:-changeme}@db:5432/novamarkt
+      APP_URL: ${APP_URL:-http://localhost:4321}
+      # MinIO / S3
+      S3_ENDPOINT: ${S3_ENDPOINT:-http://minio:9000}
+      S3_REGION: ${S3_REGION:-us-east-1}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minioadmin}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin}
+      S3_BUCKET_PUBLIC: ${S3_BUCKET_PUBLIC:-marketplace-public}
+      # Public URL reachable from browser (MinIO exposed on host)
+      S3_PUBLIC_BASE_URL: ${S3_PUBLIC_BASE_URL:-http://localhost:9000/marketplace-public}
+      # Auth + misc
+      IDNOW_API_KEY: ${IDNOW_API_KEY:-}
+      IDNOW_COMPANY_ID: ${IDNOW_COMPANY_ID:-}
+      IDNOW_BASE_URL: ${IDNOW_BASE_URL:-https://gateway.test.idnow.de}
+      MANGOPAY_CLIENT_ID: ${MANGOPAY_CLIENT_ID:-}
+      MANGOPAY_API_KEY: ${MANGOPAY_API_KEY:-}
+      MANGOPAY_BASE_URL: ${MANGOPAY_BASE_URL:-https://api.sandbox.mangopay.com}
+      ALGOLIA_APP_ID: ${ALGOLIA_APP_ID:-}
+      ALGOLIA_ADMIN_KEY: ${ALGOLIA_ADMIN_KEY:-}
+      ALGOLIA_SEARCH_KEY: ${ALGOLIA_SEARCH_KEY:-}
+      ALGOLIA_INDEX_NAME: ${ALGOLIA_INDEX_NAME:-listings}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-Novamarkt <noreply@novamarkt.de>}
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:4321/api/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  pgdata:
+    driver: local
+  minio_data:
+    driver: local

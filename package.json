@@ -1,0 +1,39 @@
+{
+  "name": "novamarkt",
+  "version": "1.0.0",
+  "description": "Sichere Kleinanzeigen-Plattform",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push"
+  },
+  "dependencies": {
+    "@astrojs/node": "^9.5.4",
+    "@aws-sdk/client-s3": "^3.995.0",
+    "@aws-sdk/s3-request-presigner": "^3.995.0",
+    "@lucia-auth/adapter-prisma": "^4.0.1",
+    "@node-rs/argon2": "^2.0.2",
+    "@prisma/client": "^6.4.1",
+    "@types/nodemailer": "^7.0.11",
+    "ably": "^2.17.1",
+    "algoliasearch": "^5.49.0",
+    "astro": "^5.0.0",
+    "lucia": "^3.2.2",
+    "mangopay2-nodejs-sdk": "^1.42.0",
+    "nodemailer": "^8.0.1",
+    "stripe": "^20.3.1",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "prisma": "^6.4.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
+}

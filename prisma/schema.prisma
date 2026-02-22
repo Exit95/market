@@ -1,0 +1,414 @@
+// Novamarkt – Complete Marketplace Schema
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ListingStatus {
+  DRAFT
+  ACTIVE
+  RESERVED
+  SOLD
+  ARCHIVED
+  REMOVED
+}
+
+enum ListingCategory {
+  ELEKTRONIK
+  FAHRZEUGE
+  MODE
+  MOEBEL
+  SPORT
+  HAUSHALT
+  BUCHER
+  SPIELZEUG
+  SONSTIGES
+}
+
+enum OrderStatus {
+  PENDING
+  PAYMENT_PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  COMPLETED
+  CANCELLED
+  REFUNDED
+  DISPUTED
+}
+
+enum PaymentStatus {
+  PENDING
+  REQUIRES_ACTION
+  SUCCEEDED
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED_BUYER
+  RESOLVED_SELLER
+  CLOSED
+}
+
+enum VerificationType {
+  EMAIL
+  PHONE
+  ID_KYC
+}
+
+enum VerificationStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  EXPIRED
+}
+
+enum TrustLevel {
+  NEW
+  BASIC
+  VERIFIED
+  TRUSTED
+  ELITE
+}
+
+enum FraudSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// ─── User ─────────────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  firstName     String?
+  lastName      String?
+  phone         String?
+  avatarUrl     String?
+  city          String?
+  postalCode    String?
+  role          Role      @default(USER)
+
+  // Verification flags
+  emailVerified Boolean   @default(false)
+  phoneVerified Boolean   @default(false)
+  idVerified    Boolean   @default(false)
+
+  // Account state
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  bannedAt      DateTime?
+  banReason     String?
+  shadowBanned  Boolean   @default(false)
+
+  // Mangopay / KYC
+  mangopayId       String?
+  mangopayWalletId String?
+  kycIdentId       String?
+
+  // Relations
+  sessions         Session[]
+  listings         Listing[]
+  buyerConversations  Conversation[] @relation("BuyerConversations")
+  sellerConversations Conversation[] @relation("SellerConversations")
+  messagesSent     Message[]
+  buyerOrders      Order[]     @relation("BuyerOrders")
+  sellerOrders     Order[]     @relation("SellerOrders")
+  disputes         Dispute[]   @relation("DisputeOpener")
+  verifications    Verification[]
+  trustScore       TrustScore?
+  fraudSignals     FraudSignal[]
+  auditLogs        AuditLog[]
+  adminActionsAsAdmin  AdminAction[] @relation("AdminActionsAsAdmin")
+  adminActionsAsTarget AdminAction[] @relation("AdminActionsAsTarget")
+
+  @@index([email])
+  @@index([role])
+  @@index([createdAt])
+  @@map("users")
+}
+
+// ─── Session (Lucia) ──────────────────────────────────────────────────────────
+
+model Session {
+  id        String   @id
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+// ─── Listing ──────────────────────────────────────────────────────────────────
+
+model Listing {
+  id           String          @id @default(cuid())
+  title        String
+  description  String
+  price        Int             // in Cent
+  currency     String          @default("EUR")
+  category     ListingCategory
+  city         String
+  postalCode   String
+  country      String          @default("DE")
+  status       ListingStatus   @default(DRAFT)
+  treuhand     Boolean         @default(false)
+  condition    String?         // Neu | Sehr gut | Gut | Akzeptabel
+  viewCount    Int             @default(0)
+
+  sellerId     String
+  seller       User            @relation(fields: [sellerId], references: [id])
+
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  soldAt       DateTime?
+
+  images       ListingImage[]
+  conversations Conversation[]
+  orders       Order[]
+
+  @@index([sellerId])
+  @@index([category])
+  @@index([status])
+  @@index([city])
+  @@index([price])
+  @@index([createdAt(sort: Desc)])
+  @@map("listings")
+}
+
+// ─── ListingImage ─────────────────────────────────────────────────────────────
+
+model ListingImage {
+  id        String   @id @default(cuid())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  objectKey String   // S3 key
+  url       String
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([listingId])
+  @@map("listing_images")
+}
+
+// ─── Conversation ─────────────────────────────────────────────────────────────
+
+model Conversation {
+  id        String    @id @default(cuid())
+  listingId String
+  listing   Listing   @relation(fields: [listingId], references: [id])
+  buyerId   String
+  buyer     User      @relation("BuyerConversations", fields: [buyerId], references: [id])
+  sellerId  String
+  seller    User      @relation("SellerConversations", fields: [sellerId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  messages  Message[]
+
+  // One conversation per (listing, buyer) pair
+  @@unique([listingId, buyerId])
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([listingId])
+  @@map("conversations")
+}
+
+// ─── Message ──────────────────────────────────────────────────────────────────
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id])
+  body           String
+  flagged        Boolean      @default(false)
+  flagReason     String?
+  readAt         DateTime?
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([createdAt])
+  @@map("messages")
+}
+
+// ─── Order ────────────────────────────────────────────────────────────────────
+
+model Order {
+  id          String      @id @default(cuid())
+  listingId   String
+  listing     Listing     @relation(fields: [listingId], references: [id])
+  buyerId     String
+  buyer       User        @relation("BuyerOrders", fields: [buyerId], references: [id])
+  sellerId    String
+  seller      User        @relation("SellerOrders", fields: [sellerId], references: [id])
+  status      OrderStatus @default(PENDING)
+  totalAmount Int         // in Cent
+  feeCents    Int         @default(0)
+  currency    String      @default("EUR")
+  trackingCode String?
+  carrier     String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  completedAt DateTime?
+
+  payment     Payment?
+  dispute     Dispute?
+
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([listingId])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("orders")
+}
+
+// ─── Payment ──────────────────────────────────────────────────────────────────
+
+model Payment {
+  id              String        @id @default(cuid())
+  orderId         String        @unique
+  order           Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider        String        @default("stripe") // stripe | mangopay
+  paymentIntentId String?       @unique
+  status          PaymentStatus @default(PENDING)
+  amountCents     Int
+  currency        String        @default("EUR")
+  refundedCents   Int           @default(0)
+  metaJson        Json?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([paymentIntentId])
+  @@index([status])
+  @@map("payments")
+}
+
+// ─── Dispute ──────────────────────────────────────────────────────────────────
+
+model Dispute {
+  id           String        @id @default(cuid())
+  orderId      String        @unique
+  order        Order         @relation(fields: [orderId], references: [id])
+  openedById   String
+  openedBy     User          @relation("DisputeOpener", fields: [openedById], references: [id])
+  reason       String
+  status       DisputeStatus @default(OPEN)
+  resolution   String?
+  metaJson     Json?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  resolvedAt   DateTime?
+
+  @@index([orderId])
+  @@index([status])
+  @@map("disputes")
+}
+
+// ─── Verification ─────────────────────────────────────────────────────────────
+
+model Verification {
+  id        String             @id @default(cuid())
+  userId    String
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      VerificationType
+  status    VerificationStatus @default(PENDING)
+  metaJson  Json?
+  expiresAt DateTime?
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  @@index([userId])
+  @@index([type, status])
+  @@map("verifications")
+}
+
+// ─── TrustScore ───────────────────────────────────────────────────────────────
+
+model TrustScore {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  score     Int        @default(0)  // 0-100
+  level     TrustLevel @default(NEW)
+  updatedAt DateTime   @updatedAt
+
+  @@map("trust_scores")
+}
+
+// ─── FraudSignal ──────────────────────────────────────────────────────────────
+
+model FraudSignal {
+  id         String        @id @default(cuid())
+  userId     String
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type       String        // e.g. "multiple_failed_logins", "suspicious_listing"
+  severity   FraudSeverity
+  metaJson   Json?
+  createdAt  DateTime      @default(now())
+  resolvedAt DateTime?
+
+  @@index([userId])
+  @@index([severity])
+  @@index([createdAt])
+  @@map("fraud_signals")
+}
+
+// ─── AuditLog ─────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  actor     User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action    String   // "login", "logout", "register", "failed_login", ...
+  ip        String?
+  userAgent String?
+  metaJson  Json?
+  createdAt DateTime @default(now())
+
+  @@index([actorId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ─── AdminAction ──────────────────────────────────────────────────────────────
+
+model AdminAction {
+  id             String   @id @default(cuid())
+  adminId        String
+  admin          User     @relation("AdminActionsAsAdmin", fields: [adminId], references: [id])
+  targetUserId   String?
+  targetUser     User?    @relation("AdminActionsAsTarget", fields: [targetUserId], references: [id])
+  actionType     String   // "ban", "unban", "shadow_ban", "remove_listing", ...
+  metaJson       Json?
+  createdAt      DateTime @default(now())
+
+  @@index([adminId])
+  @@index([targetUserId])
+  @@index([actionType])
+  @@map("admin_actions")
+}
