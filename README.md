@@ -1,158 +1,197 @@
-# Novamarkt
+# 🛒 Novamarkt
 
-Sichere Kleinanzeigen-Plattform mit KYC-Verifizierung, Treuhandkonto und Käuferschutz.
+> **Sichere Kleinanzeigen-Plattform** – Kaufen & Verkaufen mit Käuferschutz, KYC-Verifizierung und Echtzeit-Nachrichten.
 
-**Stack:** Astro 4 SSR · Node.js Adapter · PostgreSQL 16 · Prisma ORM · TypeScript · Docker
+[![Astro](https://img.shields.io/badge/Astro-5.x-FF5D01?logo=astro&logoColor=white)](https://astro.build)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Prisma](https://img.shields.io/badge/Prisma-6.x-2D3748?logo=prisma&logoColor=white)](https://prisma.io)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://postgresql.org)
+[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)](https://docker.com)
+[![License](https://img.shields.io/badge/License-MIT-green)](#)
 
 ---
 
-## Schnellstart
+## ✨ Features
+
+| Feature | Beschreibung |
+|---|---|
+| 🔐 **Authentifizierung** | Session-basierte Auth via Lucia mit Argon2-Passwort-Hashing |
+| 📦 **Inserate** | Erstellen, bearbeiten und verwalten von Kleinanzeigen mit Foto-Upload (S3) |
+| 💬 **Echtzeit-Chat** | Käufer/Verkäufer-Nachrichten über Ably Realtime |
+| 💳 **Treuhandzahlung** | Sichere Zahlungsabwicklung via Stripe & Mangopay |
+| 🛡️ **KYC-Verifizierung** | Identitätsprüfung mit IDnow + E-Mail/Telefon-Bestätigung |
+| 🔍 **Volltextsuche** | Blitzschnelle Suche über Algolia |
+| 🤖 **Betrugserkennung** | Automatische Fraud-Signals mit Schweregrad-Klassifizierung |
+| 👮 **Admin-Panel** | Nutzerverwaltung, Ban/Shadowban, Audit-Log, Review-Queue |
+| 📊 **Trust-Score** | Reputationssystem (NEW → BASIC → VERIFIED → TRUSTED → ELITE) |
+| 📧 **E-Mail** | Transaktionale E-Mails über Nodemailer/SMTP |
+
+---
+
+## 🏗️ Tech Stack
+
+**Frontend & SSR**
+- [Astro 5](https://astro.build) – Server-Side Rendering mit Node.js-Adapter
+- Vanilla CSS – kein Framework-Overhead
+
+**Backend & Datenbank**
+- [Prisma ORM](https://prisma.io) + PostgreSQL
+- [Lucia Auth](https://lucia-auth.com) – Session-Management
+- [Zod](https://zod.dev) – Validierung aller API-Inputs
+
+**Integrationen**
+- **S3** (AWS / MinIO) – Foto-Upload mit Presigned URLs
+- **Ably** – WebSocket-basierter Echtzeit-Chat
+- **Algolia** – Suchindes für Listings
+- **Stripe** – Zahlungsabwicklung & Webhooks
+- **Mangopay** – Treuhandkonto & Escrow
+- **IDnow** – KYC / Identitätsprüfung
+- **Nodemailer** – E-Mail-Versand
+
+---
+
+## 📁 Projektstruktur
+
+```
+novamarkt/
+├── prisma/
+│   ├── schema.prisma       # Datenbank-Schema (15+ Modelle)
+│   └── seed.ts             # Seed-Daten
+├── src/
+│   ├── components/         # Header, Footer, ListingCard
+│   ├── layouts/            # BaseLayout
+│   ├── lib/                # Integrations-Clients (s3, ably, algolia …)
+│   ├── pages/
+│   │   ├── api/            # REST-API-Routen
+│   │   │   ├── auth/       # login, logout, register, me
+│   │   │   ├── listings/   # CRUD Inserate
+│   │   │   ├── orders/     # Bestellungen & Lieferstatus
+│   │   │   ├── payment/    # Stripe / Mangopay Webhooks
+│   │   │   ├── admin/      # Review-Queue, User-Actions, Audit-Log
+│   │   │   └── kyc/        # IDnow KYC-Flow
+│   │   ├── admin/          # Admin-Dashboard (SSR)
+│   │   ├── dashboard/      # Meine Inserate
+│   │   └── messages/       # Chat-Inbox & Konversationen
+│   └── styles/
+│       └── global.css
+├── public/icons/           # Kategorie-Icons (SVG)
+├── docker-compose.yml      # PostgreSQL + MinIO + App
+├── Dockerfile
+└── astro.config.mjs
+```
+
+---
+
+## 🚀 Lokale Entwicklung
 
 ### Voraussetzungen
-- Node.js 20+
-- Docker & Docker Compose
 
-### Lokale Entwicklung
+- Node.js ≥ 20
+- PostgreSQL ≥ 14 (oder Docker)
+
+### 1. Repository klonen
 
 ```bash
-# 1. Repo klonen & Dependencies installieren
-git clone <repo-url> && cd novamarkt
+git clone https://github.com/Exit95/market.git
+cd market
+```
+
+### 2. Abhängigkeiten installieren
+
+```bash
 npm install
+```
 
-# 2. Env-Variablen setzen
+### 3. Umgebungsvariablen konfigurieren
+
+```bash
 cp .env.example .env
-# → .env anpassen (mindestens DATABASE_URL + DB_PASSWORD)
+# .env mit eigenen Werten befüllen
+```
 
-# 3. Datenbank starten (nur DB via Docker)
-docker compose up db -d
+### 4. Datenbank starten & migrieren
 
-# 4. Prisma Migrationen ausführen
+**Mit Docker (empfohlen):**
+```bash
+docker-compose up -d db
+```
+
+**Prisma migrieren:**
+```bash
 npm run db:migrate
-# oder für schnelles Prototyping:
-# npm run db:push
+npm run db:generate
+```
 
-# 5. Entwicklungsserver starten
+### 5. Dev-Server starten
+
+```bash
 npm run dev
 # → http://localhost:4321
 ```
 
 ---
 
-## Docker Compose (Produktion / Vollstack)
+## 🐳 Docker-Deployment
+
+Das Projekt enthält eine vollständige `docker-compose.yml` mit PostgreSQL, MinIO (S3-kompatibel) und der App:
 
 ```bash
-# App + Datenbank starten
-docker compose up --build -d
-
-# Status prüfen
-docker compose ps
-
-# Logs ansehen
-docker compose logs -f app
-
-# Healthcheck
-curl http://localhost:4321/api/health
-# → { "ok": true, "service": "novamarkt", "ts": "..." }
-
-# Stoppen
-docker compose down
+docker-compose up --build
 ```
 
 ---
 
-## Prisma
+## 🔑 Umgebungsvariablen
 
-```bash
-# Schema → Datenbank migrieren (Development)
-npm run db:migrate
-# → fragt nach Migration-Name, z.B. "init"
+| Variable | Beschreibung |
+|---|---|
+| `DATABASE_URL` | PostgreSQL Connection String |
+| `APP_URL` | Öffentliche App-URL |
+| `S3_ENDPOINT` | S3 / MinIO Endpunkt |
+| `S3_BUCKET_PUBLIC` | S3-Bucket für Fotos |
+| `IDNOW_API_KEY` | IDnow KYC API-Key |
+| `MANGOPAY_CLIENT_ID` | Mangopay Client-ID |
+| `ALGOLIA_APP_ID` | Algolia Application-ID |
+| `SMTP_HOST` | SMTP-Host für E-Mail |
+| `ABLY_API_KEY` | Ably Realtime API-Key |
+| `STRIPE_SECRET_KEY` | Stripe Secret Key |
 
-# Prisma Client regenerieren (nach Schema-Änderung)
-npm run db:generate
+Vollständige Liste: [`.env.example`](.env.example)
 
-# Schema direkt pushen ohne Migration (Prototyping)
-npm run db:push
+---
 
-# Prisma Studio (Browser-UI für DB-Daten)
-npx prisma studio
+## 📊 Datenbankschema (Übersicht)
+
+```
+User ──┬── Session (Lucia)
+       ├── Listing ──── ListingImage (S3)
+       ├── Conversation ── Message
+       ├── Order ──┬── Payment (Stripe/Mangopay)
+       │           └── Dispute
+       ├── Verification (E-Mail / Telefon / KYC)
+       ├── TrustScore
+       ├── FraudSignal
+       └── AuditLog / AdminAction
 ```
 
 ---
 
-## Build
+## 📝 API-Routen
 
-```bash
-# Astro SSR Build
-npm run build
-# Output: dist/
-
-# Build testen (standalone)
-node dist/server/entry.mjs
-```
-
----
-
-## Env-Variablen
-
-| Variable | Beschreibung | Pflicht |
+| Method | Endpoint | Beschreibung |
 |---|---|---|
-| `DATABASE_URL` | PostgreSQL Connection String | ✅ |
-| `DB_PASSWORD` | Passwort für Docker DB | ✅ |
-| `APP_URL` | Öffentliche App-URL | ✅ |
-| `S3_*` | S3-kompabler Object Storage | Für Foto-Upload |
-| `IDNOW_*` | IDnow KYC API | Für Verifizierung |
-| `MANGOPAY_*` | Mangopay Escrow | Für Zahlungen |
-| `ALGOLIA_*` | Algolia Suche | Für Search |
-| `SMTP_*` | E-Mail SMTP | Für Benachrichtigungen |
-
-Alle Variablen dokumentiert in [`.env.example`](.env.example).
-
----
-
-## API Endpoints
-
-| Route | Methode | Beschreibung |
-|---|---|---|
-| `/api/health` | GET | Healthcheck → `{ ok: true }` |
-| `/api/upload` | POST/DELETE | S3 Foto-Upload |
-| `/api/search` | GET | Algolia Suche |
-| `/api/kyc/start` | POST | IDnow KYC Session starten |
-| `/api/kyc/webhook` | POST | IDnow Webhook |
-| `/api/payment/create-payin` | POST | Mangopay Zahlung initiieren |
-| `/api/payment/confirm` | POST | Warenerhalt bestätigen |
-| `/api/payment/refund` | POST | Rückerstattung |
-| `/api/payment/webhook` | POST | Mangopay Webhook |
-| `/api/email/test` | POST | Test-E-Mail (nur Dev) |
+| `POST` | `/api/auth/register` | Registrierung |
+| `POST` | `/api/auth/login` | Login |
+| `GET` | `/api/listings` | Alle Inserate |
+| `POST` | `/api/listings` | Inserat erstellen |
+| `GET` | `/api/search` | Algolia-Suche |
+| `POST` | `/api/orders/{id}/pay` | Zahlung starten |
+| `POST` | `/api/kyc/start` | KYC-Flow starten |
+| `GET` | `/api/admin/review-queue` | Fraud-Review-Queue |
+| `POST` | `/api/admin/users/{id}/action` | User sperren / entsperren |
 
 ---
 
-## Projektstruktur
+## 📜 Lizenz
 
-```
-novamarkt/
-├── Dockerfile
-├── docker-compose.yml
-├── .env.example
-├── prisma/
-│   └── schema.prisma         # DB-Schema (User, Listing, Message, Review)
-├── public/
-│   └── icons/                # SVG-Kategorie-Icons
-├── src/
-│   ├── components/           # Header, Footer, ListingCard
-│   ├── data/                 # Mock-Daten (listings.ts)
-│   ├── layouts/              # BaseLayout.astro
-│   ├── lib/                  # s3.ts, idnow.ts, mangopay.ts, algolia.ts, mailer.ts
-│   ├── pages/
-│   │   ├── api/              # REST API Endpoints
-│   │   ├── index.astro       # Startseite
-│   │   ├── inserat/          # Inserat-Detail
-│   │   ├── inserat-erstellen.astro
-│   │   ├── anmelden.astro
-│   │   ├── profil.astro
-│   │   ├── nachrichten.astro
-│   │   └── sicherheit.astro
-│   └── styles/
-│       └── global.css
-└── astro.config.mjs
-```
-# market
+MIT © 2026 Novamarkt
