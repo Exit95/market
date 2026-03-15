@@ -8,7 +8,7 @@
  *  +30  id (KYC) verified
  *  +10  account age > 30 days
  *  + 5  account age > 180 days
- *  + 2  per completed order (max +10)
+ *  + 2  per completed deal (max +10)
  *  +10  first listing sold
  *  -10  per open dispute against user (as seller)
  *  -15  per HIGH fraud signal
@@ -36,12 +36,12 @@ function toLevel(score: number): TrustLevel {
 }
 
 export async function computeTrustScore(userId: string): Promise<ScoreBreakdown> {
-    const [user, orders, fraudSignals, disputes] = await Promise.all([
+    const [user, deals, fraudSignals, disputes] = await Promise.all([
         prisma.user.findUnique({
             where: { id: userId },
             select: { emailVerified: true, phoneVerified: true, idVerified: true, createdAt: true, bannedAt: true },
         }),
-        prisma.order.findMany({
+        prisma.deal.findMany({
             where: { sellerId: userId, status: 'COMPLETED' },
             select: { id: true },
         }),
@@ -50,7 +50,7 @@ export async function computeTrustScore(userId: string): Promise<ScoreBreakdown>
             select: { severity: true },
         }),
         prisma.dispute.findMany({
-            where: { order: { sellerId: userId }, status: { notIn: ['CLOSED', 'RESOLVED_SELLER'] } },
+            where: { deal: { sellerId: userId }, status: { notIn: ['CLOSED', 'RESOLVED_SELLER'] } },
             select: { id: true },
         }),
     ]);
@@ -69,8 +69,8 @@ export async function computeTrustScore(userId: string): Promise<ScoreBreakdown>
     if (ageDays > 180) { factors.account_age_6m = 15; score += 15; }
     else if (ageDays > 30) { factors.account_age_30d = 10; score += 10; }
 
-    const completedBonus = Math.min(orders.length * 2, 10);
-    if (completedBonus > 0) { factors.completed_orders = completedBonus; score += completedBonus; }
+    const completedBonus = Math.min(deals.length * 2, 10);
+    if (completedBonus > 0) { factors.completed_deals = completedBonus; score += completedBonus; }
 
     for (const sig of fraudSignals) {
         if (sig.severity === 'HIGH') { score -= 15; factors.fraud_high = (factors.fraud_high ?? 0) - 15; }

@@ -22,7 +22,7 @@ import { categories } from "../data/listings";
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-16">
                 {categories.map((cat) => (
                     <a
-                        href={`/?category=${cat.slug}`}
+                        href={`/?category=${cat.slug.toUpperCase()}`}
                         class="group block bg-secondary/40 border border-foreground/[.20] p-6 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300"
                     >
                         <div class="flex items-start gap-4">

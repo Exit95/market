@@ -12,6 +12,11 @@
     --bg-2:    #151516;
     --fg:      #e8e4de;
     --muted:   #6b6b6b;
+
+    /* ── Component tokens (used by ChatApp, HandshakeApp) ── */
+    --ehren-primary: #c8973a;
+    --ehren-accent:  #dbb568;
+    --ehren-blue:    #a37a2e;
   }
 
   body {

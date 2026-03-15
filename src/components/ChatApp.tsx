@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, Info, ShieldAlert, Paperclip, Send, CheckCircle2, ShieldCheck } from 'lucide-react';
 import * as Ably from 'ably';
 
-type User = { id: string; firstName: string; lastName: string; idVerified?: boolean; kycStatus?: string; trustScore?: number };
+type User = { id: string; firstName: string; lastName: string; idVerified?: boolean };
 type Listing = { id: string; title: string; price: number; status: string; images: { url: string }[] };
 type Message = { id?: string; body: string; createdAt: Date | string; senderId: string };
 type Conversation = { id: string; listing: Listing; buyerId: string; sellerId: string; buyer: User; seller: User; messages: Message[] };

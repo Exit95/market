@@ -66,10 +66,14 @@ export const POST: APIRoute = async ({ request, cookies, params, clientAddress }
         const blockReason = blocked ? reason : `Potenzieller Betrugsversuch erkannt: ${flags.join(', ')}`;
         
         // Log severe flags as fraud signals for the user
-        if (!isSafe && flags.includes("OFF_PLATFORM_WHATSAPP") || flags.includes("SUSPICIOUS_LINK")) {
-            await prisma.user.update({
-                where: { id: auth.userId },
-                data: { fraudSignals: { increment: 1 } }
+        if (!isSafe && (flags.includes("OFF_PLATFORM_WHATSAPP") || flags.includes("SUSPICIOUS_LINK"))) {
+            await prisma.fraudSignal.create({
+                data: {
+                    userId: auth.userId,
+                    type: flags.join(','),
+                    severity: 'HIGH',
+                    metaJson: { conversationId: params.id, flags },
+                },
             });
         }
 

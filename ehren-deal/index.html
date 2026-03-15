@@ -3,7 +3,37 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="Ehren-Deal – Deutschlands fairer Marktplatz mit digitalem Handschlag, KYC-Verifizierung und Treuhandkonto. Bald verfügbar."/>
+<link rel="canonical" href="https://ehren-deal.de/"/>
+
+<!-- Open Graph -->
+<meta property="og:type" content="website"/>
+<meta property="og:locale" content="de_DE"/>
+<meta property="og:site_name" content="Ehren-Deal"/>
+<meta property="og:title" content="Ehren-Deal – Handeln mit Handschlag"/>
+<meta property="og:description" content="Deutschlands fairer Marktplatz mit digitalem Handschlag, KYC-Verifizierung und Treuhandkonto. Bald verfügbar."/>
+<meta property="og:url" content="https://ehren-deal.de/"/>
+<meta property="og:image" content="https://ehren-deal.de/og-default.png"/>
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Ehren-Deal – Handeln mit Handschlag"/>
+<meta name="twitter:description" content="Deutschlands fairer Marktplatz mit digitalem Handschlag, KYC-Verifizierung und Treuhandkonto. Bald verfügbar."/>
+<meta name="twitter:image" content="https://ehren-deal.de/og-default.png"/>
+
 <title>Ehren-Deal – Handeln mit Handschlag</title>
+
+<!-- JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"WebSite",
+  "name":"Ehren-Deal",
+  "url":"https://ehren-deal.de",
+  "description":"Deutschlands fairer Marktplatz mit digitalem Handschlag, KYC-Verifizierung und Treuhandkonto."
+}
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,600;1,300;1,500&family=Barlow:wght@300;400;500&family=Barlow+Condensed:wght@400;500;600&display=swap" rel="stylesheet"/>
@@ -180,8 +210,8 @@ h1 .accent{font-style:italic;font-weight:300;color:var(--gold);}
   opacity:0;animation:appear .5s 1.45s ease forwards;
 }
 .footer-links{display:flex;gap:2rem;font-family:'Barlow Condensed',sans-serif;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);}
-.footer-links a{color:inherit;text-decoration:none;transition:color .2s;}
-.footer-links a:hover{color:var(--text);}
+.footer-links a,.footer-link-btn{color:inherit;text-decoration:none;transition:color .2s;background:none;border:none;cursor:pointer;font:inherit;padding:0;}
+.footer-links a:hover,.footer-link-btn:hover{color:var(--text);}
 .footer-copy{font-family:'Barlow Condensed',sans-serif;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(232,228,222,.60);}
 
 @keyframes appear{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -337,9 +367,9 @@ h1 .accent{font-style:italic;font-weight:300;color:var(--gold);}
 
   <footer class="footer">
     <div class="footer-links">
-      <a href="#" onclick="openModal('impressum');return false">Impressum</a>
-      <a href="#" onclick="openModal('datenschutz');return false">Datenschutz</a>
-      <a href="#" onclick="openModal('kontakt');return false">Kontakt</a>
+      <button type="button" class="footer-link-btn" onclick="openModal('impressum')">Impressum</button>
+      <button type="button" class="footer-link-btn" onclick="openModal('datenschutz')">Datenschutz</button>
+      <button type="button" class="footer-link-btn" onclick="openModal('kontakt')">Kontakt</button>
     </div>
     <div class="footer-copy">© 2026 ehren-deal.de — Alle Rechte vorbehalten</div>
   </footer>
@@ -347,10 +377,10 @@ h1 .accent{font-style:italic;font-weight:300;color:var(--gold);}
 </main>
 
 <!-- IMPRESSUM MODAL -->
-<div class="modal-overlay" id="modal-impressum">
+<div class="modal-overlay" id="modal-impressum" role="dialog" aria-modal="true" aria-labelledby="modal-impressum-title">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('impressum')">&times;</button>
-    <h2 class="modal-title">Impressum</h2>
+    <button class="modal-close" onclick="closeModal('impressum')" aria-label="Impressum schließen">&times;</button>
+    <h2 class="modal-title" id="modal-impressum-title">Impressum</h2>
     <p class="modal-subtitle">Angaben gemäss § 5 TMG</p>
 
     <div class="modal-section">
@@ -366,8 +396,8 @@ h1 .accent{font-style:italic;font-weight:300;color:var(--gold);}
     <div class="modal-section">
       <h3>Kontakt</h3>
       <p>Telefon / WhatsApp: +49 157 57126123</p>
-      <p>E-Mail: <a href="mailto:office@danapfel-digital.de">office@danapfel-digital.de</a></p>
-      <p>Website: <a href="https://danapfel-digital.de" target="_blank" rel="noopener noreferrer">danapfel-digital.de</a></p>
+      <p>E-Mail: <a href="mailto:office@ehren-deal.de">office@ehren-deal.de</a></p>
+      <p>Website: <a href="https://ehren-deal.de" target="_blank" rel="noopener noreferrer">ehren-deal.de</a></p>
     </div>
 
     <div class="modal-section">
@@ -397,10 +427,10 @@ h1 .accent{font-style:italic;font-weight:300;color:var(--gold);}
 </div>
 
 <!-- DATENSCHUTZ MODAL -->
-<div class="modal-overlay" id="modal-datenschutz">
+<div class="modal-overlay" id="modal-datenschutz" role="dialog" aria-modal="true" aria-labelledby="modal-datenschutz-title">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('datenschutz')">&times;</button>
-    <h2 class="modal-title">Datenschutzerklärung</h2>
+    <button class="modal-close" onclick="closeModal('datenschutz')" aria-label="Datenschutz schließen">&times;</button>
+    <h2 class="modal-title" id="modal-datenschutz-title">Datenschutzerklärung</h2>
     <p class="modal-subtitle">Stand: 15. März 2026</p>
 
     <div class="modal-section">
@@ -411,7 +441,7 @@ h1 .accent{font-style:italic;font-weight:300;color:var(--gold);}
         <p>Inhaber: Michael Danapfel</p>
         <p>Heek, Nordrhein-Westfalen</p>
         <p>Telefon: +49 157 57126123</p>
-        <p>E-Mail: <a href="mailto:office@danapfel-digital.de">office@danapfel-digital.de</a></p>
+        <p>E-Mail: <a href="mailto:office@ehren-deal.de">office@ehren-deal.de</a></p>
       </div>
     </div>
 
@@ -446,7 +476,7 @@ h1 .accent{font-style:italic;font-weight:300;color:var(--gold);}
       <p><strong>Art. 18 DSGVO</strong> – Recht auf Einschränkung der Verarbeitung.</p>
       <p><strong>Art. 20 DSGVO</strong> – Recht auf Datenübertragbarkeit.</p>
       <p><strong>Art. 21 DSGVO</strong> – Widerspruchsrecht.</p>
-      <p>Zur Ausübung Ihrer Rechte: <a href="mailto:office@danapfel-digital.de">office@danapfel-digital.de</a></p>
+      <p>Zur Ausübung Ihrer Rechte: <a href="mailto:office@ehren-deal.de">office@ehren-deal.de</a></p>
     </div>
 
     <div class="modal-section">
@@ -476,10 +506,10 @@ h1 .accent{font-style:italic;font-weight:300;color:var(--gold);}
 </div>
 
 <!-- KONTAKT MODAL -->
-<div class="modal-overlay" id="modal-kontakt">
+<div class="modal-overlay" id="modal-kontakt" role="dialog" aria-modal="true" aria-labelledby="modal-kontakt-title">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('kontakt')">&times;</button>
-    <h2 class="modal-title">Kontakt</h2>
+    <button class="modal-close" onclick="closeModal('kontakt')" aria-label="Kontakt schließen">&times;</button>
+    <h2 class="modal-title" id="modal-kontakt-title">Kontakt</h2>
     <p class="modal-subtitle">Wir sind für dich da</p>
 
     <div class="modal-contact-grid">
@@ -490,13 +520,13 @@ h1 .accent{font-style:italic;font-weight:300;color:var(--gold);}
       </div>
       <div class="modal-contact-card">
         <h4>E-Mail</h4>
-        <p><a href="mailto:office@danapfel-digital.de">office@danapfel-digital.de</a></p>
+        <p><a href="mailto:office@ehren-deal.de">office@ehren-deal.de</a></p>
         <p style="margin-top:.4rem;font-size:.75rem;color:var(--dim);">Antwort innerhalb von 24 Stunden.</p>
       </div>
       <div class="modal-contact-card">
         <h4>Datenschutz-Anfragen</h4>
         <p>Auskunft, Löschung oder Berichtigung (Art. 15–21 DSGVO):</p>
-        <p><a href="mailto:office@danapfel-digital.de">office@danapfel-digital.de</a></p>
+        <p><a href="mailto:office@ehren-deal.de">office@ehren-deal.de</a></p>
       </div>
       <div class="modal-contact-card">
         <h4>Geschäftszeiten</h4>
@@ -513,7 +543,7 @@ h1 .accent{font-style:italic;font-weight:300;color:var(--gold);}
         <p class="highlight">Danapfel Digital</p>
         <p>Inhaber: Michael Danapfel</p>
         <p>Heek, Nordrhein-Westfalen · Deutschland</p>
-        <p>Web: <a href="https://danapfel-digital.de" target="_blank" rel="noopener noreferrer">danapfel-digital.de</a></p>
+        <p>Web: <a href="https://ehren-deal.de" target="_blank" rel="noopener noreferrer">ehren-deal.de</a></p>
       </div>
     </div>
   </div>

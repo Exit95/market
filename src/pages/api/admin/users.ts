@@ -8,8 +8,8 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
     if (!isAuthContext(auth)) return auth;
 
     const search = url.searchParams.get('q') ?? '';
-    const page = Math.max(1, parseInt(url.searchParams.get('page') ?? '1'));
-    const limit = Math.min(100, Math.max(1, parseInt(url.searchParams.get('limit') ?? '25')));
+    const page = Math.max(1, parseInt(url.searchParams.get('page') ?? '1') || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(url.searchParams.get('limit') ?? '25') || 25));
     const filter = url.searchParams.get('filter') ?? 'all'; // all | banned | admin | unverified
 
     const where: any = {};

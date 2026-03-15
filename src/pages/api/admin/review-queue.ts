@@ -21,7 +21,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
                     bannedAt: true, shadowBanned: true,
                     emailVerified: true, phoneVerified: true, idVerified: true,
                     createdAt: true, trustScore: { select: { score: true, level: true } },
-                    _count: { select: { listings: true, buyerOrders: true, fraudSignals: true } },
+                    _count: { select: { listings: true, buyerDeals: true, fraudSignals: true } },
                 },
             },
         },

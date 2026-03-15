@@ -27,9 +27,18 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
 
     const user = await prisma.user.findUnique({ where: { email } });
 
-    // Constant-time-ähnlich: hash auch bei fehlendem User prüfen
-    const hashToCheck = user?.passwordHash ?? '$argon2id$v=19$m=19456,t=2,p=1$dummy';
-    const valid = user ? await verify(hashToCheck, password) : false;
+    // Constant-time: always run verify to prevent timing-based user enumeration
+    const DUMMY_HASH = '$argon2id$v=19$m=19456,t=2,p=1$aaaaaaaaaaaaaaaa$bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+    const hashToCheck = user?.passwordHash ?? DUMMY_HASH;
+    let valid = false;
+    try {
+        valid = await verify(hashToCheck, password);
+    } catch {
+        // verify throws on malformed hashes (e.g. dummy) – treat as invalid
+        valid = false;
+    }
+    // Even if hash matched the dummy, reject if user doesn't exist
+    if (!user) valid = false;
 
     if (!user || !valid) {
         await prisma.auditLog.create({

@@ -564,7 +564,7 @@ import { categories } from "../data/listings";
     .form-row { @apply flex flex-col sm:flex-row gap-4; }
     .form-group { @apply flex flex-col gap-2 mb-4; }
     .label { @apply text-sm font-bold text-foreground; }
-    .input { @apply input-field; }
+    .input { @apply w-full px-4 py-3 rounded-default border border-foreground/[.22] bg-transparent text-foreground placeholder-foreground/60 focus:outline-none focus:border-primary/50 transition-all duration-200; }
     .char-count { @apply text-xs text-foreground/80 text-right mt-1; }
     .price-warning { @apply flex items-center gap-2 mt-2 text-xs text-amber-600 bg-amber-500/10 p-2 px-3 rounded-sm border border-amber-500/20; }
     .toggle-group { @apply flex gap-4 flex-wrap mt-2; }

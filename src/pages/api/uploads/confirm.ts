@@ -2,11 +2,11 @@ import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { requireAuth, isAuthContext } from '../../../lib/auth-middleware';
 import { prisma } from '../../../lib/auth';
+import { publicUrl as buildPublicUrl } from '../../../lib/s3';
 
 const ConfirmSchema = z.object({
     listingId: z.string(),
     objectKey: z.string().regex(/^(listings|avatars)\//, 'Invalid objectKey prefix'),
-    publicUrl: z.string().url(),
     position: z.number().int().min(0).default(0),
 });
 
@@ -20,7 +20,10 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
     const parsed = ConfirmSchema.safeParse(body);
     if (!parsed.success) return err(400, parsed.error.issues[0]?.message ?? 'Validation error');
 
-    const { listingId, objectKey, publicUrl, position } = parsed.data;
+    const { listingId, objectKey, position } = parsed.data;
+
+    // Compute publicUrl server-side from objectKey – never trust client-supplied URL
+    const resolvedUrl = buildPublicUrl(objectKey);
 
     // Verify ownership
     const listing = await prisma.listing.findUnique({ where: { id: listingId }, select: { sellerId: true } });
@@ -33,7 +36,7 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
     }
 
     const image = await prisma.listingImage.create({
-        data: { listingId, objectKey, url: publicUrl, position },
+        data: { listingId, objectKey, url: resolvedUrl, position },
     });
 
     await prisma.auditLog.create({

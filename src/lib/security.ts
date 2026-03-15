@@ -11,15 +11,15 @@ const VERIFIED_ID_BONUS = 50;
 /**
  * Calculates current trust score based on user verification status
  */
-export function calculateTrustScore(user: { idVerified: boolean; fraudSignals?: number }) {
+export function calculateTrustScore(user: { idVerified: boolean; fraudSignalCount?: number }) {
     let score = BASE_TRUST_SCORE;
-    
+
     if (user.idVerified) {
         score += VERIFIED_ID_BONUS;
     }
 
-    if (user.fraudSignals && user.fraudSignals > 0) {
-        score -= user.fraudSignals * 20; // Heavy penalty for fraud signals
+    if (user.fraudSignalCount && user.fraudSignalCount > 0) {
+        score -= user.fraudSignalCount * 20; // Heavy penalty for fraud signals
     }
 
     return Math.max(0, Math.min(score, MAX_TRUST_SCORE));
@@ -62,10 +62,10 @@ export function scanChatMessage(message: string): ChatScanResult {
 /**
  * Determines if a user meets the threshold to post high-risk items (e.g., Rolex, Cars)
  */
-export function canPostHighRiskItem(user: { idVerified: boolean; fraudSignals?: number }) {
+export function canPostHighRiskItem(user: { idVerified: boolean; fraudSignalCount?: number }) {
     const score = calculateTrustScore(user);
     // Requires verified ID and a minimum trust threshold without active fraud signals
-    return user.idVerified && score >= 60 && (!user.fraudSignals || user.fraudSignals === 0);
+    return user.idVerified && score >= 60 && (!user.fraudSignalCount || user.fraudSignalCount === 0);
 }
 
 /**

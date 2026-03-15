@@ -4,7 +4,7 @@
  *
  * Rules:
  *  1. TOO_MANY_LISTINGS   – > 5 listings in 1h
- *  2. CHAT_WITHOUT_ORDERS – > 10 conversations, 0 orders (buyer)
+ *  2. CHAT_WITHOUT_DEALS  – > 10 conversations, 0 deals (buyer)
  *  3. LOW_PRICE_LISTING   – price < 30% of category median
  *  4. MANY_FAILED_LOGINS  – > 10 failed logins in 1h (IP or userId)
  *  5. FREQUENT_MSG_BLOCKS – > 5 blocked messages in 1h
@@ -59,13 +59,13 @@ export async function checkListingFraud(userId: string, listing: { price: number
     }
 }
 
-export async function checkChatWithoutOrderFraud(userId: string) {
-    const [convCount, orderCount] = await Promise.all([
+export async function checkChatWithoutDealFraud(userId: string) {
+    const [convCount, dealCount] = await Promise.all([
         prisma.conversation.count({ where: { buyerId: userId } }),
-        prisma.order.count({ where: { buyerId: userId } }),
+        prisma.deal.count({ where: { buyerId: userId } }),
     ]);
-    if (convCount > 10 && orderCount === 0) {
-        await createSignal(userId, 'CHAT_WITHOUT_ORDERS', 'MEDIUM', { convCount, orderCount });
+    if (convCount > 10 && dealCount === 0) {
+        await createSignal(userId, 'CHAT_WITHOUT_DEALS', 'MEDIUM', { convCount, dealCount });
     }
 }
 

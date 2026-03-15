@@ -4,11 +4,18 @@ import "../styles/global.css";
 interface Props {
   title?: string;
   description?: string;
+  ogImage?: string;
+  canonicalPath?: string;
 }
 const {
   title = "Ehren-Deal – Handeln mit Handschlag",
   description = "Deutschlands sicherste C2C-Plattform für lokale Deals mit digitalem Handschlag und Identitätsprüfung.",
+  ogImage = "/og-default.png",
+  canonicalPath,
 } = Astro.props;
+
+const siteUrl = "https://ehren-deal.de";
+const canonical = canonicalPath ? `${siteUrl}${canonicalPath}` : Astro.url.href;
 ---
 
 <!doctype html>
@@ -17,8 +24,39 @@ const {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:site_name" content="Ehren-Deal" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={`${siteUrl}${ogImage}`} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={`${siteUrl}${ogImage}`} />
+
     <title>{title}</title>
-    
+
+    <!-- JSON-LD WebSite -->
+    <script is:inline type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Ehren-Deal",
+      "url": siteUrl,
+      "description": description,
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": `${siteUrl}/kategorien?q={search_term_string}`,
+        "query-input": "required name=search_term_string"
+      }
+    })} />
+
     <!-- Google Fonts: Cormorant Garamond + Barlow + Barlow Condensed -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

@@ -9,6 +9,16 @@ const PORT = 3000;
 
 app.use(express.urlencoded({ extended: false }));
 
+/** HTML-escape to prevent injection in mail body */
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // Statische HTML-Seite ausliefern
 app.get('/', (req, res) => {
   res.sendFile(join(__dirname, 'index.html'));
@@ -25,26 +35,28 @@ app.post('/signup', async (req, res) => {
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT) || 587,
-    secure: false,
-    tls: { rejectUnauthorized: false },
+    secure: Number(process.env.SMTP_PORT) === 465,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
     },
+    tls: { rejectUnauthorized: false },
   });
+
+  const safeEmail = escapeHtml(email);
 
   try {
     await transporter.sendMail({
       from: `"Ehren Deal" <${process.env.SMTP_FROM}>`,
       to: process.env.NOTIFY_EMAIL,
-      subject: '🎉 Neue Anmeldung auf ehren-deal.de',
+      subject: 'Neue Anmeldung auf ehren-deal.de',
       html: `
         <h2 style="color:#1a3a1a;">Neue Anmeldung auf ehren-deal.de!</h2>
-        <p><strong>E-Mail:</strong> ${email}</p>
+        <p><strong>E-Mail:</strong> ${safeEmail}</p>
         <p style="color:#888;">Eingetragen am ${new Date().toLocaleString('de-DE', { timeZone: 'Europe/Berlin' })}</p>
       `,
     });
-    console.log(`[signup] Mail gesendet für: ${email}`);
+    console.log(`[signup] Mail gesendet für: ${safeEmail}`);
   } catch (err) {
     console.error('[signup] Mailfehler:', err.message);
   }

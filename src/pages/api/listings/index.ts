@@ -43,14 +43,19 @@ export const GET: APIRoute = async ({ url }) => {
         return json(getFallbackListings(parsed.data));
     }
 
-    const { query, category, minPrice, maxPrice, city, page, pageSize, status } = parsed.data;
+    const { query, category: rawCategory, minPrice, maxPrice, city, page, pageSize, status } = parsed.data;
     const skip = (page - 1) * pageSize;
+
+    // Normalize category slug to Prisma enum (uppercase)
+    const VALID_CATEGORIES = ['ELEKTRONIK', 'FAHRZEUGE', 'MODE', 'MOEBEL', 'SPORT', 'HAUSHALT', 'BUCHER', 'SPIELZEUG', 'SONSTIGES'];
+    const category = rawCategory ? rawCategory.toUpperCase() : undefined;
+    const safeCategory = category && VALID_CATEGORIES.includes(category) ? category : undefined;
 
     const where: Record<string, unknown> = {
         status: status ?? 'ACTIVE',
         // Hide listings from shadow-banned sellers (they don't know)
         seller: { shadowBanned: false },
-        ...(category && { category }),
+        ...(safeCategory && { category: safeCategory }),
         ...(city && { city: { contains: city, mode: 'insensitive' } }),
         ...(minPrice !== undefined || maxPrice !== undefined
             ? { price: { ...(minPrice !== undefined && { gte: minPrice }), ...(maxPrice !== undefined && { lte: maxPrice }) } }
@@ -117,12 +122,13 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
                        ['ELEKTRONIK', 'FAHRZEUGE'].includes(parsed.data.category);
                        
     if (isHighRisk) {
-        const user = await prisma.user.findUnique({ 
-            where: { id: auth.userId }, 
-            select: { idVerified: true, fraudSignals: true } 
+        const user = await prisma.user.findUnique({
+            where: { id: auth.userId },
+            select: { idVerified: true, _count: { select: { fraudSignals: true } } },
         });
-        
-        if (!user || !canPostHighRiskItem(user)) {
+
+        const userForCheck = user ? { idVerified: user.idVerified, fraudSignalCount: user._count.fraudSignals } : null;
+        if (!userForCheck || !canPostHighRiskItem(userForCheck)) {
             await prisma.auditLog.create({
                 data: { actorId: auth.userId, action: 'listing_blocked_high_risk', ip: clientAddress, metaJson: { category: parsed.data.category } },
             });

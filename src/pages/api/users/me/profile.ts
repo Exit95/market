@@ -19,7 +19,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
                 phone: true, avatarUrl: true, city: true, postalCode: true,
                 role: true, emailVerified: true, phoneVerified: true, idVerified: true,
                 createdAt: true, trustScore: true,
-                _count: { select: { listings: true, buyerOrders: true, sellerOrders: true } },
+                _count: { select: { listings: true, buyerDeals: true, sellerDeals: true } },
             },
         }),
         computeTrustScore(auth.userId),

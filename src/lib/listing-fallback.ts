@@ -77,7 +77,7 @@ export function getFallbackListings(query: ListingQuery) {
 
     let filtered = getAllFallbackListings().filter((listing) => {
         if (query.status && query.status !== 'ACTIVE') return false;
-        if (query.category && listing.category !== query.category) return false;
+        if (query.category && listing.category !== query.category.toUpperCase()) return false;
         if (query.minPrice !== undefined && listing.price < query.minPrice) return false;
         if (query.maxPrice !== undefined && listing.price > query.maxPrice) return false;
         if (cityNeedle && !listing.city.toLowerCase().includes(cityNeedle)) return false;

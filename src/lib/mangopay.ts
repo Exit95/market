@@ -4,7 +4,7 @@
  *
  * Transaction Flow:
  * 1. Buyer creates PayIn → money lands in Buyer's Mangopay wallet
- * 2. Transfer: Buyer wallet → Platform escrow wallet (held while order is open)
+ * 2. Transfer: Buyer wallet → Platform escrow wallet (held while deal is open)
  * 3. Buyer confirms receipt → Transfer: Escrow wallet → Seller wallet
  * 4. Seller requests Payout → money goes to their IBAN
  */

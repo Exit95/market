@@ -21,17 +21,17 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     if (event.type === 'payment_intent.succeeded') {
-        const pi = event.data.object as { id: string; metadata: { orderId?: string } };
-        const orderId = pi.metadata?.orderId;
-        if (!orderId) return new Response('ok', { status: 200 });
+        const pi = event.data.object as { id: string; metadata: { dealId?: string; orderId?: string } };
+        const dealId = pi.metadata?.dealId ?? pi.metadata?.orderId; // backwards compat
+        if (!dealId) return new Response('ok', { status: 200 });
 
         await prisma.$transaction([
             prisma.payment.updateMany({
                 where: { paymentIntentId: pi.id },
                 data: { status: 'SUCCEEDED' },
             }),
-            prisma.order.updateMany({
-                where: { id: orderId, status: 'PENDING' },
+            prisma.deal.updateMany({
+                where: { id: dealId, status: 'PENDING' },
                 data: { status: 'PAID' },
             }),
         ]);
@@ -39,7 +39,7 @@ export const POST: APIRoute = async ({ request }) => {
         await prisma.auditLog.create({
             data: {
                 action: 'payment_succeeded',
-                metaJson: { orderId, paymentIntentId: pi.id },
+                metaJson: { dealId, paymentIntentId: pi.id },
             },
         });
     }

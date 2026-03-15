@@ -70,6 +70,8 @@ const currentPath = Astro.url.pathname;
                 class="md:hidden p-2 text-foreground/75 hover:text-foreground transition-colors focus:outline-none"
                 id="mobileMenuBtn"
                 aria-label="Menü öffnen"
+                aria-expanded="false"
+                aria-controls="mobileMenu"
             >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
@@ -106,10 +108,15 @@ const currentPath = Astro.url.pathname;
     const menu = document.getElementById("mobileMenu");
 
     btn?.addEventListener("click", () => {
-        if (menu?.classList.contains('hidden')) {
-            menu.classList.remove('hidden');
+        const isHidden = menu?.classList.contains('hidden');
+        if (isHidden) {
+            menu?.classList.remove('hidden');
+            btn.setAttribute('aria-expanded', 'true');
+            btn.setAttribute('aria-label', 'Menü schließen');
         } else {
             menu?.classList.add('hidden');
+            btn.setAttribute('aria-expanded', 'false');
+            btn.setAttribute('aria-label', 'Menü öffnen');
         }
     });
 </script>

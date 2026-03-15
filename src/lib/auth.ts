@@ -25,8 +25,7 @@ export const lucia = new Lucia(adapter, {
             lastName: attrs.lastName,
             role: attrs.role,
             emailVerified: attrs.emailVerified,
-            kycStatus: attrs.kycStatus,
-            trustScore: attrs.trustScore,
+            idVerified: attrs.idVerified,
         };
     },
 });
@@ -42,8 +41,7 @@ declare module 'lucia' {
             lastName: string | null;
             role: Role;
             emailVerified: boolean;
-            kycStatus: string;
-            trustScore: number;
+            idVerified: boolean;
         };
     }
 }

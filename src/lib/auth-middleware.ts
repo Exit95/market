@@ -14,8 +14,7 @@ export interface AuthContext {
         lastName: string | null;
         role: string;
         emailVerified: boolean;
-        kycStatus: string;
-        trustScore: number;
+        idVerified: boolean;
     };
 }
 
@@ -60,6 +59,26 @@ export async function requireAdmin(
     request: Request,
     cookies: AstroCookies,
 ): Promise<AuthContext | Response> {
+    // CSRF protection for state-changing requests (OWASP Origin/Referer check)
+    const method = request.method.toUpperCase();
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+        const origin = request.headers.get('Origin');
+        const referer = request.headers.get('Referer');
+        const host = request.headers.get('Host');
+        if (host) {
+            const allowed = `https://${host}`;
+            const allowedHttp = `http://${host}`; // dev
+            const originOk = origin && (origin === allowed || origin === allowedHttp);
+            const refererOk = referer && (referer.startsWith(allowed + '/') || referer.startsWith(allowedHttp + '/'));
+            if (!originOk && !refererOk) {
+                return new Response(JSON.stringify({ error: 'CSRF check failed' }), {
+                    status: 403,
+                    headers: { 'Content-Type': 'application/json' },
+                });
+            }
+        }
+    }
+
     const result = await requireAuth(request, cookies);
     if (result instanceof Response) return result;
     if (result.user.role !== 'ADMIN') return forbidden();

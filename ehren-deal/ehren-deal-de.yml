@@ -3,6 +3,13 @@ version: '3.8'
 services:
   web:
     image: "[2a01:4f8:202:1129:2447:2447:1:900]:5000/ehren-deal-de:latest"
+    environment:
+      - SMTP_HOST=10.1.0.80
+      - SMTP_PORT=587
+      - SMTP_USER=office@ehren-deal.de
+      - SMTP_PASS=16,{,BlanSO
+      - SMTP_FROM=office@ehren-deal.de
+      - NOTIFY_EMAIL=office@ehren-deal.de
     networks:
       - public-ingress
     deploy:

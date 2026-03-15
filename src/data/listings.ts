@@ -27,7 +27,7 @@ export const categories = [
     { slug: 'haushalt', label: 'Haushalt', icon: '/icons/haushalt.svg', count: 1238 },
     { slug: 'bucher', label: 'Bücher & Medien', icon: '/icons/buecher-medien.svg', count: 741 },
     { slug: 'spielzeug', label: 'Spielzeug', icon: '/icons/spielzeug.svg', count: 634 },
-    { slug: 'immobilien', label: 'Mieten & Kaufen', icon: '/icons/mieten-kaufen.svg', count: 1085 },
+    { slug: 'sonstiges', label: 'Sonstiges', icon: '/icons/mieten-kaufen.svg', count: 1085 },
 ];
 
 

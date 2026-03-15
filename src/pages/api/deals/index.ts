@@ -4,8 +4,8 @@ import { calcFee } from '../../../lib/stripe';
 import { prisma } from '../../../lib/auth';
 
 /**
- * POST /api/orders
- * Buyer creates an order for a listing.
+ * POST /api/deals
+ * Buyer creates a deal for a listing.
  */
 export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
     const auth = await requireAuth(request, cookies);
@@ -25,14 +25,14 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
     if (listing.status !== 'ACTIVE') return err(409, 'Listing ist nicht verfügbar');
     if (listing.sellerId === auth.userId) return err(400, 'Eigenes Listing kann nicht gekauft werden');
 
-    // Prevent duplicate orders
-    const existing = await prisma.order.findFirst({
+    // Prevent duplicate deals
+    const existing = await prisma.deal.findFirst({
         where: { listingId, buyerId: auth.userId, status: { notIn: ['CANCELLED', 'REFUNDED'] } },
     });
-    if (existing) return json({ order: existing }, 200);
+    if (existing) return json({ deal: existing }, 200);
 
     const feeCents = calcFee(listing.price);
-    const order = await prisma.order.create({
+    const deal = await prisma.deal.create({
         data: {
             listingId,
             buyerId: auth.userId,
@@ -47,10 +47,10 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
     await prisma.listing.update({ where: { id: listingId }, data: { status: 'RESERVED' } });
 
     await prisma.auditLog.create({
-        data: { actorId: auth.userId, action: 'order_create', ip: clientAddress, metaJson: { orderId: order.id, listingId } },
+        data: { actorId: auth.userId, action: 'deal_create', ip: clientAddress, metaJson: { dealId: deal.id, listingId } },
     });
 
-    return json({ order }, 201);
+    return json({ deal }, 201);
 };
 
 function json(data: unknown, status = 200) {
@@ -59,3 +59,4 @@ function json(data: unknown, status = 200) {
 function err(status: number, error: string) {
     return new Response(JSON.stringify({ error }), { status, headers: { 'Content-Type': 'application/json' } });
 }
+

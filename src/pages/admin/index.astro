@@ -81,7 +81,7 @@ function formatCents(cents: number) {
         <div class="adm-content">
             <!-- Mobile Header -->
             <div class="mobile-bar">
-                <button id="menuToggle" class="menu-btn">
+                <button id="menuToggle" class="menu-btn" aria-label="Seitenmenü öffnen">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
                 </button>
                 <span class="mobile-title">Admin Panel</span>
@@ -561,7 +561,7 @@ function formatCents(cents: number) {
         const container = document.getElementById('usersContainer')!;
         container.innerHTML = '<p class="loading-msg">Lade Benutzer...</p>';
         try {
-            const res = await fetch(`/api/admin/users?page=${page}&limit=20&search=${encodeURIComponent(q)}&filter=${f}`);
+            const res = await fetch(`/api/admin/users?page=${page}&limit=20&q=${encodeURIComponent(q)}&filter=${f}`);
             const data = await res.json();
             if (!data.users?.length) { container.innerHTML = '<p class="empty-msg">Keine Benutzer gefunden.</p>'; return; }
             container.innerHTML = data.users.map((u: any) => `
@@ -571,7 +571,7 @@ function formatCents(cents: number) {
                         <div style="font-size:.72rem;color:#6b6b6b">${esc(u.email)} &middot; ${fmtDate(u.createdAt)}</div>
                     </div>
                     <div style="display:flex;gap:.3rem;flex-wrap:wrap;align-items:center">
-                        ${u.isAdmin ? '<span class="badge-sm gold">ADMIN</span>' : ''}
+                        ${u.role === 'ADMIN' ? '<span class="badge-sm gold">ADMIN</span>' : ''}
                         ${u.bannedAt ? '<span class="badge-sm danger">GESPERRT</span>' : ''}
                         ${u.emailVerified ? '<span class="badge-sm" style="background:rgba(82,183,136,.12);color:#52b788">VERIFIZIERT</span>' : '<span class="badge-sm" style="background:rgba(107,107,107,.12);color:#6b6b6b">UNVERIFIZIERT</span>'}
                         ${u.idVerified ? '<span class="badge-sm gold">ID ✓</span>' : ''}
@@ -581,7 +581,7 @@ function formatCents(cents: number) {
                     </div>
                 </div>
             `).join('');
-            renderPagination('usersPagination', page, data.totalPages || 1, (p: number) => loadUsers(p));
+            renderPagination('usersPagination', page, data.pagination?.pages || 1, (p: number) => loadUsers(p));
         } catch { container.innerHTML = '<p class="empty-msg">Fehler beim Laden.</p>'; }
     }
 
@@ -592,7 +592,7 @@ function formatCents(cents: number) {
         const container = document.getElementById('listingsContainer')!;
         container.innerHTML = '<p class="loading-msg">Lade Inserate...</p>';
         try {
-            const res = await fetch(`/api/admin/listings?page=${page}&limit=20&search=${encodeURIComponent(q)}&status=${f}`);
+            const res = await fetch(`/api/admin/listings?page=${page}&limit=20&q=${encodeURIComponent(q)}&status=${f}`);
             const data = await res.json();
             if (!data.listings?.length) { container.innerHTML = '<p class="empty-msg">Keine Inserate gefunden.</p>'; return; }
             const statusColor: Record<string,string> = { ACTIVE: '#52b788', DRAFT: '#6b6b6b', SOLD: '#c8973a', REMOVED: '#ef4444' };
@@ -600,13 +600,13 @@ function formatCents(cents: number) {
                 <div class="data-card">
                     <div style="flex:1;min-width:200px">
                         <div style="font-weight:600;font-size:.85rem;color:#e8e4de">${esc(l.title)}</div>
-                        <div style="font-size:.72rem;color:#6b6b6b">${esc(l.user?.firstName || '?')} ${esc(l.user?.lastName || '')} &middot; ${fmtDate(l.createdAt)}</div>
+                        <div style="font-size:.72rem;color:#6b6b6b">${esc(l.seller?.firstName || '?')} ${esc(l.seller?.lastName || '')} &middot; ${fmtDate(l.createdAt)}</div>
                     </div>
-                    <div style="font-weight:700;color:#c8973a;font-size:.9rem">${fmtCents(l.priceCents)}</div>
+                    <div style="font-weight:700;color:#c8973a;font-size:.9rem">${fmtCents(l.price)}</div>
                     <span class="badge-sm" style="background:${statusColor[l.status] || '#555'}22;color:${statusColor[l.status] || '#555'}">${l.status}</span>
                 </div>
             `).join('');
-            renderPagination('listingsPagination', page, data.totalPages || 1, (p: number) => loadListings(p));
+            renderPagination('listingsPagination', page, data.pagination?.pages || 1, (p: number) => loadListings(p));
         } catch { container.innerHTML = '<p class="empty-msg">Fehler beim Laden.</p>'; }
     }
 
@@ -626,11 +626,11 @@ function formatCents(cents: number) {
                         <div style="font-weight:600;font-size:.82rem;color:#e8e4de">${esc(d.listing?.title || 'Deal #' + d.id.slice(0,8))}</div>
                         <div style="font-size:.7rem;color:#6b6b6b">Käufer: ${esc(d.buyer?.firstName || '?')} &middot; ${fmtDate(d.createdAt)}</div>
                     </div>
-                    <div style="font-weight:700;color:#c8973a;font-size:.9rem">${fmtCents(d.totalCents)}</div>
+                    <div style="font-weight:700;color:#c8973a;font-size:.9rem">${fmtCents(d.totalAmount)}</div>
                     <span class="badge-sm" style="background:${stColor[d.status] || '#555'}22;color:${stColor[d.status] || '#555'}">${d.status}</span>
                 </div>
             `).join('');
-            renderPagination('dealsPagination', page, data.totalPages || 1, (p: number) => loadDeals(p));
+            renderPagination('dealsPagination', page, data.pagination?.pages || 1, (p: number) => loadDeals(p));
         } catch { container.innerHTML = '<p class="empty-msg">Fehler beim Laden.</p>'; }
     }
 
