@@ -46,7 +46,7 @@ app.post('/signup', async (req, res) => {
 
   try {
     await transporter.sendMail({
-      from: `"Ehren Deal" <${process.env.SMTP_FROM}>`,
+      from: process.env.SMTP_FROM || 'Ehren-Deal <office@ehren-deal.de>',
       to: process.env.NOTIFY_EMAIL,
       subject: 'Neue Anmeldung auf ehren-deal.de',
       html: `

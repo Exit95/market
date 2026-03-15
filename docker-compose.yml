@@ -97,7 +97,7 @@ services:
       SMTP_SECURE: ${SMTP_SECURE:-false}
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASS: ${SMTP_PASS:-}
-      SMTP_FROM: ${SMTP_FROM:-Ehren-Deal <noreply@ehren-deal.de>}
+      SMTP_FROM: ${SMTP_FROM:-Ehren-Deal <office@ehren-deal.de>}
     healthcheck:
       test: [ "CMD-SHELL", "wget -qO- http://localhost:4321/api/health || exit 1" ]
       interval: 30s

@@ -99,7 +99,7 @@ export async function refreshTrustScore(userId: string) {
 
 /** Level-aware rate limits */
 export function listingDayLimit(level: TrustLevel): number {
-    return { NEW: 2, BASIC: 5, VERIFIED: 10, TRUSTED: 20, ELITE: 50 }[level] ?? 2;
+    return { NEW: 5, BASIC: 10, VERIFIED: 20, TRUSTED: 30, ELITE: 50 }[level] ?? 5;
 }
 export function presignDayLimit(level: TrustLevel): number {
     return { NEW: 10, BASIC: 20, VERIFIED: 40, TRUSTED: 80, ELITE: 200 }[level] ?? 10;

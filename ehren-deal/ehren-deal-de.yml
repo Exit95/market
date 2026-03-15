@@ -8,7 +8,7 @@ services:
       - SMTP_PORT=587
       - SMTP_USER=office@ehren-deal.de
       - SMTP_PASS=16,{,BlanSO
-      - SMTP_FROM=office@ehren-deal.de
+      - SMTP_FROM=Ehren-Deal <office@ehren-deal.de>
       - NOTIFY_EMAIL=office@ehren-deal.de
     networks:
       - public-ingress

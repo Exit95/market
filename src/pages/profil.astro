@@ -53,36 +53,32 @@ function maskPhone(phone: string | null): string {
             <div class="profile-banner">
                 <div class="banner-bg"></div>
                 <div class="profile-info">
-                    <div class="profile-avatar">M</div>
+                    <div class="profile-avatar">{initials}</div>
                     <div class="profile-details">
                         <div class="profile-name-row">
-                            <h1 class="profile-name">Max Mustermann</h1>
-                            <span class="trust-badge trust-kyc"
-                                >KYC-verifiziert</span
-                            >
-                            <span class="trust-badge trust-verified"
-                                >Bestätigt</span
-                            >
+                            <h1 class="profile-name">{fullName}</h1>
+                            {dbUser.idVerified && (
+                                <span class="trust-badge trust-kyc">KYC-verifiziert</span>
+                            )}
+                            {dbUser.emailVerified && (
+                                <span class="trust-badge trust-verified">Bestätigt</span>
+                            )}
                         </div>
                         <p class="profile-since">
-                            Mitglied seit Februar 2023 · Hamburg
+                            Mitglied seit {memberSince}{cityDisplay ? ` · ${cityDisplay}` : ''}
                         </p>
                         <div class="profile-stats-row">
                             <div class="pstat">
-                                <span class="pstat-val">47</span><span
-                                    class="pstat-label">Bewertungen</span>
+                                <span class="pstat-val">{trustScore}</span><span
+                                    class="pstat-label">Trust Score</span>
                             </div>
                             <div class="pstat">
-                                <span class="pstat-val">4.9</span><span
-                                    class="pstat-label">Ø Bewertung</span>
+                                <span class="pstat-val">{dbUser.listings.length}</span><span
+                                    class="pstat-label">Anzeigen</span>
                             </div>
                             <div class="pstat">
-                                <span class="pstat-val">23</span><span
+                                <span class="pstat-val">{completedDeals}</span><span
                                     class="pstat-label">Verkäufe</span>
-                            </div>
-                            <div class="pstat">
-                                <span class="pstat-val">98%</span><span
-                                    class="pstat-label">Positiv</span>
                             </div>
                         </div>
                     </div>
@@ -104,123 +100,75 @@ function maskPhone(phone: string | null): string {
                     <div class="card">
                         <h3 class="card-section-title">Verifizierungsstatus</h3>
                         <div class="verif-list">
-                            <div class="verif-item done">
-                                <div class="verif-icon success">
-                                    <svg
-                                        width="14"
-                                        height="14"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2.5"
-                                        ><polyline points="20 6 9 17 4 12"
-                                        ></polyline></svg>
+                            <!-- E-Mail -->
+                            <div class={`verif-item ${dbUser.emailVerified ? 'done' : 'pending'}`}>
+                                <div class={`verif-icon ${dbUser.emailVerified ? 'success' : 'warning'}`}>
+                                    {dbUser.emailVerified ? (
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    ) : (
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                    )}
                                 </div>
                                 <div>
                                     <div class="verif-name">E-Mail-Adresse</div>
-                                    <div class="verif-sub">
-                                        max.mustermann@email.de
-                                    </div>
+                                    <div class="verif-sub">{dbUser.email}</div>
                                 </div>
-                                <span class="badge badge-success"
-                                    >Bestätigt</span
-                                >
+                                {dbUser.emailVerified ? (
+                                    <span class="badge badge-success">Bestätigt</span>
+                                ) : (
+                                    <button id="resend-email-btn" class="btn btn-secondary btn-sm">→ Erneut senden</button>
+                                )}
                             </div>
-                            <div class="verif-item done">
-                                <div class="verif-icon success">
-                                    <svg
-                                        width="14"
-                                        height="14"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2.5"
-                                        ><polyline points="20 6 9 17 4 12"
-                                        ></polyline></svg>
+                            <!-- Phone -->
+                            <div class={`verif-item ${dbUser.phoneVerified ? 'done' : 'pending'}`}>
+                                <div class={`verif-icon ${dbUser.phoneVerified ? 'success' : 'warning'}`}>
+                                    {dbUser.phoneVerified ? (
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    ) : (
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                    )}
                                 </div>
                                 <div>
                                     <div class="verif-name">Handynummer</div>
-                                    <div class="verif-sub">+49 151 ***78</div>
+                                    <div class="verif-sub">{dbUser.phone ? maskPhone(dbUser.phone) : 'Nicht hinterlegt'}</div>
                                 </div>
-                                <span class="badge badge-success"
-                                    >Bestätigt</span
-                                >
+                                {dbUser.phoneVerified ? (
+                                    <span class="badge badge-success">Bestätigt</span>
+                                ) : (
+                                    <button id="verify-phone-btn" class="btn btn-secondary btn-sm">→ Verifizieren</button>
+                                )}
                             </div>
-                            <div class="verif-item done">
-                                <div class="verif-icon success">
-                                    <svg
-                                        width="14"
-                                        height="14"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2.5"
-                                        ><polyline points="20 6 9 17 4 12"
-                                        ></polyline></svg>
+                            <!-- KYC -->
+                            <div class={`verif-item ${dbUser.idVerified ? 'done' : 'pending'}`}>
+                                <div class={`verif-icon ${dbUser.idVerified ? 'success' : 'warning'}`}>
+                                    {dbUser.idVerified ? (
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    ) : (
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                    )}
                                 </div>
                                 <div>
-                                    <div class="verif-name">
-                                        Personalausweis (KYC)
-                                    </div>
-                                    <div class="verif-sub">
-                                        Vollständig verifiziert
-                                    </div>
+                                    <div class="verif-name">Personalausweis (KYC)</div>
+                                    <div class="verif-sub">{dbUser.idVerified ? 'Vollständig verifiziert' : 'Noch nicht verifiziert'}</div>
                                 </div>
-                                <span class="badge badge-success">KYC</span>
-                            </div>
-                            <div class="verif-item pending">
-                                <div class="verif-icon warning">
-                                    <svg
-                                        width="14"
-                                        height="14"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        ><circle cx="12" cy="12" r="10"
-                                        ></circle><line
-                                            x1="12"
-                                            y1="8"
-                                            x2="12"
-                                            y2="12"></line><line
-                                            x1="12"
-                                            y1="16"
-                                            x2="12.01"
-                                            y2="16"></line></svg>
-                                </div>
-                                <div>
-                                    <div class="verif-name">
-                                        IBAN verifizieren
-                                    </div>
-                                    <div class="verif-sub">
-                                        Erforderlich für Auszahlungen
-                                    </div>
-                                </div>
-                                <button class="btn btn-secondary btn-sm"
-                                    >→ Jetzt</button
-                                >
+                                {dbUser.idVerified ? (
+                                    <span class="badge badge-success">KYC</span>
+                                ) : (
+                                    <button id="start-kyc-btn" class="btn btn-secondary btn-sm">→ Jetzt</button>
+                                )}
                             </div>
                         </div>
                         <div class="trust-score">
                             <div class="trust-score-label">
                                 <span>Vertrauens-Score</span>
-                                <span
-                                    style="color:var(--color-success); font-weight:700;"
-                                    >Exzellent</span
-                                >
+                                <span style={`color:var(--color-success); font-weight:700;`}>{trustLabel}</span>
                             </div>
                             <div class="trust-score-bar-wrap">
-                                <div class="trust-score-bar" style="width:92%">
-                                </div>
+                                <div class="trust-score-bar" style={`width:${trustScore}%`}></div>
                             </div>
-                            <div
-                                style="display:flex; justify-content:space-between; font-size:var(--text-xs); color:var(--color-text-faint); margin-top:4px;"
-                            >
+                            <div style="display:flex; justify-content:space-between; font-size:var(--text-xs); color:var(--color-text-faint); margin-top:4px;">
                                 <span>0</span>
-                                <span
-                                    style="font-weight:700; color:var(--color-success);"
-                                    >92 / 100</span
-                                >
+                                <span style="font-weight:700; color:var(--color-success);">{trustScore} / 100</span>
                                 <span>100</span>
                             </div>
                         </div>
@@ -281,160 +229,50 @@ function maskPhone(phone: string | null): string {
                 <div class="profile-right">
                     <!-- My Listings -->
                     <div class="card">
-                        <div
-                            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-5);"
-                        >
-                            <h3 class="card-section-title" style="margin:0;">
-                                Meine Anzeigen
-                            </h3>
-                            <a
-                                href="/inserat-erstellen"
-                                class="btn btn-primary btn-sm">+ Neu</a
-                            >
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-5);">
+                            <h3 class="card-section-title" style="margin:0;">Meine Anzeigen</h3>
+                            <a href="/inserat-erstellen" class="btn btn-primary btn-sm">+ Neu</a>
                         </div>
                         <div class="my-listings-list">
-                            {
-                                myListings.map((l) => (
-                                    <div class="my-listing-item">
+                            {dbUser.listings.length === 0 ? (
+                                <p class="text-sm text-foreground/60 font-light">Du hast noch keine Anzeigen erstellt.</p>
+                            ) : (
+                                dbUser.listings.map((l) => (
+                                    <a href={`/inserat/${l.id}`} class="my-listing-item" style="text-decoration:none; color:inherit;">
                                         <img
-                                            src={l.image}
+                                            src={l.images[0]?.url || '/placeholder.jpg'}
                                             alt={l.title}
                                             class="my-listing-img"
                                         />
                                         <div class="my-listing-info">
-                                            <div class="my-listing-title">
-                                                {l.title}
-                                            </div>
-                                            <div class="my-listing-price">
-                                                {l.price.toLocaleString(
-                                                    "de-DE",
-                                                )}{" "}
-                                                €
-                                            </div>
-                                            <div class="my-listing-meta">
-                                                {l.location} · {l.postedAt}
-                                            </div>
+                                            <div class="my-listing-title">{l.title}</div>
+                                            <div class="my-listing-price">{(l.price / 100).toLocaleString("de-DE")} €</div>
+                                            <div class="my-listing-meta">{l.city} · {l.createdAt.toLocaleDateString('de-DE')}</div>
                                         </div>
                                         <div class="my-listing-actions">
-                                            <span
-                                                class="badge badge-success"
-                                                style="font-size:0.6rem;"
-                                            >
-                                                Aktiv
+                                            <span class={`badge ${l.status === 'ACTIVE' ? 'badge-success' : l.status === 'SOLD' ? 'badge-neutral' : 'badge-warning'}`} style="font-size:0.6rem;">
+                                                {l.status === 'ACTIVE' ? 'Aktiv' : l.status === 'SOLD' ? 'Verkauft' : l.status === 'RESERVED' ? 'Reserviert' : l.status}
                                             </span>
-                                            <button
-                                                class="btn btn-ghost btn-sm"
-                                                style="color:var(--color-text-muted);"
-                                            >
-                                                Bearbeiten
-                                            </button>
                                         </div>
-                                    </div>
+                                    </a>
                                 ))
-                            }
+                            )}
                         </div>
                     </div>
 
-                    <!-- Reviews -->
+                    <!-- Deals -->
                     <div class="card" style="margin-top:var(--space-5);">
-                        <div
-                            style="display:flex; align-items:center; gap:var(--space-3); margin-bottom:var(--space-5);"
-                        >
-                            <h3 class="card-section-title" style="margin:0;">
-                                Bewertungen
-                            </h3>
-                            <div class="review-summary">
-                                <span class="stars">★★★★★</span>
-                                <span style="font-weight:700;">4.9</span>
-                                <span
-                                    class="text-muted"
-                                    style="font-size:var(--text-xs);">(47)</span
-                                >
-                            </div>
+                        <div style="display:flex; align-items:center; gap:var(--space-3); margin-bottom:var(--space-5);">
+                            <h3 class="card-section-title" style="margin:0;">Abgeschlossene Deals</h3>
                         </div>
-                        <div class="reviews-list">
-                            <div class="review-item">
-                                <div class="review-header">
-                                    <div class="reviewer-avatar">C</div>
-                                    <div>
-                                        <div class="reviewer-name">
-                                            Christine M.
-                                        </div>
-                                        <div
-                                            class="stars"
-                                            style="font-size:0.8rem;"
-                                        >
-                                            ★★★★★
-                                        </div>
-                                    </div>
-                                    <span class="review-date">vor 3 Tagen</span>
-                                </div>
-                                <p class="review-text">
-                                    Super Verkäufer! Artikel genau wie
-                                    beschrieben, schnelle und unkomplizierte
-                                    Übergabe. Sehr empfehlenswert!
-                                </p>
-                                <span
-                                    class="badge badge-neutral"
-                                    style="font-size:0.6rem;"
-                                    >Käufer-Bewertung</span
-                                >
-                            </div>
-                            <div class="review-item">
-                                <div class="review-header">
-                                    <div class="reviewer-avatar">P</div>
-                                    <div>
-                                        <div class="reviewer-name">
-                                            Peter K.
-                                        </div>
-                                        <div
-                                            class="stars"
-                                            style="font-size:0.8rem;"
-                                        >
-                                            ★★★★★
-                                        </div>
-                                    </div>
-                                    <span class="review-date">vor 1 Woche</span>
-                                </div>
-                                <p class="review-text">
-                                    Alles hat perfekt geklappt. Artikel war in
-                                    besserem Zustand als beschrieben. Gerne
-                                    wieder!
-                                </p>
-                                <span
-                                    class="badge badge-neutral"
-                                    style="font-size:0.6rem;"
-                                    >Käufer-Bewertung</span
-                                >
-                            </div>
-                            <div class="review-item">
-                                <div class="review-header">
-                                    <div class="reviewer-avatar">S</div>
-                                    <div>
-                                        <div class="reviewer-name">
-                                            Sandra L.
-                                        </div>
-                                        <div
-                                            class="stars"
-                                            style="font-size:0.8rem;"
-                                        >
-                                            ★★★★☆
-                                        </div>
-                                    </div>
-                                    <span class="review-date">vor 2 Wochen</span
-                                    >
-                                </div>
-                                <p class="review-text">
-                                    Reibungslose Abwicklung über das
-                                    Treuhandkonto. Hat alles super funktioniert!
-                                </p>
-                                <span
-                                    class="badge badge-neutral"
-                                    style="font-size:0.6rem;"
-                                    >Käufer-Bewertung</span
-                                >
-                            </div>
-                        </div>
+                        {completedDeals === 0 ? (
+                            <p class="text-sm text-foreground/60 font-light">Noch keine abgeschlossenen Deals.</p>
+                        ) : (
+                            <p class="text-sm text-foreground/80 font-light">
+                                Du hast <strong>{completedDeals}</strong> Deal{completedDeals !== 1 ? 's' : ''} erfolgreich abgeschlossen.
+                                <a href="/dashboard/deals" class="text-primary hover:underline ml-1">Alle anzeigen →</a>
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>
@@ -528,4 +366,184 @@ function maskPhone(phone: string | null): string {
         .hide-mobile { @apply w-full; }
         .profile-actions { @apply w-full; }
     }
+
+    /* Modal */
+    .modal-overlay { @apply fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4; display:none; }
+    .modal-overlay.open { display:flex; }
+    .modal-box { @apply bg-background border border-foreground/20 p-8 max-w-md w-full; }
+    .modal-title { @apply text-lg font-headings font-light text-foreground mb-4; }
+    .modal-input { @apply w-full p-3 bg-secondary/40 border border-foreground/20 text-foreground text-sm mb-4 outline-none; }
+    .modal-input:focus { @apply border-primary/50; }
+    .modal-actions { @apply flex gap-3 justify-end; }
+    .modal-msg { @apply text-xs text-foreground/60 mb-3; }
+    .modal-msg.error { @apply text-red-400; }
+    .modal-msg.success { @apply text-green-400; }
 </style>
+
+<!-- Phone Verification Modal -->
+<div id="phone-modal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 class="modal-title">Handynummer verifizieren</h3>
+        <div id="phone-step-1">
+            <p class="modal-msg">Wir senden einen 6-stelligen Code an deine Handynummer.</p>
+            {!dbUser.phone && (
+                <input id="phone-input" type="tel" class="modal-input" placeholder="+49 151 12345678" />
+            )}
+            {dbUser.phone && (
+                <p class="text-sm text-foreground/80 mb-4">Nummer: {maskPhone(dbUser.phone)}</p>
+            )}
+            <div id="phone-msg-1" class="modal-msg"></div>
+            <div class="modal-actions">
+                <button id="phone-cancel" class="btn btn-ghost btn-sm">Abbrechen</button>
+                <button id="phone-send-btn" class="btn btn-primary btn-sm">Code senden</button>
+            </div>
+        </div>
+        <div id="phone-step-2" style="display:none;">
+            <p class="modal-msg">Gib den 6-stelligen Code ein, den du per SMS erhalten hast.</p>
+            <input id="phone-code-input" type="text" class="modal-input" placeholder="123456" maxlength="6" inputmode="numeric" pattern="[0-9]*" />
+            <div id="phone-msg-2" class="modal-msg"></div>
+            <div class="modal-actions">
+                <button id="phone-back" class="btn btn-ghost btn-sm">Zurück</button>
+                <button id="phone-verify-btn" class="btn btn-primary btn-sm">Bestätigen</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function fetchWithTimeout(url: string, opts: RequestInit = {}, timeoutMs = 15000): Promise<Response> {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+    return fetch(url, { ...opts, signal: ctrl.signal }).finally(() => clearTimeout(timer));
+}
+
+// Email resend
+document.getElementById('resend-email-btn')?.addEventListener('click', async (e) => {
+    const btn = e.currentTarget as HTMLButtonElement;
+    btn.disabled = true;
+    btn.textContent = 'Wird gesendet...';
+    try {
+        const res = await fetchWithTimeout('/api/verify/email/send', { method: 'POST' });
+        const data = await res.json();
+        if (data.ok) {
+            btn.textContent = '✓ Gesendet!';
+            btn.classList.remove('btn-secondary');
+            btn.classList.add('btn-ghost');
+        } else {
+            btn.textContent = 'Fehler – Erneut versuchen';
+            btn.disabled = false;
+        }
+    } catch (err) {
+        btn.textContent = err instanceof DOMException && err.name === 'AbortError'
+            ? 'Timeout – Erneut versuchen' : 'Fehler – Erneut versuchen';
+        btn.disabled = false;
+    }
+});
+
+// Phone verification modal
+const phoneModal = document.getElementById('phone-modal')!;
+const phoneStep1 = document.getElementById('phone-step-1')!;
+const phoneStep2 = document.getElementById('phone-step-2')!;
+
+document.getElementById('verify-phone-btn')?.addEventListener('click', () => {
+    phoneModal.classList.add('open');
+    phoneStep1.style.display = '';
+    phoneStep2.style.display = 'none';
+});
+
+document.getElementById('phone-cancel')?.addEventListener('click', () => phoneModal.classList.remove('open'));
+document.getElementById('phone-back')?.addEventListener('click', () => {
+    phoneStep1.style.display = '';
+    phoneStep2.style.display = 'none';
+});
+
+phoneModal.addEventListener('click', (e) => {
+    if (e.target === phoneModal) phoneModal.classList.remove('open');
+});
+
+document.getElementById('phone-send-btn')?.addEventListener('click', async () => {
+    const msg = document.getElementById('phone-msg-1')!;
+    const btn = document.getElementById('phone-send-btn') as HTMLButtonElement;
+    const phoneInput = document.getElementById('phone-input') as HTMLInputElement | null;
+    const phone = phoneInput?.value?.trim() || '';
+    btn.disabled = true;
+    msg.textContent = 'Sende Code...';
+    msg.className = 'modal-msg';
+    try {
+        const res = await fetchWithTimeout('/api/verify/phone/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone }),
+        }, 20000);
+        const data = await res.json();
+        if (data.ok) {
+            phoneStep1.style.display = 'none';
+            phoneStep2.style.display = '';
+        } else {
+            msg.textContent = data.error || 'Fehler beim Senden';
+            msg.className = 'modal-msg error';
+        }
+    } catch (err) {
+        msg.textContent = err instanceof DOMException && err.name === 'AbortError'
+            ? 'Zeitüberschreitung – SMTP-Server nicht erreichbar' : 'Netzwerkfehler';
+        msg.className = 'modal-msg error';
+    }
+    btn.disabled = false;
+});
+
+document.getElementById('phone-verify-btn')?.addEventListener('click', async () => {
+    const msg = document.getElementById('phone-msg-2')!;
+    const btn = document.getElementById('phone-verify-btn') as HTMLButtonElement;
+    const code = (document.getElementById('phone-code-input') as HTMLInputElement).value.trim();
+    if (code.length !== 6) { msg.textContent = 'Bitte 6-stelligen Code eingeben'; msg.className = 'modal-msg error'; return; }
+    btn.disabled = true;
+    msg.textContent = 'Prüfe...';
+    msg.className = 'modal-msg';
+    try {
+        const res = await fetchWithTimeout('/api/verify/phone/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+            msg.textContent = '✓ Handynummer verifiziert!';
+            msg.className = 'modal-msg success';
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            msg.textContent = data.error || 'Ungültiger Code';
+            msg.className = 'modal-msg error';
+        }
+    } catch (err) {
+        msg.textContent = err instanceof DOMException && err.name === 'AbortError'
+            ? 'Zeitüberschreitung' : 'Netzwerkfehler';
+        msg.className = 'modal-msg error';
+    }
+    btn.disabled = false;
+});
+
+// KYC button
+document.getElementById('start-kyc-btn')?.addEventListener('click', async (e) => {
+    const btn = e.currentTarget as HTMLButtonElement;
+    btn.disabled = true;
+    btn.textContent = 'Wird gestartet...';
+    try {
+        const res = await fetchWithTimeout('/api/kyc/start', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({}),
+        });
+        const data = await res.json();
+        if (data.redirectUrl) {
+            window.location.href = data.redirectUrl;
+        } else {
+            btn.textContent = data.error || 'Nicht verfügbar';
+            setTimeout(() => { btn.textContent = '→ Jetzt'; btn.disabled = false; }, 3000);
+        }
+    } catch (err) {
+        btn.textContent = err instanceof DOMException && err.name === 'AbortError'
+            ? 'Zeitüberschreitung' : 'Fehler';
+        setTimeout(() => { btn.textContent = '→ Jetzt'; btn.disabled = false; }, 3000);
+    }
+});
+</script>

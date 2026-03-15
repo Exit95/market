@@ -21,12 +21,12 @@ const ListingQuerySchema = z.object({
 });
 
 const CreateListingSchema = z.object({
-    title: z.string().min(3).max(120),
-    description: z.string().min(10).max(5000),
-    price: z.number().int().min(0),   // Cent
-    category: z.enum(['ELEKTRONIK', 'FAHRZEUGE', 'MODE', 'MOEBEL', 'SPORT', 'HAUSHALT', 'BUCHER', 'SPIELZEUG', 'SONSTIGES']),
-    city: z.string().min(2).max(80),
-    postalCode: z.string().min(4).max(10),
+    title: z.string().min(3, 'Titel muss mindestens 3 Zeichen haben.').max(120, 'Titel darf maximal 120 Zeichen haben.'),
+    description: z.string().min(10, 'Beschreibung muss mindestens 10 Zeichen haben.').max(5000),
+    price: z.number().int().min(0, 'Preis darf nicht negativ sein.'),
+    category: z.enum(['ELEKTRONIK', 'FAHRZEUGE', 'MODE', 'MOEBEL', 'SPORT', 'HAUSHALT', 'BUCHER', 'SPIELZEUG', 'SONSTIGES'], { message: 'Ungültige Kategorie.' }),
+    city: z.string().max(80).default(''),
+    postalCode: z.string().min(4, 'PLZ muss mindestens 4 Zeichen haben.').max(10),
     condition: z.string().optional(),
     treuhand: z.boolean().default(false),
     status: z.enum(['DRAFT', 'ACTIVE']).default('DRAFT'),
@@ -102,25 +102,34 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
     const auth = await requireAuth(request, cookies);
     if (!isAuthContext(auth)) return auth;
 
-    // Rate limit: level-based (NEW=2, BASIC=5, VERIFIED=10, TRUSTED=20, ELITE=50 per day)
-    const ts = await prisma.trustScore.findUnique({ where: { userId: auth.userId }, select: { level: true } });
-    const limit = listingDayLimit(ts?.level ?? 'NEW');
-    if (!checkRateLimit(`listing-create:${auth.userId}`, limit, DAY_MS)) {
-        return rateLimitResponse();
-    }
-
+    // Parse & validate FIRST (before rate-limit) so invalid requests don't consume quota
     let body: unknown;
     try { body = await request.json(); } catch { return jsonErr(400, 'Invalid JSON'); }
 
     const parsed = CreateListingSchema.safeParse(body);
-    if (!parsed.success) return jsonErr(400, parsed.error.issues[0]?.message ?? 'Validation error');
+    if (!parsed.success) {
+        console.error('[POST /api/listings] Validation failed:', JSON.stringify(parsed.error.issues, null, 2), 'Body:', JSON.stringify(body));
+        return jsonErr(400, parsed.error.issues[0]?.message ?? 'Validation error');
+    }
+
+    // Rate limit: level-based (NEW=5, BASIC=10, VERIFIED=20, TRUSTED=30, ELITE=50 per day)
+    let ts = await prisma.trustScore.findUnique({ where: { userId: auth.userId }, select: { level: true } });
+    if (!ts) {
+        // Auto-create TrustScore on first listing attempt
+        const { refreshTrustScore } = await import('../../../lib/trust-score');
+        const created = await refreshTrustScore(auth.userId);
+        ts = { level: created.level };
+    }
+    const limit = listingDayLimit(ts.level);
+    if (!checkRateLimit(`listing-create:${auth.userId}`, limit, DAY_MS)) {
+        return rateLimitResponse();
+    }
 
     // Ehren-Deal Security: High-Risk Category Check
     const { HIGH_RISK_CATEGORIES, canPostHighRiskItem } = await import('../../../lib/security');
     
-    // Check if category is considered high risk (e.g., 'ELEKTRONIK', 'FAHRZEUGE')
-    const isHighRisk = HIGH_RISK_CATEGORIES.includes(parsed.data.category) || 
-                       ['ELEKTRONIK', 'FAHRZEUGE'].includes(parsed.data.category);
+    // Check if category is considered high risk (UHREN, AUTOS, SMARTPHONES, SCHMUCK, DESIGNER)
+    const isHighRisk = HIGH_RISK_CATEGORIES.includes(parsed.data.category);
                        
     if (isHighRisk) {
         const user = await prisma.user.findUnique({
@@ -130,6 +139,7 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
 
         const userForCheck = user ? { idVerified: user.idVerified, fraudSignalCount: user._count.fraudSignals } : null;
         if (!userForCheck || !canPostHighRiskItem(userForCheck)) {
+            console.error('[POST /api/listings] HIGH-RISK BLOCK:', parsed.data.category, 'user:', JSON.stringify(userForCheck));
             await prisma.auditLog.create({
                 data: { actorId: auth.userId, action: 'listing_blocked_high_risk', ip: clientAddress, metaJson: { category: parsed.data.category } },
             });
@@ -145,6 +155,7 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
         parsed.data.category,
     );
 
+    console.log('[POST /api/listings] AI scan result:', fraudResult.action, 'score:', fraudResult.score, 'flags:', fraudResult.flags);
     if (fraudResult.action === 'BLOCK') {
         // Hart blockiert – FraudSignal + AuditLog erstellen, Anzeige ablehnen
         await Promise.all([

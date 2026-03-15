@@ -13,13 +13,17 @@ function getTransport() {
       user: import.meta.env.SMTP_USER,
       pass: import.meta.env.SMTP_PASS,
     },
+    tls: { rejectUnauthorized: false },
+    connectionTimeout: 10_000,   // 10s connection timeout
+    greetingTimeout: 10_000,     // 10s greeting timeout
+    socketTimeout: 15_000,       // 15s socket timeout
   });
 }
 
 export async function sendMail(opts: { to: string; subject: string; html: string }) {
   const transport = getTransport();
   return transport.sendMail({
-    from: import.meta.env.SMTP_FROM ?? 'Ehren-Deal <noreply@ehren-deal.de>',
+    from: import.meta.env.SMTP_FROM ?? 'Ehren-Deal <office@ehren-deal.de>',
     ...opts,
   });
 }

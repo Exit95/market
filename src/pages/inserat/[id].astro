@@ -2,22 +2,164 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
-import { listings } from "../../data/listings";
+import { listings as staticListings } from "../../data/listings";
+import { prisma } from "../../lib/auth";
 
-export function getStaticPaths() {
-    return listings.map((l) => ({
-        params: { id: l.id },
-        props: { listing: l },
-    }));
+const { id } = Astro.params;
+if (!id) return Astro.redirect('/404');
+
+// ── Category labels ──
+const catLabels: Record<string, string> = {
+    ELEKTRONIK: 'Elektronik', FAHRZEUGE: 'Fahrzeuge', MODE: 'Mode & Kleidung',
+    MOEBEL: 'Möbel & Wohnen', SPORT: 'Sport & Freizeit', HAUSHALT: 'Haushalt',
+    BUCHER: 'Bücher & Medien', SPIELZEUG: 'Spielzeug', SONSTIGES: 'Sonstiges',
+};
+
+// ── Time-ago helper ──
+function timeAgo(date: Date): string {
+    const ms = Date.now() - date.getTime();
+    const mins = Math.floor(ms / 60000);
+    if (mins < 1) return 'Gerade eben';
+    if (mins < 60) return `vor ${mins} Min.`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `vor ${hrs} Std.`;
+    const days = Math.floor(hrs / 24);
+    if (days === 1) return 'Gestern';
+    if (days < 30) return `vor ${days} Tagen`;
+    const months = Math.floor(days / 30);
+    return `vor ${months} Monat${months > 1 ? 'en' : ''}`;
 }
 
-const { listing } = Astro.props;
-const stars =
-    "★".repeat(Math.round(listing.sellerRating)) +
-    "☆".repeat(5 - Math.round(listing.sellerRating));
-const relatedListings = listings
-    .filter((l) => l.id !== listing.id && l.category === listing.category)
-    .slice(0, 3);
+// ── 1) Try DB first ──
+let listing: any = null;
+let allImages: { url: string; id: string }[] = [];
+let sellerMemberSince = '';
+let sellerListingCount = 0;
+let sellerTrustScore = 0;
+let sellerId = '';
+let isFromDB = false;
+let dbCategory = '';
+
+const dbListing = await prisma.listing.findUnique({
+    where: { id },
+    include: {
+        images: { orderBy: { position: 'asc' } },
+        seller: {
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                idVerified: true,
+                emailVerified: true,
+                phoneVerified: true,
+                createdAt: true,
+                trustScore: true,
+                _count: { select: { listings: true } },
+            },
+        },
+    },
+});
+
+if (dbListing) {
+    isFromDB = true;
+    dbCategory = dbListing.category;
+    sellerId = dbListing.seller.id;
+
+    // Increment view count (fire & forget)
+    prisma.listing.update({ where: { id }, data: { viewCount: { increment: 1 } } }).catch(() => {});
+
+    const s = dbListing.seller;
+    const sellerFirst = s.firstName || '';
+    const sellerLast = s.lastName || '';
+    const sellerName = sellerFirst
+        ? `${sellerFirst} ${sellerLast ? sellerLast.charAt(0) + '.' : ''}`.trim()
+        : 'Verkäufer';
+
+    // Seller stats
+    sellerMemberSince = s.createdAt.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+    sellerListingCount = s._count.listings;
+    sellerTrustScore = s.trustScore?.score ?? 0;
+
+    // All images
+    allImages = dbListing.images.map((img: any) => ({ url: img.url, id: img.id }));
+    const mainImage = allImages[0]?.url || 'https://placehold.co/600x400/1a1a2e/c8973a?text=Kein+Bild';
+
+    listing = {
+        id: dbListing.id,
+        title: dbListing.title,
+        price: dbListing.price / 100,
+        location: [dbListing.postalCode, dbListing.city].filter(Boolean).join(' '),
+        category: catLabels[dbListing.category] || dbListing.category,
+        image: mainImage,
+        sellerName,
+        sellerRating: sellerTrustScore / 20, // 0-100 → 0-5
+        sellerVerified: s.emailVerified || s.phoneVerified,
+        sellerKYC: s.idVerified,
+        postedAt: timeAgo(dbListing.createdAt),
+        condition: dbListing.condition || 'Gut',
+        treuhandAvailable: dbListing.treuhand,
+        description: dbListing.description,
+        viewCount: dbListing.viewCount + 1,
+        status: dbListing.status,
+    };
+}
+
+// ── 2) Fallback: static demo data ──
+if (!listing) {
+    const staticListing = staticListings.find((l) => l.id === id);
+    if (staticListing) {
+        listing = { ...staticListing, viewCount: 0, status: 'ACTIVE' };
+        allImages = [{ url: staticListing.image, id: 'static-0' }];
+        sellerMemberSince = 'Januar 2024';
+        sellerListingCount = 3;
+        sellerTrustScore = 75;
+    }
+}
+
+// ── 404 ──
+if (!listing) return Astro.redirect('/404');
+
+// ── Stars ──
+const rating = Math.max(0, Math.min(5, Math.round(listing.sellerRating)));
+const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+
+// ── Security Score (dynamisch berechnen) ──
+let securityScore = 40; // Basis
+if (listing.sellerVerified) securityScore += 15;
+if (listing.sellerKYC) securityScore += 20;
+if (listing.treuhandAvailable) securityScore += 15;
+if (sellerTrustScore >= 50) securityScore += 5;
+if (sellerTrustScore >= 80) securityScore += 5;
+securityScore = Math.min(100, securityScore);
+const securityLabel = securityScore >= 80 ? 'Niedrig' : securityScore >= 50 ? 'Mittel' : 'Hoch';
+const securityBadge = securityScore >= 80 ? 'badge-success' : securityScore >= 50 ? 'badge-warning' : 'badge-danger';
+const securityColor = securityScore >= 80 ? 'var(--color-success)' : securityScore >= 50 ? 'var(--color-warning)' : 'var(--color-danger)';
+
+// ── Related Listings (DB + static fallback) ──
+let relatedListings: any[] = [];
+if (isFromDB && dbCategory) {
+    const dbRelated = await prisma.listing.findMany({
+        where: { category: dbCategory as any, status: 'ACTIVE', id: { not: id } },
+        include: { images: { orderBy: { position: 'asc' }, take: 1 } },
+        orderBy: { createdAt: 'desc' },
+        take: 3,
+    });
+    relatedListings = dbRelated.map((r: any) => ({
+        id: r.id,
+        title: r.title,
+        price: r.price / 100,
+        location: [r.postalCode, r.city].filter(Boolean).join(' '),
+        image: r.images[0]?.url || 'https://placehold.co/400x300/1a1a2e/c8973a?text=Kein+Bild',
+    }));
+}
+// Fill up with static if needed
+if (relatedListings.length < 3) {
+    const staticRelated = staticListings
+        .filter((l) => l.id !== listing!.id && l.category === listing!.category)
+        .slice(0, 3 - relatedListings.length)
+        .map((l) => ({ id: l.id, title: l.title, price: l.price, location: l.location, image: l.image }));
+    relatedListings = [...relatedListings, ...staticRelated];
+}
 ---
 
 <BaseLayout title={`${listing.title} – Ehren-Deal`}>
@@ -42,36 +184,45 @@ const relatedListings = listings
                     <div class="img-gallery">
                         <div class="img-main-wrap">
                             <img
-                                src={listing.image}
+                                src={allImages[0]?.url || listing.image}
                                 alt={listing.title}
                                 class="img-main"
                                 id="mainImg"
                             />
-                            {
-                                listing.condition === "Neu" && (
-                                    <span class="badge badge-success img-badge-large">
-                                        Neu
-                                    </span>
-                                )
-                            }
-                            {
-                                listing.treuhandAvailable && (
-                                    <div class="treuhand-ribbon">
-                                        <svg
-                                            width="14"
-                                            height="14"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="2.5"
-                                        >
-                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                                        </svg>
-                                        Käuferschutz aktiv
-                                    </div>
-                                )
-                            }
+                            {listing.condition === "Neu" && (
+                                <span class="badge badge-success img-badge-large">Neu</span>
+                            )}
+                            {listing.treuhandAvailable && (
+                                <div class="treuhand-ribbon">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                    </svg>
+                                    Käuferschutz aktiv
+                                </div>
+                            )}
+                            {allImages.length > 1 && (
+                                <button class="gallery-nav gallery-prev" id="galleryPrev" aria-label="Vorheriges Bild">‹</button>
+                            )}
+                            {allImages.length > 1 && (
+                                <button class="gallery-nav gallery-next" id="galleryNext" aria-label="Nächstes Bild">›</button>
+                            )}
+                            <div class="img-counter" id="imgCounter">
+                                {allImages.length > 1 ? `1 / ${allImages.length}` : ''}
+                            </div>
                         </div>
+                        {allImages.length > 1 && (
+                            <div class="img-thumbs">
+                                {allImages.map((img, i) => (
+                                    <button
+                                        class={`img-thumb ${i === 0 ? 'active' : ''}`}
+                                        data-index={i}
+                                        data-url={img.url}
+                                    >
+                                        <img src={img.url} alt={`Bild ${i + 1}`} />
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     <!-- Description -->
@@ -116,18 +267,18 @@ const relatedListings = listings
                                 >
                             </div>
                             <div class="detail-row">
-                                <span class="detail-key">Inserat-ID</span>
-                                <span
-                                    class="detail-val"
-                                    style="color:var(--color-text-faint);"
-                                    >#{listing.id.padStart(8, "0")}</span
-                                >
+                                <span class="detail-key">Eingestellt</span>
+                                <span class="detail-val">{listing.postedAt}</span>
                             </div>
                             <div class="detail-row">
-                                <span class="detail-key">Eingestellt</span>
-                                <span class="detail-val"
-                                    >{listing.postedAt}</span
-                                >
+                                <span class="detail-key">Aufrufe</span>
+                                <span class="detail-val">{listing.viewCount ?? 0}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Inserat-ID</span>
+                                <span class="detail-val" style="color:var(--color-text-faint); font-size:var(--text-xs); font-family:monospace;">
+                                    {listing.id.length > 12 ? listing.id.slice(-8) : listing.id}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -328,96 +479,53 @@ const relatedListings = listings
                         </div>
                     </div>
 
-                    <!-- Risk Score -->
-                    <div
-                        class="card"
-                        style="margin-top:var(--space-4); padding:var(--space-5);"
-                    >
+                    <!-- Risk Score (dynamisch) -->
+                    <div class="card" style="margin-top:var(--space-4); padding:var(--space-5);">
                         <div class="risk-header">
-                            <span
-                                style="font-size:var(--text-sm); font-weight:700;"
-                                >Sicherheits-Score</span
-                            >
-                            <span
-                                class="badge badge-success"
-                                style="font-size:0.65rem;">Niedrig</span
-                            >
+                            <span style="font-size:var(--text-sm); font-weight:700;">Sicherheits-Score</span>
+                            <span class={`badge ${securityBadge}`} style="font-size:0.65rem;">{securityLabel}</span>
                         </div>
                         <div class="risk-bar-wrap">
-                            <div class="risk-bar" style="width: 88%"></div>
+                            <div class="risk-bar" style={`width: ${securityScore}%`}></div>
                         </div>
                         <div class="risk-labels">
                             <span>Risiko</span>
-                            <span
-                                style="color:var(--color-success); font-weight:600;"
-                                >88 / 100</span
-                            >
+                            <span style={`color:${securityColor}; font-weight:600;`}>{securityScore} / 100</span>
                         </div>
                         <div class="risk-checks">
-                            <div class="risk-check ok">
-                                <svg
-                                    width="12"
-                                    height="12"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2.5"
-                                    ><polyline points="20 6 9 17 4 12"
-                                    ></polyline></svg
-                                > Verifizierter Verkäufer
+                            <div class={`risk-check ${listing.sellerVerified ? 'ok' : 'warn'}`}>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    {listing.sellerVerified
+                                        ? <polyline points="20 6 9 17 4 12" />
+                                        : <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>
+                                    }
+                                </svg>
+                                {listing.sellerVerified ? 'Verifizierter Verkäufer' : 'Verkäufer nicht verifiziert'}
                             </div>
-                            <div class="risk-check ok">
-                                <svg
-                                    width="12"
-                                    height="12"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2.5"
-                                    ><polyline points="20 6 9 17 4 12"
-                                    ></polyline></svg
-                                > Preis im marktüblichen Bereich
+                            <div class={`risk-check ${listing.sellerKYC ? 'ok' : 'warn'}`}>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    {listing.sellerKYC
+                                        ? <polyline points="20 6 9 17 4 12" />
+                                        : <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>
+                                    }
+                                </svg>
+                                {listing.sellerKYC ? 'KYC-Identität bestätigt' : 'Keine KYC-Verifizierung'}
                             </div>
-                            <div class="risk-check ok">
-                                <svg
-                                    width="12"
-                                    height="12"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2.5"
-                                    ><polyline points="20 6 9 17 4 12"
-                                    ></polyline></svg
-                                > Keine Betrugsmuster erkannt
+                            <div class={`risk-check ${listing.treuhandAvailable ? 'ok' : 'warn'}`}>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    {listing.treuhandAvailable
+                                        ? <polyline points="20 6 9 17 4 12" />
+                                        : <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>
+                                    }
+                                </svg>
+                                {listing.treuhandAvailable ? 'Treuhandkonto verfügbar' : 'Kein Treuhandschutz'}
                             </div>
-                            {
-                                listing.treuhandAvailable && (
-                                    <div class="risk-check ok">
-                                        <svg
-                                            width="12"
-                                            height="12"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="2.5"
-                                        >
-                                            <polyline points="20 6 9 17 4 12" />
-                                        </svg>{" "}
-                                        Treuhandkonto verfügbar
-                                    </div>
-                                )
-                            }
                         </div>
                     </div>
 
-                    <!-- Seller Card -->
-                    <div
-                        class="card"
-                        style="margin-top:var(--space-4); padding:var(--space-5);"
-                    >
-                        <h3
-                            style="font-size:var(--text-sm); font-weight:700; margin-bottom:var(--space-4); color:var(--color-text-muted); text-transform:uppercase; letter-spacing:0.06em;"
-                        >
+                    <!-- Seller Card (echte Daten) -->
+                    <div class="card" style="margin-top:var(--space-4); padding:var(--space-5);">
+                        <h3 style="font-size:var(--text-sm); font-weight:700; margin-bottom:var(--space-4); color:var(--color-text-muted); text-transform:uppercase; letter-spacing:0.06em;">
                             Über den Verkäufer
                         </h3>
                         <div class="seller-block">
@@ -425,56 +533,39 @@ const relatedListings = listings
                                 {listing.sellerName.charAt(0)}
                             </div>
                             <div>
-                                <div class="seller-name-detail">
-                                    {listing.sellerName}
-                                </div>
+                                <div class="seller-name-detail">{listing.sellerName}</div>
                                 <div class="seller-badges">
-                                    {
-                                        listing.sellerKYC && (
-                                            <span
-                                                class="trust-badge trust-kyc"
-                                                style="font-size:0.65rem; padding:3px 7px;"
-                                            >
-                                                KYC-verifiziert
-                                            </span>
-                                        )
-                                    }
-                                    {
-                                        listing.sellerVerified && (
-                                            <span
-                                                class="trust-badge trust-verified"
-                                                style="font-size:0.65rem; padding:3px 7px;"
-                                            >
-                                                ✓ Bestätigt
-                                            </span>
-                                        )
-                                    }
+                                    {listing.sellerKYC && (
+                                        <span class="trust-badge trust-kyc" style="font-size:0.65rem; padding:3px 7px;">KYC-verifiziert</span>
+                                    )}
+                                    {listing.sellerVerified && (
+                                        <span class="trust-badge trust-verified" style="font-size:0.65rem; padding:3px 7px;">✓ Bestätigt</span>
+                                    )}
                                 </div>
                             </div>
                         </div>
                         <div class="seller-stats">
                             <div class="seller-stat-item">
-                                <span class="stars" style="font-size:1rem;"
-                                    >{stars}</span
-                                >
-                                <span
-                                    style="font-size:var(--text-sm); font-weight:600;"
-                                    >{listing.sellerRating.toFixed(1)}</span
-                                >
+                                <span class="stars" style="font-size:1rem;">{stars}</span>
+                                <span style="font-size:var(--text-sm); font-weight:600;">
+                                    {listing.sellerRating > 0 ? listing.sellerRating.toFixed(1) : '–'}
+                                </span>
                             </div>
                             <div class="seller-stats-meta">
-                                <span
-                                    style="font-size:var(--text-xs); color:var(--color-text-muted);"
-                                    >Mitglied seit 2022 · 47 Bewertungen</span
-                                >
+                                <span style="font-size:var(--text-xs); color:var(--color-text-muted);">
+                                    Mitglied seit {sellerMemberSince} · {sellerListingCount} {sellerListingCount === 1 ? 'Anzeige' : 'Anzeigen'}
+                                </span>
                             </div>
                         </div>
-                        <a
-                            href="/profil"
-                            class="btn btn-secondary w-full btn-sm"
-                            style="margin-top:var(--space-4); justify-content:center;"
-                            >Profil ansehen</a
-                        >
+                        {sellerId ? (
+                            <a href={`/profil/${sellerId}`} class="btn btn-secondary w-full btn-sm" style="margin-top:var(--space-4); justify-content:center;">
+                                Profil ansehen
+                            </a>
+                        ) : (
+                            <a href="/profil" class="btn btn-secondary w-full btn-sm" style="margin-top:var(--space-4); justify-content:center;">
+                                Profil ansehen
+                            </a>
+                        )}
                     </div>
                 </div>
             </div>
@@ -628,6 +719,65 @@ const relatedListings = listings
         display: flex;
         align-items: center;
         gap: var(--space-2);
+    }
+    /* Gallery Navigation */
+    .gallery-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0,0,0,0.5);
+        color: white;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-full);
+        font-size: 1.4rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+        z-index: 5;
+    }
+    .gallery-nav:hover { background: rgba(0,0,0,0.75); }
+    .gallery-prev { left: var(--space-3); }
+    .gallery-next { right: var(--space-3); }
+    .img-counter {
+        position: absolute;
+        bottom: var(--space-3);
+        right: var(--space-3);
+        background: rgba(0,0,0,0.6);
+        color: white;
+        font-size: var(--text-xs);
+        padding: 2px 10px;
+        border-radius: var(--radius-full);
+        z-index: 5;
+    }
+    .img-thumbs {
+        display: flex;
+        gap: var(--space-2);
+        margin-top: var(--space-3);
+        overflow-x: auto;
+        padding-bottom: var(--space-2);
+    }
+    .img-thumb {
+        flex-shrink: 0;
+        width: 72px;
+        height: 54px;
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 2px solid transparent;
+        cursor: pointer;
+        background: var(--color-surface-2);
+        padding: 0;
+        transition: border-color 0.2s;
+    }
+    .img-thumb.active { border-color: var(--color-primary); }
+    .img-thumb:hover { border-color: var(--color-border-hover); }
+    .img-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
     .detail-table {
         display: flex;
@@ -790,6 +940,12 @@ const relatedListings = listings
     }
     .risk-check.ok svg {
         color: var(--color-success);
+    }
+    .risk-check.warn {
+        color: var(--color-warning);
+    }
+    .risk-check.warn svg {
+        color: var(--color-warning);
     }
 
     /* Seller */
@@ -959,19 +1115,44 @@ const relatedListings = listings
 </style>
 
 <script>
+    // ── Contact Modal ──
     const contactBtn = document.getElementById("contactBtn");
     const modal = document.getElementById("contactModal");
     const closeModal = document.getElementById("closeModal");
     const closeModal2 = document.getElementById("closeModal2");
 
     contactBtn?.addEventListener("click", () => modal?.classList.add("open"));
-    closeModal?.addEventListener("click", () =>
-        modal?.classList.remove("open"),
-    );
-    closeModal2?.addEventListener("click", () =>
-        modal?.classList.remove("open"),
-    );
+    closeModal?.addEventListener("click", () => modal?.classList.remove("open"));
+    closeModal2?.addEventListener("click", () => modal?.classList.remove("open"));
     modal?.addEventListener("click", (e) => {
         if (e.target === modal) modal.classList.remove("open");
+    });
+
+    // ── Image Gallery ──
+    const mainImg = document.getElementById("mainImg") as HTMLImageElement | null;
+    const thumbs = document.querySelectorAll<HTMLButtonElement>(".img-thumb");
+    const prevBtn = document.getElementById("galleryPrev");
+    const nextBtn = document.getElementById("galleryNext");
+    const counter = document.getElementById("imgCounter");
+    const urls = Array.from(thumbs).map((t) => t.dataset.url || "");
+    let currentIdx = 0;
+
+    function showImage(idx: number) {
+        if (!mainImg || urls.length === 0) return;
+        currentIdx = (idx + urls.length) % urls.length;
+        mainImg.src = urls[currentIdx];
+        thumbs.forEach((t, i) => t.classList.toggle("active", i === currentIdx));
+        if (counter && urls.length > 1) counter.textContent = `${currentIdx + 1} / ${urls.length}`;
+    }
+
+    thumbs.forEach((t) => t.addEventListener("click", () => showImage(Number(t.dataset.index))));
+    prevBtn?.addEventListener("click", () => showImage(currentIdx - 1));
+    nextBtn?.addEventListener("click", () => showImage(currentIdx + 1));
+
+    // Keyboard navigation
+    document.addEventListener("keydown", (e) => {
+        if (urls.length <= 1) return;
+        if (e.key === "ArrowLeft") showImage(currentIdx - 1);
+        if (e.key === "ArrowRight") showImage(currentIdx + 1);
     });
 </script>

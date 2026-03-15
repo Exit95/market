@@ -168,7 +168,7 @@ import { categories } from "../data/listings";
                                 </select>
                             </div>
                         </div>
-                        <div class="form-row">
+                        <div class="form-row" style="align-items:flex-end;">
                             <div class="form-group" style="flex:1;">
                                 <label class="label" for="plz">PLZ *</label>
                                 <input
@@ -188,10 +188,22 @@ import { categories } from "../data/listings";
                                     id="city"
                                     class="input"
                                     placeholder="wird automatisch ermittelt"
-                                    readonly
                                 />
                             </div>
+                            <div class="form-group" style="flex:0 0 auto;">
+                                <button
+                                    type="button"
+                                    id="geoLocateBtn"
+                                    class="btn btn-secondary btn-sm"
+                                    style="white-space:nowrap; display:flex; align-items:center; gap:6px; height:42px;"
+                                    title="Standort ermitteln"
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line></svg>
+                                    <span id="geoLocateText">Ort ermitteln</span>
+                                </button>
+                            </div>
                         </div>
+                        <div id="geoStatus" class="hidden" style="font-size:0.85rem; margin-top:-8px; margin-bottom:8px; color:var(--ehren-accent,#c8973a);"></div>
                         <div class="form-group">
                             <label class="label">Versand & Übergabe</label>
                             <div class="toggle-group">
@@ -616,19 +628,29 @@ import { categories } from "../data/listings";
 </style>
 
 <script>
-    // Step navigation
+    // ── Helpers ─────────────────────────────────────────────────────────
+    function fetchT(url: string, opts: RequestInit = {}, ms = 30000): Promise<Response> {
+        const c = new AbortController();
+        const t = setTimeout(() => c.abort(), ms);
+        return fetch(url, { ...opts, signal: c.signal }).finally(() => clearTimeout(t));
+    }
+
+    // slug → ENUM mapping
+    const SLUG_TO_ENUM: Record<string, string> = {
+        elektronik: 'ELEKTRONIK', fahrzeuge: 'FAHRZEUGE', mode: 'MODE',
+        moebel: 'MOEBEL', sport: 'SPORT', haushalt: 'HAUSHALT',
+        bucher: 'BUCHER', spielzeug: 'SPIELZEUG', sonstiges: 'SONSTIGES',
+    };
+
+    // ── State ───────────────────────────────────────────────────────────
     let currentStep = 1;
     let selectedCategory: string | null = null;
+    const selectedFiles: File[] = [];
 
+    // ── Step navigation ─────────────────────────────────────────────────
     function goToStep(step: number) {
-        document
-            .querySelectorAll(".step-content")
-            .forEach((el) => el.classList.add("hidden"));
-        const target = document.getElementById(`step${step}`);
-        if (target) {
-            target.classList.remove("hidden");
-        }
-
+        document.querySelectorAll(".step-content").forEach((el) => el.classList.add("hidden"));
+        document.getElementById(`step${step}`)?.classList.remove("hidden");
         document.querySelectorAll(".progress-step").forEach((el, idx) => {
             el.classList.remove("active", "done");
             if (idx + 1 < step) el.classList.add("done");
@@ -638,90 +660,331 @@ import { categories } from "../data/listings";
         window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    // Category selection
+    // ── Category selection ──────────────────────────────────────────────
     document.querySelectorAll(".cat-select-btn").forEach((btn) => {
         btn.addEventListener("click", () => {
-            document
-                .querySelectorAll(".cat-select-btn")
-                .forEach((b) => b.classList.remove("selected"));
+            document.querySelectorAll(".cat-select-btn").forEach((b) => b.classList.remove("selected"));
             btn.classList.add("selected");
             selectedCategory = btn.getAttribute("data-cat");
-            (document.getElementById("toStep2") as HTMLButtonElement).disabled =
-                false;
+            (document.getElementById("toStep2") as HTMLButtonElement).disabled = false;
         });
     });
 
-    document
-        .getElementById("toStep2")
-        ?.addEventListener("click", () => goToStep(2));
-    document
-        .getElementById("backToStep1")
-        ?.addEventListener("click", () => goToStep(1));
-    document
-        .getElementById("toStep3")
-        ?.addEventListener("click", () => goToStep(3));
-    document
-        .getElementById("backToStep2")
-        ?.addEventListener("click", () => goToStep(2));
+    // ── Location helpers ─────────────────────────────────────────────────
+    const plzInput = document.getElementById("plz") as HTMLInputElement;
+    const cityInput = document.getElementById("city") as HTMLInputElement;
+    const geoBtn = document.getElementById("geoLocateBtn") as HTMLButtonElement;
+    const geoText = document.getElementById("geoLocateText") as HTMLSpanElement;
+    const geoStatus = document.getElementById("geoStatus") as HTMLDivElement;
+
+    function showGeoStatus(msg: string, isError = false) {
+        geoStatus.textContent = msg;
+        geoStatus.style.color = isError ? '#e53e3e' : 'var(--ehren-accent,#c8973a)';
+        geoStatus.classList.remove('hidden');
+        if (!isError) setTimeout(() => geoStatus.classList.add('hidden'), 4000);
+    }
+
+    // PLZ → City auto-lookup via openplzapi
+    if (plzInput && cityInput) {
+        plzInput.addEventListener("input", async () => {
+            const plz = plzInput.value.trim();
+            if (plz.length === 5 && /^[0-9]{5}$/.test(plz)) {
+                try {
+                    const res = await fetch(`https://openplzapi.org/de/Localities?postalCode=${plz}&page=1&pageSize=1`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data && data.length > 0) {
+                            cityInput.value = data[0].name || '';
+                        }
+                    }
+                } catch {
+                    // API not reachable – user can type manually
+                }
+            }
+        });
+    }
+
+    // Browser Geolocation → Reverse Geocode → PLZ + City
+    if (geoBtn) {
+        geoBtn.addEventListener("click", () => {
+            if (!navigator.geolocation) {
+                showGeoStatus('Standortermittlung wird von deinem Browser nicht unterstützt.', true);
+                return;
+            }
+            geoBtn.disabled = true;
+            geoText.textContent = 'Wird ermittelt…';
+            showGeoStatus('Standort wird ermittelt – bitte Zugriff erlauben…');
+
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    const { latitude, longitude } = pos.coords;
+                    try {
+                        const res = await fetchT(
+                            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1&accept-language=de`,
+                            { headers: { 'User-Agent': 'EhrenDeal/1.0' } },
+                            10000
+                        );
+                        if (res.ok) {
+                            const data = await res.json();
+                            const addr = data.address || {};
+                            const city = addr.city || addr.town || addr.village || addr.municipality || '';
+                            const postcode = addr.postcode || '';
+                            if (city && cityInput) cityInput.value = city;
+                            if (postcode && plzInput) plzInput.value = postcode;
+                            showGeoStatus(city ? `Standort erkannt: ${postcode} ${city}` : 'Standort erkannt, Ort konnte nicht zugeordnet werden.');
+                        } else {
+                            showGeoStatus('Geocoding fehlgeschlagen – bitte manuell eingeben.', true);
+                        }
+                    } catch {
+                        showGeoStatus('Geocoding-Timeout – bitte manuell eingeben.', true);
+                    }
+                    geoBtn.disabled = false;
+                    geoText.textContent = 'Ort ermitteln';
+                },
+                (err) => {
+                    const msgs: Record<number, string> = {
+                        1: 'Standort-Zugriff verweigert. Bitte in den Browser-Einstellungen erlauben.',
+                        2: 'Standort konnte nicht ermittelt werden.',
+                        3: 'Zeitüberschreitung bei Standortermittlung.',
+                    };
+                    showGeoStatus(msgs[err.code] || 'Standortfehler.', true);
+                    geoBtn.disabled = false;
+                    geoText.textContent = 'Ort ermitteln';
+                },
+                { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
+            );
+        });
+    }
+
+    // ── Navigation buttons ──────────────────────────────────────────────
+    document.getElementById("toStep2")?.addEventListener("click", () => goToStep(2));
+    document.getElementById("backToStep1")?.addEventListener("click", () => goToStep(1));
+    document.getElementById("toStep3")?.addEventListener("click", () => goToStep(3));
+    document.getElementById("backToStep2")?.addEventListener("click", () => goToStep(2));
     document.getElementById("toStep4")?.addEventListener("click", () => {
-        // Update preview
-        const titleVal =
-            (document.getElementById("title") as HTMLInputElement)?.value ||
-            "Deine Anzeige";
-        const priceVal =
-            (document.getElementById("price") as HTMLInputElement)?.value ||
-            "0";
+        const titleVal = (document.getElementById("title") as HTMLInputElement)?.value || "Deine Anzeige";
+        const priceVal = (document.getElementById("price") as HTMLInputElement)?.value || "0";
         const previewTitle = document.getElementById("previewTitle");
         const previewPrice = document.getElementById("previewPrice");
         if (previewTitle) previewTitle.textContent = titleVal;
-        if (previewPrice)
-            previewPrice.textContent = `${parseFloat(priceVal).toLocaleString("de-DE")} €`;
+        if (previewPrice) previewPrice.textContent = `${parseFloat(priceVal).toLocaleString("de-DE")} €`;
+
+        // Show first photo in preview if available
+        const reviewImg = document.querySelector(".review-img-placeholder") as HTMLElement;
+        if (reviewImg && selectedFiles.length > 0) {
+            reviewImg.style.backgroundImage = `url(${URL.createObjectURL(selectedFiles[0])})`;
+            reviewImg.style.backgroundSize = 'cover';
+            reviewImg.style.backgroundPosition = 'center';
+        }
+
         goToStep(4);
     });
-    document
-        .getElementById("backToStep3")
-        ?.addEventListener("click", () => goToStep(3));
+    document.getElementById("backToStep3")?.addEventListener("click", () => goToStep(3));
 
-    // Price warning
+    // ── Price warning ───────────────────────────────────────────────────
     document.getElementById("price")?.addEventListener("input", (e) => {
         const val = parseFloat((e.target as HTMLInputElement).value);
         const warn = document.getElementById("priceWarning");
-        if (warn) {
-            if (val > 0 && val < 5) {
-                warn.classList.remove("hidden");
-            } else {
-                warn.classList.add("hidden");
-            }
-        }
+        if (warn) { val > 0 && val < 5 ? warn.classList.remove("hidden") : warn.classList.add("hidden"); }
     });
 
-    // Char count
+    // ── Char count ──────────────────────────────────────────────────────
     document.getElementById("title")?.addEventListener("input", (e) => {
         const len = (e.target as HTMLInputElement).value.length;
         const counter = document.querySelector(".char-count");
         if (counter) counter.textContent = `${len} / 80`;
     });
 
-    // Checkbox submit enable
+    // ── Photo handling ──────────────────────────────────────────────────
+    const uploadArea = document.getElementById("uploadArea")!;
+    const photoInput = document.getElementById("photoInput") as HTMLInputElement;
+    const photoGrid = document.getElementById("photoGrid")!;
+    const uploadError = document.getElementById("uploadError")!;
+
+    function renderThumbnails() {
+        photoGrid.innerHTML = '';
+        selectedFiles.forEach((file, idx) => {
+            const thumb = document.createElement('div');
+            thumb.className = 'photo-thumb';
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.alt = file.name;
+            const del = document.createElement('button');
+            del.className = 'photo-thumb-del';
+            del.textContent = '✕';
+            del.type = 'button';
+            del.addEventListener('click', () => { selectedFiles.splice(idx, 1); renderThumbnails(); });
+            thumb.appendChild(img);
+            thumb.appendChild(del);
+            photoGrid.appendChild(thumb);
+        });
+        // Add "+" button if under 12
+        if (selectedFiles.length < 12) {
+            const addBtn = document.createElement('div');
+            addBtn.className = 'photo-thumb-add';
+            addBtn.textContent = '+';
+            addBtn.addEventListener('click', () => photoInput.click());
+            photoGrid.appendChild(addBtn);
+        }
+    }
+
+    function addFiles(files: FileList | File[]) {
+        uploadError.classList.add('hidden');
+        for (const file of Array.from(files)) {
+            if (selectedFiles.length >= 12) {
+                uploadError.textContent = 'Maximal 12 Fotos erlaubt.';
+                uploadError.classList.remove('hidden');
+                break;
+            }
+            if (file.size > 10 * 1024 * 1024) {
+                uploadError.textContent = `"${file.name}" ist zu groß (max. 10 MB).`;
+                uploadError.classList.remove('hidden');
+                continue;
+            }
+            if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+                uploadError.textContent = `"${file.name}" hat ein ungültiges Format.`;
+                uploadError.classList.remove('hidden');
+                continue;
+            }
+            selectedFiles.push(file);
+        }
+        renderThumbnails();
+    }
+
+    photoInput.addEventListener('change', () => { if (photoInput.files) addFiles(photoInput.files); photoInput.value = ''; });
+    uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('border-primary', 'bg-primary/5'); });
+    uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('border-primary', 'bg-primary/5'); });
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('border-primary', 'bg-primary/5');
+        if (e.dataTransfer?.files) addFiles(e.dataTransfer.files);
+    });
+
+    // ── Checkbox submit enable ──────────────────────────────────────────
     const checks = ["check1", "check2", "check3"];
     checks.forEach((id) => {
         document.getElementById(id)?.addEventListener("change", () => {
-            const allChecked = checks.every(
-                (c) =>
-                    (document.getElementById(c) as HTMLInputElement)?.checked,
-            );
-            (
-                document.getElementById("submitBtn") as HTMLButtonElement
-            ).disabled = !allChecked;
+            const allChecked = checks.every((c) => (document.getElementById(c) as HTMLInputElement)?.checked);
+            (document.getElementById("submitBtn") as HTMLButtonElement).disabled = !allChecked;
         });
     });
 
-    // Submit
-    document.getElementById("submitBtn")?.addEventListener("click", () => {
-        document
-            .querySelectorAll(".step-content")
-            .forEach((el) => el.classList.add("hidden"));
-        document.getElementById("successState")?.classList.remove("hidden");
-        window.scrollTo({ top: 0, behavior: "smooth" });
+    // ── Submit – real API flow ──────────────────────────────────────────
+    let isSubmitting = false;
+    document.getElementById("submitBtn")?.addEventListener("click", async () => {
+        if (isSubmitting) return; // Guard against double-submit
+        isSubmitting = true;
+        const btn = document.getElementById("submitBtn") as HTMLButtonElement;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="upload-spinner" style="display:inline-block;width:16px;height:16px;"></span> Wird veröffentlicht…';
+
+        const title = (document.getElementById("title") as HTMLInputElement).value.trim();
+        const description = (document.getElementById("desc") as HTMLTextAreaElement).value.trim();
+        const priceRaw = parseFloat((document.getElementById("price") as HTMLInputElement).value);
+        const price = Math.round(priceRaw * 100); // Convert € to Cent
+        const city = (document.getElementById("city") as HTMLInputElement)?.value?.trim() || '';
+        const postalCode = (document.getElementById("plz") as HTMLInputElement)?.value?.trim() || '';
+        const conditionSel = (document.getElementById("condition") as HTMLSelectElement)?.value || '';
+        const COND_MAP: Record<string, string> = { neu: 'Neu', sehr_gut: 'Sehr gut', gut: 'Gut', akzeptabel: 'Akzeptabel' };
+        const condition = COND_MAP[conditionSel] || undefined;
+        const treuhand = !!(document.querySelector('input[name="shipping"][value="treuhand"]') as HTMLInputElement)?.checked;
+        const category = SLUG_TO_ENUM[selectedCategory || ''] || 'SONSTIGES';
+
+        // ── Frontend-Validierung ──────────────────────────────────────
+        const errors: string[] = [];
+        if (title.length < 3) errors.push('Titel muss mindestens 3 Zeichen haben.');
+        if (description.length < 10) errors.push('Beschreibung muss mindestens 10 Zeichen haben.');
+        if (isNaN(price) || price < 0) errors.push('Bitte einen gültigen Preis eingeben.');
+        if (postalCode.length < 4) errors.push('Bitte eine gültige PLZ eingeben.');
+        if (!conditionSel) errors.push('Bitte einen Zustand auswählen.');
+        if (errors.length > 0) {
+            uploadError.textContent = errors.join(' ');
+            uploadError.classList.remove('hidden');
+            btn.disabled = false;
+            btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-white"><polyline points="20 6 9 17 4 12"></polyline></svg> Anzeige kostenfrei veröffentlichen`;
+            const allChecked = checks.every((c) => (document.getElementById(c) as HTMLInputElement)?.checked);
+            btn.disabled = !allChecked;
+            return;
+        }
+
+        try {
+            // Step 1: Create the listing
+            const listingRes = await fetchT('/api/listings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, description, price, category, city, postalCode, condition, treuhand, status: 'ACTIVE' }),
+            });
+            const listingData = await listingRes.json();
+            if (!listingRes.ok) throw new Error(listingData.error || 'Fehler beim Erstellen der Anzeige');
+            const listingId = listingData.listing.id;
+
+            // Step 2: Upload photos (if any)
+            if (selectedFiles.length > 0) {
+                const progressWrap = document.getElementById("uploadProgress")!;
+                const progressText = document.getElementById("uploadProgressText")!;
+                const progressBar = document.getElementById("uploadProgressBar")!;
+                progressWrap.classList.remove("hidden");
+
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    const file = selectedFiles[i];
+                    progressText.textContent = `Foto ${i + 1}/${selectedFiles.length} wird hochgeladen…`;
+                    progressBar.style.width = `${((i) / selectedFiles.length) * 100}%`;
+
+                    // 2a: Get presigned URL
+                    const presignRes = await fetchT('/api/uploads/presign', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            type: 'listingImage',
+                            listingId,
+                            contentType: file.type,
+                            size: file.size,
+                        }),
+                    });
+                    const presignData = await presignRes.json();
+                    if (!presignRes.ok) throw new Error(presignData.error || 'Presign-Fehler');
+
+                    // 2b: Upload to S3
+                    const uploadRes = await fetch(presignData.uploadUrl, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': file.type },
+                        body: file,
+                    });
+                    if (!uploadRes.ok) throw new Error(`Upload-Fehler für Foto ${i + 1}`);
+
+                    // 2c: Confirm upload
+                    const confirmRes = await fetchT('/api/uploads/confirm', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ listingId, objectKey: presignData.objectKey, position: i }),
+                    });
+                    if (!confirmRes.ok) {
+                        const cData = await confirmRes.json();
+                        throw new Error(cData.error || 'Bestätigungs-Fehler');
+                    }
+
+                    progressBar.style.width = `${((i + 1) / selectedFiles.length) * 100}%`;
+                }
+                progressText.textContent = 'Alle Fotos hochgeladen ✓';
+            }
+
+            // Step 3: Show success
+            document.querySelectorAll(".step-content").forEach((el) => el.classList.add("hidden"));
+            document.getElementById("successState")?.classList.remove("hidden");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+        } catch (err: any) {
+            isSubmitting = false; // Allow retry
+            const msg = err instanceof DOMException && err.name === 'AbortError'
+                ? 'Zeitüberschreitung – bitte erneut versuchen.'
+                : err.message || 'Unbekannter Fehler';
+            uploadError.textContent = msg;
+            uploadError.classList.remove('hidden');
+            btn.disabled = false;
+            btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-white"><polyline points="20 6 9 17 4 12"></polyline></svg> Anzeige kostenfrei veröffentlichen`;
+            // Re-check checkboxes state
+            const allChecked = checks.every((c) => (document.getElementById(c) as HTMLInputElement)?.checked);
+            btn.disabled = !allChecked;
+        }
     });
 </script>

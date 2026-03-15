@@ -1,0 +1,322 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { lucia, prisma } from "../lib/auth";
+
+// Auth check
+const sessionId = Astro.cookies.get(lucia.sessionCookieName)?.value;
+if (!sessionId) return Astro.redirect("/anmelden?redirect=/einstellungen");
+
+const { user: sessionUser } = await lucia.validateSession(sessionId);
+if (!sessionUser) return Astro.redirect("/anmelden?redirect=/einstellungen");
+
+const dbUser = await prisma.user.findUnique({
+    where: { id: sessionUser.id },
+    select: {
+        id: true, email: true, firstName: true, lastName: true,
+        phone: true, city: true, postalCode: true,
+        emailVerified: true, phoneVerified: true, idVerified: true,
+        createdAt: true,
+    },
+});
+if (!dbUser) return Astro.redirect("/anmelden?redirect=/einstellungen");
+---
+
+<BaseLayout title="Einstellungen – Ehren-Deal">
+    <Header />
+    <main class="settings-main">
+        <div class="settings-container">
+            <!-- Back Link -->
+            <a href="/profil" class="back-link">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M19 12H5m0 0l7 7m-7-7l7-7"/></svg>
+                Zurück zum Profil
+            </a>
+
+            <h1 class="settings-title">Einstellungen</h1>
+
+            <!-- Tabs -->
+            <div class="settings-tabs">
+                <button class="settings-tab active" data-tab="profile">Profil</button>
+                <button class="settings-tab" data-tab="security">Sicherheit</button>
+                <button class="settings-tab" data-tab="notifications">Benachrichtigungen</button>
+            </div>
+
+            <!-- Profile Tab -->
+            <div class="settings-panel" id="panel-profile">
+                <h2 class="panel-title">Persönliche Daten</h2>
+                <p class="panel-desc">Bearbeite deine Profildaten. Diese werden bei Deals und auf deinem Profil angezeigt.</p>
+
+                <form id="profile-form" class="settings-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">Vorname</label>
+                            <input type="text" id="firstName" name="firstName" value={dbUser.firstName || ''} maxlength="80" />
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Nachname</label>
+                            <input type="text" id="lastName" name="lastName" value={dbUser.lastName || ''} maxlength="80" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">E-Mail-Adresse</label>
+                        <input type="email" id="email" value={dbUser.email} disabled />
+                        <span class="form-hint">E-Mail kann nicht geändert werden. {dbUser.emailVerified ? '✓ Verifiziert' : '⚠ Nicht verifiziert'}</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Handynummer</label>
+                        <input type="tel" id="phone" name="phone" value={dbUser.phone || ''} placeholder="+49 151 12345678" />
+                        <span class="form-hint">{dbUser.phoneVerified ? '✓ Verifiziert' : 'Nach Änderung erneut verifizieren auf der Profilseite'}</span>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city">Stadt</label>
+                            <input type="text" id="city" name="city" value={dbUser.city || ''} maxlength="100" />
+                        </div>
+                        <div class="form-group">
+                            <label for="postalCode">PLZ</label>
+                            <input type="text" id="postalCode" name="postalCode" value={dbUser.postalCode || ''} maxlength="10" />
+                        </div>
+                    </div>
+                    <div id="profile-msg" class="form-msg"></div>
+                    <button type="submit" class="btn btn-primary">Änderungen speichern</button>
+                </form>
+            </div>
+
+            <!-- Security Tab -->
+            <div class="settings-panel hidden" id="panel-security">
+                <h2 class="panel-title">Passwort ändern</h2>
+                <p class="panel-desc">Wähle ein sicheres Passwort mit mindestens 8 Zeichen.</p>
+
+                <form id="password-form" class="settings-form">
+                    <div class="form-group">
+                        <label for="currentPassword">Aktuelles Passwort</label>
+                        <input type="password" id="currentPassword" name="currentPassword" required autocomplete="current-password" />
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">Neues Passwort</label>
+                        <input type="password" id="newPassword" name="newPassword" required minlength="8" autocomplete="new-password" />
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Neues Passwort bestätigen</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8" autocomplete="new-password" />
+                    </div>
+                    <div id="password-msg" class="form-msg"></div>
+                    <button type="submit" class="btn btn-primary">Passwort ändern</button>
+                </form>
+
+                <div class="security-info">
+                    <h2 class="panel-title" style="margin-top:2.5rem;">Verifizierungen</h2>
+                    <div class="verif-status-list">
+                        <div class="verif-status-item">
+                            <span>E-Mail</span>
+                            <span class={dbUser.emailVerified ? 'status-ok' : 'status-pending'}>{dbUser.emailVerified ? '✓ Verifiziert' : '⚠ Ausstehend'}</span>
+                        </div>
+                        <div class="verif-status-item">
+                            <span>Handynummer</span>
+                            <span class={dbUser.phoneVerified ? 'status-ok' : 'status-pending'}>{dbUser.phoneVerified ? '✓ Verifiziert' : '⚠ Ausstehend'}</span>
+                        </div>
+                        <div class="verif-status-item">
+                            <span>Personalausweis (KYC)</span>
+                            <span class={dbUser.idVerified ? 'status-ok' : 'status-pending'}>{dbUser.idVerified ? '✓ Verifiziert' : '⚠ Ausstehend'}</span>
+                        </div>
+                    </div>
+                    <a href="/profil" class="btn btn-secondary btn-sm" style="margin-top:1rem;">Verifizierungen verwalten →</a>
+                </div>
+            </div>
+
+            <!-- Notifications Tab -->
+            <div class="settings-panel hidden" id="panel-notifications">
+                <h2 class="panel-title">Benachrichtigungen</h2>
+                <p class="panel-desc">Wähle, worüber du informiert werden möchtest.</p>
+
+                <div class="notification-options">
+                    <label class="notif-toggle">
+                        <div>
+                            <span class="notif-label">Deal-Updates</span>
+                            <span class="notif-desc">Benachrichtigungen bei Statusänderungen deiner Deals</span>
+                        </div>
+                        <input type="checkbox" id="notif-deals" checked />
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <label class="notif-toggle">
+                        <div>
+                            <span class="notif-label">Neue Nachrichten</span>
+                            <span class="notif-desc">E-Mail bei neuen Chat-Nachrichten</span>
+                        </div>
+                        <input type="checkbox" id="notif-messages" checked />
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <label class="notif-toggle">
+                        <div>
+                            <span class="notif-label">Sicherheitswarnungen</span>
+                            <span class="notif-desc">Login-Versuche und Kontoänderungen</span>
+                        </div>
+                        <input type="checkbox" id="notif-security" checked />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <p class="form-hint" style="margin-top:1.5rem;">Benachrichtigungs-Einstellungen werden in Kürze vollständig verfügbar sein.</p>
+            </div>
+
+        </div>
+    </main>
+    <Footer />
+</BaseLayout>
+
+<style>
+    .settings-main { @apply pb-16 min-h-screen text-foreground font-body; }
+    .settings-container { @apply max-w-2xl mx-auto px-4 sm:px-6 py-10; }
+
+    .back-link { @apply inline-flex items-center gap-2 text-xs font-condensed tracking-wider uppercase text-foreground/50 hover:text-primary transition-colors mb-6; }
+    .settings-title { @apply text-2xl font-headings font-light tracking-wide text-foreground mb-6; }
+
+    .settings-tabs { @apply flex gap-1 border-b border-foreground/20 mb-8; }
+    .settings-tab { @apply px-4 py-3 text-xs font-condensed uppercase tracking-[.1em] text-foreground/50 hover:text-foreground transition-colors border-b-2 border-transparent cursor-pointer bg-transparent; }
+    .settings-tab.active { @apply text-primary border-primary; }
+
+    .settings-panel { @apply animate-fadeIn; }
+    .settings-panel.hidden { display: none; }
+    .panel-title { @apply text-sm font-condensed uppercase tracking-[.1em] text-foreground/80 mb-2; }
+    .panel-desc { @apply text-xs text-foreground/50 mb-6 font-light; }
+
+    .settings-form { @apply flex flex-col gap-5; }
+    .form-row { @apply grid grid-cols-1 sm:grid-cols-2 gap-5; }
+    .form-group { @apply flex flex-col gap-1.5; }
+    .form-group label { @apply text-xs font-condensed uppercase tracking-[.08em] text-foreground/60; }
+    .form-group input { @apply w-full p-3 bg-secondary/40 border border-foreground/20 text-foreground text-sm outline-none transition-colors; }
+    .form-group input:focus { @apply border-primary/50; }
+    .form-group input:disabled { @apply opacity-50 cursor-not-allowed; }
+    .form-hint { @apply text-[.65rem] text-foreground/40 font-light; }
+
+    .form-msg { @apply text-xs py-2 min-h-[1.5rem]; }
+    .form-msg.error { @apply text-red-400; }
+    .form-msg.success { @apply text-green-400; }
+
+    /* Security */
+    .security-info { @apply mt-8 pt-6 border-t border-foreground/10; }
+    .verif-status-list { @apply flex flex-col gap-2 mt-3; }
+    .verif-status-item { @apply flex items-center justify-between p-3 bg-foreground/[.04] border border-foreground/10 text-sm; }
+    .status-ok { @apply text-green-400 text-xs font-condensed tracking-wider; }
+    .status-pending { @apply text-yellow-400 text-xs font-condensed tracking-wider; }
+
+    /* Notifications */
+    .notification-options { @apply flex flex-col gap-3; }
+    .notif-toggle { @apply flex items-center justify-between p-4 bg-foreground/[.04] border border-foreground/10 cursor-pointer transition-colors hover:bg-foreground/[.08]; }
+    .notif-label { @apply text-sm text-foreground/80 font-medium block; }
+    .notif-desc { @apply text-[.65rem] text-foreground/40 font-light block mt-0.5; }
+
+    .notif-toggle input { @apply hidden; }
+    .toggle-slider { @apply relative w-10 h-5 bg-foreground/20 rounded-full flex-shrink-0 transition-colors; }
+    .toggle-slider::after { content:''; @apply absolute top-0.5 left-0.5 w-4 h-4 bg-foreground/60 rounded-full transition-transform; }
+    .notif-toggle input:checked ~ .toggle-slider { @apply bg-primary/60; }
+    .notif-toggle input:checked ~ .toggle-slider::after { @apply translate-x-5 bg-primary; }
+
+    @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+    .animate-fadeIn { animation: fadeIn .2s ease; }
+</style>
+
+<script>
+// Tab switching
+document.querySelectorAll('.settings-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.settings-panel').forEach(p => p.classList.add('hidden'));
+        tab.classList.add('active');
+        const panel = document.getElementById(`panel-${tab.getAttribute('data-tab')}`);
+        if (panel) { panel.classList.remove('hidden'); }
+    });
+});
+
+// Profile form
+document.getElementById('profile-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById('profile-msg')!;
+    const form = e.currentTarget as HTMLFormElement;
+    const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+    btn.disabled = true;
+    btn.textContent = 'Speichere...';
+    msg.textContent = '';
+    msg.className = 'form-msg';
+
+    const data = {
+        firstName: (document.getElementById('firstName') as HTMLInputElement).value.trim(),
+        lastName: (document.getElementById('lastName') as HTMLInputElement).value.trim(),
+        phone: (document.getElementById('phone') as HTMLInputElement).value.trim(),
+        city: (document.getElementById('city') as HTMLInputElement).value.trim(),
+        postalCode: (document.getElementById('postalCode') as HTMLInputElement).value.trim(),
+    };
+
+    try {
+        const res = await fetch('/api/auth/update-profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+        const result = await res.json();
+        if (result.ok) {
+            msg.textContent = '✓ Profil gespeichert';
+            msg.className = 'form-msg success';
+        } else {
+            msg.textContent = result.error || 'Fehler beim Speichern';
+            msg.className = 'form-msg error';
+        }
+    } catch {
+        msg.textContent = 'Netzwerkfehler';
+        msg.className = 'form-msg error';
+    }
+    btn.disabled = false;
+    btn.textContent = 'Änderungen speichern';
+});
+
+// Password form
+document.getElementById('password-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById('password-msg')!;
+    const form = e.currentTarget as HTMLFormElement;
+    const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+    const currentPassword = (document.getElementById('currentPassword') as HTMLInputElement).value;
+    const newPassword = (document.getElementById('newPassword') as HTMLInputElement).value;
+    const confirmPassword = (document.getElementById('confirmPassword') as HTMLInputElement).value;
+
+    if (newPassword !== confirmPassword) {
+        msg.textContent = 'Passwörter stimmen nicht überein';
+        msg.className = 'form-msg error';
+        return;
+    }
+    if (newPassword.length < 8) {
+        msg.textContent = 'Mindestens 8 Zeichen erforderlich';
+        msg.className = 'form-msg error';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Wird geändert...';
+    msg.textContent = '';
+    msg.className = 'form-msg';
+
+    try {
+        const res = await fetch('/api/auth/change-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ currentPassword, newPassword }),
+        });
+        const result = await res.json();
+        if (result.ok) {
+            msg.textContent = '✓ Passwort erfolgreich geändert';
+            msg.className = 'form-msg success';
+            form.reset();
+        } else {
+            msg.textContent = result.error || 'Fehler';
+            msg.className = 'form-msg error';
+        }
+    } catch {
+        msg.textContent = 'Netzwerkfehler';
+        msg.className = 'form-msg error';
+    }
+    btn.disabled = false;
+    btn.textContent = 'Passwort ändern';
+});
+</script>
+
