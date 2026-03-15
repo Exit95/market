@@ -128,9 +128,12 @@ import Footer from "../components/Footer.astro";
                             2-Faktor-Authentifizierung schützt deinen Account
                         </div>
 
+                        <div id="loginError" class="auth-error" style="display:none; color:#ef4444; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); padding:0.75rem 1rem; border-radius:4px; margin-bottom:1rem; font-size:0.875rem;"></div>
+
                         <button
                             type="submit"
                             class="btn btn-primary w-full btn-lg"
+                            id="loginBtn"
                             >Anmelden</button
                         >
 
@@ -281,9 +284,12 @@ import Footer from "../components/Footer.astro";
                             >
                         </label>
 
+                        <div id="registerError" class="auth-error" style="display:none; color:#ef4444; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); padding:0.75rem 1rem; border-radius:4px; margin-bottom:1rem; font-size:0.875rem;"></div>
+
                         <button
                             type="submit"
                             class="btn btn-primary w-full btn-lg"
+                            id="registerBtn"
                             >Kostenlos registrieren</button
                         >
                     </form>
@@ -472,5 +478,105 @@ import Footer from "../components/Footer.astro";
         bar.style.width = lvl.width;
         label.style.color = lvl.color;
         label.textContent = lvl.text;
+    });
+
+    // ── Login Submit ─────────────────────────────────────────────────────────
+    loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const errEl = document.getElementById("loginError")!;
+        const btn = document.getElementById("loginBtn") as HTMLButtonElement;
+        errEl.style.display = "none";
+
+        const email = (document.getElementById("loginEmail") as HTMLInputElement).value.trim();
+        const password = (document.getElementById("loginPw") as HTMLInputElement).value;
+
+        if (!email || !password) {
+            errEl.textContent = "Bitte E-Mail und Passwort eingeben.";
+            errEl.style.display = "block";
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Wird angemeldet...";
+
+        try {
+            const res = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+                errEl.textContent = data.error || "Anmeldung fehlgeschlagen.";
+                errEl.style.display = "block";
+                btn.disabled = false;
+                btn.textContent = "Anmelden";
+                return;
+            }
+
+            // Erfolg – weiterleiten
+            if (data.user?.role === "ADMIN") {
+                window.location.href = "/admin";
+            } else {
+                window.location.href = "/";
+            }
+        } catch {
+            errEl.textContent = "Netzwerkfehler. Bitte erneut versuchen.";
+            errEl.style.display = "block";
+            btn.disabled = false;
+            btn.textContent = "Anmelden";
+        }
+    });
+
+    // ── Register Submit ──────────────────────────────────────────────────────
+    registerForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const errEl = document.getElementById("registerError")!;
+        const btn = document.getElementById("registerBtn") as HTMLButtonElement;
+        errEl.style.display = "none";
+
+        const email = (document.getElementById("regEmail") as HTMLInputElement).value.trim();
+        const password = (document.getElementById("regPw") as HTMLInputElement).value;
+        const firstName = (document.getElementById("firstName") as HTMLInputElement)?.value.trim() || undefined;
+        const lastName = (document.getElementById("lastName") as HTMLInputElement)?.value.trim() || undefined;
+
+        if (!email || !password) {
+            errEl.textContent = "Bitte alle Pflichtfelder ausfuellen.";
+            errEl.style.display = "block";
+            return;
+        }
+        if (password.length < 8) {
+            errEl.textContent = "Passwort muss mindestens 8 Zeichen haben.";
+            errEl.style.display = "block";
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Wird registriert...";
+
+        try {
+            const res = await fetch("/api/auth/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password, firstName, lastName }),
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+                errEl.textContent = data.error || "Registrierung fehlgeschlagen.";
+                errEl.style.display = "block";
+                btn.disabled = false;
+                btn.textContent = "Kostenlos registrieren";
+                return;
+            }
+
+            window.location.href = "/";
+        } catch {
+            errEl.textContent = "Netzwerkfehler. Bitte erneut versuchen.";
+            errEl.style.display = "block";
+            btn.disabled = false;
+            btn.textContent = "Kostenlos registrieren";
+        }
     });
 </script>
