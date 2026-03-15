@@ -34,11 +34,11 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
     if (!user || !valid) {
         await prisma.auditLog.create({
             data: {
-                userId: user?.id,
+                actorId: user?.id,
                 action: 'failed_login',
                 ip: clientAddress,
                 userAgent: request.headers.get('user-agent'),
-                meta: { email },
+                metaJson: { email },
             },
         });
         return err(401, 'E-Mail oder Passwort falsch');
@@ -50,7 +50,7 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
 
     await prisma.auditLog.create({
         data: {
-            userId: user.id,
+            actorId: user.id,
             action: 'login',
             ip: clientAddress,
             userAgent: request.headers.get('user-agent'),

@@ -25,7 +25,7 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
 
     await prisma.auditLog.create({
         data: {
-            userId: user?.id,
+            actorId: user?.id,
             action: 'logout',
             ip: clientAddress,
             userAgent: request.headers.get('user-agent'),

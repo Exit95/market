@@ -87,11 +87,10 @@ export const POST: APIRoute = async ({ request, cookies, params }) => {
     // Audit Log
     await prisma.auditLog.create({
         data: {
-            userId: auth.userId,
+            actorId: auth.userId,
             action: 'handshake_verified',
-            entityId: dealId,
-            details: { role: 'seller', method: 'QR_CODE' },
-            ipAddress: request.headers.get('x-forwarded-for') || '127.0.0.1'
+            ip: request.headers.get('x-forwarded-for') || '127.0.0.1',
+            metaJson: { dealId, role: 'seller', method: 'QR_CODE' },
         }
     });
 
