@@ -1,0 +1,157 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import HandshakeApp from "../../components/HandshakeApp.tsx";
+import { requireAuth, isAuthContext } from "../../lib/auth-middleware";
+import { prisma } from "../../lib/auth";
+
+const auth = await requireAuth(Astro.request, Astro.cookies);
+if (!isAuthContext(auth)) return Astro.redirect("/anmelden");
+
+const { id } = Astro.params;
+if (!id) return Astro.redirect("/dashboard/deals");
+
+const deal = await prisma.deal.findUnique({
+    where: { id },
+    include: {
+        listing: { select: { id: true, title: true, price: true, images: { take: 1, orderBy: { position: "asc" }, select: { url: true } } } },
+        buyer: { select: { id: true, firstName: true, lastName: true } },
+        seller: { select: { id: true, firstName: true, lastName: true } },
+        payment: { select: { status: true } },
+        dispute: { select: { id: true, status: true, reason: true } },
+    },
+});
+
+if (!deal) return Astro.redirect("/dashboard/deals");
+if (deal.buyerId !== auth.userId && deal.sellerId !== auth.userId) return Astro.redirect("/dashboard/deals");
+
+const isBuyer = deal.buyerId === auth.userId;
+const isSeller = deal.sellerId === auth.userId;
+const otherUser = isBuyer ? deal.seller : deal.buyer;
+
+const STATUS_LABEL: Record<string, string> = {
+    PENDING: "Ausstehend", PAYMENT_PENDING: "Zahlung läuft", PAID: "Bezahlt",
+    SHIPPED: "Versendet", DELIVERED: "Geliefert", COMPLETED: "Abgeschlossen",
+    CANCELLED: "Storniert", REFUNDED: "Erstattet", DISPUTED: "Strittig",
+};
+const fmt = (c: number) => (c / 100).toLocaleString("de-DE", { style: "currency", currency: "EUR" });
+const paymentSuccess = Astro.url.searchParams.get("payment") === "success";
+const img = deal.listing?.images?.[0]?.url;
+---
+
+<BaseLayout title={`Deal – ${deal.listing?.title} – Ehren-Deal`}>
+    <Header />
+    <main class="min-h-screen py-10 pb-24">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <a href="/dashboard/deals" class="text-xs text-foreground/50 hover:text-foreground mb-4 inline-block">&larr; Zurück zu meinen Deals</a>
+
+            {paymentSuccess && (
+                <div class="bg-green-50 border border-green-200 text-green-800 rounded-lg p-4 mb-6 text-sm font-medium">
+                    ✅ Zahlung erfolgreich! Das Geld wird treuhänderisch verwahrt, bis die Ware bestätigt wird.
+                </div>
+            )}
+
+            <!-- Deal Header -->
+            <div class="bg-secondary/30 border border-foreground/10 rounded-xl p-6 mb-6">
+                <div class="flex gap-4 items-start">
+                    {img && <img src={img} alt={deal.listing?.title} class="w-24 h-24 rounded-lg object-cover shrink-0" />}
+                    <div class="flex-1 min-w-0">
+                        <h1 class="text-xl font-headings font-semibold mb-1">{deal.listing?.title}</h1>
+                        <div class="flex flex-wrap gap-2 items-center mb-2">
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-[var(--ehren-primary)]/10 text-[var(--ehren-primary)] font-semibold">
+                                {STATUS_LABEL[deal.status] ?? deal.status}
+                            </span>
+                            <span class="text-xs text-foreground/50">{isBuyer ? "Du kaufst" : "Du verkaufst"}</span>
+                        </div>
+                        <div class="text-lg font-bold text-[var(--ehren-primary)]">{fmt(deal.totalAmount)}</div>
+                        <div class="text-xs text-foreground/50 mt-1">
+                            {isBuyer ? "Verkäufer" : "Käufer"}: {otherUser.firstName} {otherUser.lastName?.[0]}.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="bg-secondary/30 border border-foreground/10 rounded-xl p-6 mb-6" id="actions-section">
+                <h2 class="text-sm font-headings font-semibold uppercase tracking-wider text-foreground/60 mb-4">Aktionen</h2>
+
+                {/* Buyer: Pay */}
+                {isBuyer && deal.status === "PENDING" && (
+                    <a href={`/checkout/${deal.listing.id}`} class="btn btn-primary w-full text-center block mb-3">Jetzt bezahlen</a>
+                )}
+
+                {/* Seller: Mark shipped */}
+                {isSeller && deal.status === "PAID" && (
+                    <div>
+                        <button id="btn-ship" class="btn btn-primary w-full mb-2">Als versendet markieren</button>
+                        <input id="tracking-input" type="text" placeholder="Tracking-Nummer (optional)" class="w-full px-3 py-2 text-sm border border-foreground/15 rounded-lg bg-background" />
+                    </div>
+                )}
+
+                {/* Buyer: Confirm delivery */}
+                {isBuyer && deal.status === "SHIPPED" && (
+                    <button id="btn-confirm" class="btn btn-primary w-full">Empfang bestätigen</button>
+                )}
+
+                {/* Buyer: Open dispute */}
+                {isBuyer && ["PAID", "SHIPPED", "DELIVERED"].includes(deal.status) && !deal.dispute && (
+                    <button id="btn-dispute" class="btn btn-danger w-full mt-3">Problem melden</button>
+                )}
+
+                {/* Handshake for local deals */}
+                {deal.status === "PAID" && deal.verificationMethod === "QR_CODE" && (
+                    <div class="mt-4">
+                        <HandshakeApp client:load dealId={deal.id} role={isBuyer ? "buyer" : "seller"} initialStatus={deal.handshakeStatus} />
+                    </div>
+                )}
+
+                {deal.status === "COMPLETED" && (
+                    <p class="text-green-600 font-semibold text-center">✅ Dieser Deal ist abgeschlossen.</p>
+                )}
+                {deal.dispute && (
+                    <div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-3 mt-3 text-sm">
+                        ⚠️ Dispute offen: {deal.dispute.reason ?? "Keine Angabe"} (Status: {deal.dispute.status})
+                    </div>
+                )}
+            </div>
+        </div>
+    </main>
+    <Footer />
+</BaseLayout>
+
+<script define:vars={{ dealId: deal.id }} is:inline>
+    document.getElementById('btn-ship')?.addEventListener('click', async () => {
+        const tracking = document.getElementById('tracking-input')?.value || '';
+        const res = await fetch('/api/deals/' + dealId + '/mark-shipped', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tracking: tracking }),
+        });
+        if (res.ok) location.reload();
+        else alert('Fehler: ' + ((await res.json().catch(function() { return {}; })).error || 'Unbekannter Fehler'));
+    });
+
+    document.getElementById('btn-confirm')?.addEventListener('click', async () => {
+        if (!confirm('Empfang bestätigen? Das Geld wird an den Verkäufer freigegeben.')) return;
+        const res = await fetch('/api/deals/' + dealId + '/confirm-delivery', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        if (res.ok) location.reload();
+        else alert('Fehler: ' + ((await res.json().catch(function() { return {}; })).error || 'Unbekannter Fehler'));
+    });
+
+    document.getElementById('btn-dispute')?.addEventListener('click', async () => {
+        var reason = prompt('Beschreibe das Problem:');
+        if (!reason) return;
+        const res = await fetch('/api/deals/' + dealId + '/open-dispute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: reason }),
+        });
+        if (res.ok) location.reload();
+        else alert('Fehler: ' + ((await res.json().catch(function() { return {}; })).error || 'Unbekannter Fehler'));
+    });
+</script>
+

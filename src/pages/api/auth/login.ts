@@ -23,7 +23,8 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
     const parsed = LoginSchema.safeParse(body);
     if (!parsed.success) return err(400, 'E-Mail oder Passwort ungültig');
 
-    const { email, password } = parsed.data;
+    const { password } = parsed.data;
+    const email = parsed.data.email.toLowerCase().trim();
 
     const user = await prisma.user.findUnique({ where: { email } });
 

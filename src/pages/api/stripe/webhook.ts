@@ -20,9 +20,38 @@ export const POST: APIRoute = async ({ request }) => {
         return new Response(JSON.stringify({ error: e.message }), { status: 400 });
     }
 
+    // Handle Stripe Checkout Session completion
+    if (event.type === 'checkout.session.completed') {
+        const session = event.data.object as {
+            id: string;
+            payment_intent: string | null;
+            metadata: { dealId?: string };
+        };
+        const dealId = session.metadata?.dealId;
+        if (!dealId) return new Response('ok', { status: 200 });
+
+        await prisma.$transaction([
+            prisma.payment.updateMany({
+                where: { dealId },
+                data: { status: 'SUCCEEDED', paymentIntentId: session.payment_intent },
+            }),
+            prisma.deal.updateMany({
+                where: { id: dealId, status: { in: ['PENDING', 'PAYMENT_PENDING'] } },
+                data: { status: 'PAID' },
+            }),
+        ]);
+
+        await prisma.auditLog.create({
+            data: {
+                action: 'payment_succeeded',
+                metaJson: { dealId, sessionId: session.id, paymentIntentId: session.payment_intent },
+            },
+        });
+    }
+
     if (event.type === 'payment_intent.succeeded') {
         const pi = event.data.object as { id: string; metadata: { dealId?: string; orderId?: string } };
-        const dealId = pi.metadata?.dealId ?? pi.metadata?.orderId; // backwards compat
+        const dealId = pi.metadata?.dealId ?? pi.metadata?.orderId;
         if (!dealId) return new Response('ok', { status: 200 });
 
         await prisma.$transaction([
@@ -31,7 +60,7 @@ export const POST: APIRoute = async ({ request }) => {
                 data: { status: 'SUCCEEDED' },
             }),
             prisma.deal.updateMany({
-                where: { id: dealId, status: 'PENDING' },
+                where: { id: dealId, status: { in: ['PENDING', 'PAYMENT_PENDING'] } },
                 data: { status: 'PAID' },
             }),
         ]);

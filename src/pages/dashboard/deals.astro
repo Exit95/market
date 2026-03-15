@@ -1,0 +1,110 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { requireAuth, isAuthContext } from "../../lib/auth-middleware";
+
+const auth = await requireAuth(Astro.request, Astro.cookies);
+if (!isAuthContext(auth)) return Astro.redirect("/anmelden");
+
+const res = await fetch(`${Astro.url.origin}/api/deals`, { headers: Astro.request.headers });
+const data = res.ok ? await res.json() : { deals: [] };
+const deals = data.deals ?? [];
+
+const STATUS_LABEL: Record<string, string> = {
+    PENDING: "Ausstehend",
+    PAYMENT_PENDING: "Zahlung läuft",
+    PAID: "Bezahlt",
+    SHIPPED: "Versendet",
+    DELIVERED: "Geliefert",
+    COMPLETED: "Abgeschlossen",
+    CANCELLED: "Storniert",
+    REFUNDED: "Erstattet",
+    DISPUTED: "Strittig",
+};
+const STATUS_COLOR: Record<string, string> = {
+    PENDING: "bg-yellow-100 text-yellow-800",
+    PAYMENT_PENDING: "bg-orange-100 text-orange-800",
+    PAID: "bg-indigo-100 text-indigo-800",
+    SHIPPED: "bg-blue-100 text-blue-800",
+    DELIVERED: "bg-teal-100 text-teal-800",
+    COMPLETED: "bg-green-100 text-green-800",
+    CANCELLED: "bg-gray-100 text-gray-600",
+    REFUNDED: "bg-gray-100 text-gray-600",
+    DISPUTED: "bg-red-100 text-red-800",
+};
+const fmt = (cents: number) => (cents / 100).toLocaleString("de-DE", { style: "currency", currency: "EUR" });
+---
+
+<BaseLayout title="Meine Deals – Ehren-Deal">
+    <Header />
+    <main class="container dash-wrap">
+        <div class="dash-header">
+            <h1>Meine Deals</h1>
+            <div class="flex gap-3">
+                <a href="/dashboard/listings" class="btn btn-ghost">Meine Anzeigen</a>
+                <a href="/nachrichten" class="btn btn-ghost">Nachrichten</a>
+            </div>
+        </div>
+
+        {deals.length === 0 && (
+            <div class="empty-state">
+                <p>Du hast noch keine Deals.</p>
+                <a href="/" class="btn btn-primary" style="margin-top:1rem;">Marktplatz durchsuchen</a>
+            </div>
+        )}
+
+        {deals.length > 0 && (
+            <div class="deal-grid">
+                {deals.map((d: any) => {
+                    const isBuyer = d.buyerId === auth.userId;
+                    const otherUser = isBuyer ? d.seller : d.buyer;
+                    const roleLabel = isBuyer ? "Käufer" : "Verkäufer";
+                    const img = d.listing?.images?.[0]?.url;
+                    return (
+                        <a href={`/deals/${d.id}`} class="deal-card">
+                            <div class="deal-img">
+                                {img ? <img src={img} alt={d.listing?.title} /> : <div class="deal-img-placeholder" />}
+                            </div>
+                            <div class="deal-info">
+                                <div class="deal-title">{d.listing?.title ?? "Deal"}</div>
+                                <div class="deal-meta">
+                                    <span class={`status-badge ${STATUS_COLOR[d.status] ?? "bg-gray-100 text-gray-600"}`}>
+                                        {STATUS_LABEL[d.status] ?? d.status}
+                                    </span>
+                                    <span class="deal-role">{roleLabel}</span>
+                                </div>
+                                <div class="deal-price">{fmt(d.totalAmount)}</div>
+                                <div class="deal-partner">
+                                    {isBuyer ? "Verkäufer" : "Käufer"}: {otherUser?.firstName ?? "?"} {otherUser?.lastName?.[0] ?? ""}.
+                                </div>
+                            </div>
+                        </a>
+                    );
+                })}
+            </div>
+        )}
+    </main>
+    <Footer />
+</BaseLayout>
+
+<style>
+    .dash-wrap { @apply py-10 pb-16 bg-background min-h-screen text-foreground font-body max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
+    .dash-header { @apply flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-6 border-b border-secondary gap-4; }
+    .dash-header h1 { @apply text-2xl font-headings font-light text-foreground tracking-wide m-0; }
+    .empty-state { @apply text-center py-16 px-4 bg-secondary/40 border border-dashed border-foreground/[.22] text-foreground/75 font-light; }
+
+    .deal-grid { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4; }
+    .deal-card { @apply flex gap-4 p-4 bg-secondary/30 border border-foreground/10 rounded-lg hover:border-foreground/25 transition-all no-underline text-foreground; }
+    .deal-img { @apply w-20 h-20 shrink-0 rounded-md overflow-hidden bg-secondary; }
+    .deal-img img { @apply w-full h-full object-cover; }
+    .deal-img-placeholder { @apply w-full h-full bg-secondary; }
+    .deal-info { @apply flex flex-col gap-1 min-w-0; }
+    .deal-title { @apply font-semibold text-sm truncate; }
+    .deal-meta { @apply flex items-center gap-2 flex-wrap; }
+    .status-badge { @apply text-xs px-2 py-0.5 rounded-full font-medium; }
+    .deal-role { @apply text-xs text-foreground/50; }
+    .deal-price { @apply text-sm font-bold text-[var(--ehren-primary)]; }
+    .deal-partner { @apply text-xs text-foreground/50; }
+</style>
+

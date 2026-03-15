@@ -4,6 +4,38 @@ import { calcFee } from '../../../lib/stripe';
 import { prisma } from '../../../lib/auth';
 
 /**
+ * GET /api/deals – List own deals (as buyer or seller)
+ */
+export const GET: APIRoute = async ({ request, cookies, url }) => {
+    const auth = await requireAuth(request, cookies);
+    if (!isAuthContext(auth)) return auth;
+
+    const status = url.searchParams.get('status');
+    const role = url.searchParams.get('role'); // 'buyer' | 'seller' | null (both)
+
+    const where: any = {
+        OR: [{ buyerId: auth.userId }, { sellerId: auth.userId }],
+    };
+    if (role === 'buyer') { delete where.OR; where.buyerId = auth.userId; }
+    if (role === 'seller') { delete where.OR; where.sellerId = auth.userId; }
+    if (status) where.status = status.toUpperCase();
+
+    const deals = await prisma.deal.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        take: 50,
+        include: {
+            listing: { select: { id: true, title: true, price: true, images: { take: 1, orderBy: { position: 'asc' }, select: { url: true } } } },
+            buyer: { select: { id: true, firstName: true, lastName: true } },
+            seller: { select: { id: true, firstName: true, lastName: true } },
+            payment: { select: { status: true } },
+        },
+    });
+
+    return json({ deals });
+};
+
+/**
  * POST /api/deals
  * Buyer creates a deal for a listing.
  */

@@ -83,6 +83,7 @@ enum VerificationType {
   EMAIL
   PHONE
   ID_KYC
+  PASSWORD_RESET
 }
 
 enum VerificationStatus {

@@ -2,8 +2,47 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
-import { listings } from "../data/listings";
-const myListings = listings.slice(0, 3);
+import { lucia, prisma } from "../lib/auth";
+
+// Auth check – redirect to login if not authenticated
+const sessionId = Astro.cookies.get(lucia.sessionCookieName)?.value;
+if (!sessionId) return Astro.redirect("/anmelden?redirect=/profil");
+
+const { user: sessionUser } = await lucia.validateSession(sessionId);
+if (!sessionUser) return Astro.redirect("/anmelden?redirect=/profil");
+
+// Fetch full user from DB with relations
+const dbUser = await prisma.user.findUnique({
+    where: { id: sessionUser.id },
+    include: {
+        trustScore: true,
+        listings: {
+            where: { status: { in: ['ACTIVE', 'RESERVED', 'SOLD'] } },
+            orderBy: { createdAt: 'desc' },
+            take: 5,
+            include: { images: true },
+        },
+        sellerDeals: { where: { status: 'COMPLETED' } },
+    },
+});
+if (!dbUser) return Astro.redirect("/anmelden?redirect=/profil");
+
+// Computed values
+const fullName = [dbUser.firstName, dbUser.lastName].filter(Boolean).join(' ') || dbUser.email.split('@')[0];
+const initials = dbUser.firstName ? dbUser.firstName[0].toUpperCase() : dbUser.email[0].toUpperCase();
+const trustScore = dbUser.trustScore?.score ?? 0;
+const trustLevel = dbUser.trustScore?.level ?? 'NEW';
+const trustLabel = trustScore >= 80 ? 'Exzellent' : trustScore >= 60 ? 'Gut' : trustScore >= 40 ? 'Aufbauend' : 'Neu';
+const completedDeals = dbUser.sellerDeals.length;
+const memberSince = dbUser.createdAt.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+const cityDisplay = dbUser.city || '';
+
+// Mask phone for display
+function maskPhone(phone: string | null): string {
+    if (!phone) return '';
+    if (phone.length < 6) return phone;
+    return phone.slice(0, 6) + ' ***' + phone.slice(-2);
+}
 ---
 
 <BaseLayout title="Mein Profil – Ehren-Deal">

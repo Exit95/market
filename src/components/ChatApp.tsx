@@ -337,7 +337,13 @@ export default function ChatApp({ currentUserId }: { currentUserId: string }) {
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                             Verkaufer ist fur lokale Ehren-Deals bereit
                         </div>
-                        <button style={{ border: '1px solid rgba(82,183,136,.3)', background: 'transparent', color: '#52b788', padding: '5px 14px', fontSize: '.65rem', fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '.08em', cursor: 'pointer', transition: 'all .2s' }}>
+                        <button
+                            onClick={() => {
+                                if (activeConv) {
+                                    window.location.href = `/checkout/${activeConv.listing.id}`;
+                                }
+                            }}
+                            style={{ border: '1px solid rgba(82,183,136,.3)', background: 'transparent', color: '#52b788', padding: '5px 14px', fontSize: '.65rem', fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '.08em', cursor: 'pointer', transition: 'all .2s' }}>
                             Handschlag anbieten
                         </button>
                     </div>

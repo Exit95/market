@@ -442,24 +442,15 @@ const imageUrl = listing.images?.[0]?.url ?? null;
             }
             const payment = await payRes.json();
 
-            // Step 3: Redirect to Stripe or confirm payment
+            // Step 3: Redirect to Stripe Checkout
             showLoading('Weiterleitung zu Stripe...');
 
-            // If Stripe.js is loaded, use it; otherwise redirect to a payment page
-            if (window.Stripe && payment.clientSecret) {
-                const stripe = window.Stripe(document.querySelector('meta[name="stripe-pk"]')?.content || '');
-                const { error } = await stripe.confirmCardPayment(payment.clientSecret);
-                if (error) {
-                    throw new Error(error.message);
-                }
-                hideLoading();
-                document.getElementById('deal-link').href = `/deals/${deal.id}`;
-                successOverlay.classList.remove('hidden');
+            if (payment.checkoutUrl) {
+                // Redirect to Stripe hosted checkout page
+                window.location.href = payment.checkoutUrl;
+                return; // page will navigate away
             } else {
-                // Fallback: show success with deal link (payment handled externally)
-                hideLoading();
-                document.getElementById('deal-link').href = `/deals/${deal.id}`;
-                successOverlay.classList.remove('hidden');
+                throw new Error('Keine Checkout-URL erhalten. Bitte versuche es erneut.');
             }
 
         } catch (err) {

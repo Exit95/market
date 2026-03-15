@@ -14,7 +14,7 @@ const adapter = new PrismaAdapter(prisma.session, prisma.user);
 export const lucia = new Lucia(adapter, {
     sessionCookie: {
         attributes: {
-            secure: import.meta.env.NODE_ENV === 'production',
+            secure: import.meta.env.PROD,
             sameSite: 'lax',
         },
     },

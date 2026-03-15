@@ -20,17 +20,11 @@ export async function publishMessage(conversationId: string, message: unknown) {
 /** Generate a short-lived token request for the frontend Ably client */
 export async function createTokenRequest(userId: string, conversationId: string) {
     const ably = getAbly();
-    return new Promise<Ably.TokenRequest>((resolve, reject) => {
-        ably.auth.createTokenRequest(
-            {
-                clientId: userId,
-                capability: { [`conversation:${conversationId}`]: ['subscribe', 'publish'] },
-                ttl: 3600_000, // 1 hour
-            },
-            (err, req) => {
-                if (err || !req) reject(err ?? new Error('Token failed'));
-                else resolve(req);
-            },
-        );
+    // Ably v2 uses promise-based API
+    const tokenRequest = await ably.auth.createTokenRequest({
+        clientId: userId,
+        capability: { [`conversation:${conversationId}`]: ['subscribe', 'publish'] },
+        ttl: 3600_000, // 1 hour
     });
+    return tokenRequest;
 }

@@ -5,7 +5,7 @@ import { prisma } from '../../../../lib/auth';
 
 /**
  * POST /api/deals/:id/pay
- * Creates a Stripe PaymentIntent and returns clientSecret to buyer.
+ * Creates a Stripe Checkout Session and returns the URL to redirect the buyer.
  */
 export const POST: APIRoute = async ({ request, cookies, params, clientAddress }) => {
     const auth = await requireAuth(request, cookies);
@@ -19,45 +19,79 @@ export const POST: APIRoute = async ({ request, cookies, params, clientAddress }
     if (deal.buyerId !== auth.userId) return err(403, 'Forbidden');
     if (deal.status !== 'PENDING') return err(409, `Deal status is ${deal.status}, expected PENDING`);
 
-    // Idempotency: reuse existing PaymentIntent if already created
-    let paymentIntentId = deal.payment?.paymentIntentId ?? null;
-    let clientSecret: string | null = null;
+    const chargeAmount = deal.totalAmount + deal.feeCents; // price + platform fee
+    const appUrl = import.meta.env.APP_URL || 'http://localhost:4321';
 
-    if (paymentIntentId) {
-        const pi = await getStripe().paymentIntents.retrieve(paymentIntentId);
-        clientSecret = pi.client_secret;
-    } else {
-        const pi = await getStripe().paymentIntents.create({
-            amount: deal.totalAmount,
-            currency: deal.currency.toLowerCase(),
-            description: `Ehren-Deal – ${deal.listing.title}`,
-            metadata: {
-                dealId: deal.id,
-                listingId: deal.listingId,
-                buyerId: deal.buyerId,
-                sellerId: deal.sellerId,
+    // Idempotency: reuse existing session/PI if already created
+    if (deal.payment?.paymentIntentId) {
+        // Check if we stored a checkout session ID
+        const meta = deal.payment.metaJson as Record<string, unknown> | null;
+        const existingSessionId = meta?.checkoutSessionId as string | undefined;
+        if (existingSessionId) {
+            try {
+                const session = await getStripe().checkout.sessions.retrieve(existingSessionId);
+                if (session.url && session.status === 'open') {
+                    return json({ checkoutUrl: session.url, dealId: deal.id });
+                }
+            } catch { /* session expired, create new one */ }
+        }
+    }
+
+    // Create Stripe Checkout Session
+    const session = await getStripe().checkout.sessions.create({
+        mode: 'payment',
+        payment_method_types: ['card'],
+        line_items: [{
+            price_data: {
+                currency: deal.currency.toLowerCase(),
+                product_data: {
+                    name: `Ehren-Deal: ${deal.listing.title}`,
+                    description: 'Treuhand-gesicherte Zahlung über Ehren-Deal',
+                },
+                unit_amount: chargeAmount,
             },
-        });
-        clientSecret = pi.client_secret;
-        paymentIntentId = pi.id;
+            quantity: 1,
+        }],
+        metadata: {
+            dealId: deal.id,
+            listingId: deal.listingId,
+            buyerId: deal.buyerId,
+            sellerId: deal.sellerId,
+        },
+        success_url: `${appUrl}/deals/${deal.id}?payment=success`,
+        cancel_url: `${appUrl}/checkout/${deal.listingId}?payment=cancelled`,
+    });
 
+    // Store payment record
+    if (!deal.payment) {
         await prisma.payment.create({
             data: {
                 dealId: deal.id,
                 provider: 'stripe',
-                paymentIntentId: pi.id,
+                paymentIntentId: session.payment_intent as string | null,
                 status: 'PENDING',
-                amountCents: deal.totalAmount,
+                amountCents: chargeAmount,
                 currency: deal.currency,
+                metaJson: { checkoutSessionId: session.id },
             },
+        });
+    } else {
+        await prisma.payment.update({
+            where: { id: deal.payment.id },
+            data: { metaJson: { checkoutSessionId: session.id } },
         });
     }
 
-    await prisma.auditLog.create({
-        data: { actorId: auth.userId, action: 'payment_intent_created', ip: clientAddress, metaJson: { dealId: deal.id, paymentIntentId } },
+    await prisma.deal.update({
+        where: { id: deal.id },
+        data: { status: 'PAYMENT_PENDING' },
     });
 
-    return json({ clientSecret, paymentIntentId, amount: deal.totalAmount, currency: deal.currency });
+    await prisma.auditLog.create({
+        data: { actorId: auth.userId, action: 'checkout_session_created', ip: clientAddress, metaJson: { dealId: deal.id, sessionId: session.id } },
+    });
+
+    return json({ checkoutUrl: session.url, dealId: deal.id });
 };
 
 function json(data: unknown, status = 200) {
