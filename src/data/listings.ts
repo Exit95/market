@@ -1,4 +1,4 @@
-// Mock data for Novamarkt listings
+// Mock data for Ehren-Deal listings
 
 export interface Listing {
     id: string;

@@ -52,7 +52,7 @@ export const POST: APIRoute = async ({ request }) => {
                 // TODO: Admin benachrichtigen
                 console.log(`[webhook] Payout fehlgeschlagen: ${resourceId}`);
                 await sendEmail({
-                    to: import.meta.env.SMTP_FROM || 'admin@novamarkt.de',
+                    to: import.meta.env.SMTP_FROM || 'admin@ehren-deal.de',
                     subject: `⚠️ Mangopay Payout fehlgeschlagen: ${resourceId}`,
                     html: `<p>Payout ${resourceId} ist fehlgeschlagen. Bitte im Mangopay Dashboard prüfen.</p>`,
                 }).catch(console.error);

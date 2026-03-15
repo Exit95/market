@@ -54,7 +54,7 @@ export const POST: APIRoute = async ({ request }) => {
             creditedWalletId: sellerWalletId,
             amountCents: netAmountCents,
             feeCents,
-            tag: 'Novamarkt escrow release',
+            tag: 'Ehren-Deal escrow release',
         });
 
         // E-Mail an Verkäufer

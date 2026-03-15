@@ -42,7 +42,7 @@ export async function createMangopayUser(data: {
 
 // ─── Wallets ──────────────────────────────────────────────────────────────────
 
-export async function createWallet(userId: string, description = 'Novamarkt Wallet') {
+export async function createWallet(userId: string, description = 'Ehren-Deal Wallet') {
     return mangopay.Wallets.create({
         Owners: [userId],
         Description: description,
@@ -65,7 +65,7 @@ export async function createCardPayIn(data: {
     buyerMangopayId: string;
     walletId: string;
     amountCents: number; // e.g. 94900 for 949.00€
-    feeCents: number;    // Novamarkt platform fee
+    feeCents: number;    // Ehren-Deal platform fee
     returnUrl: string;   // after 3DS redirect
     listingTitle: string;
 }) {
@@ -102,7 +102,7 @@ export async function createTransfer(data: {
         CreditedWalletId: data.creditedWalletId,
         DebitedFunds: { Currency: 'EUR', Amount: data.amountCents },
         Fees: { Currency: 'EUR', Amount: data.feeCents ?? 0 },
-        Tag: data.tag ?? 'Novamarkt transfer',
+        Tag: data.tag ?? 'Ehren-Deal transfer',
     });
 }
 
@@ -138,7 +138,7 @@ export async function createPayout(data: {
         Fees: { Currency: 'EUR', Amount: 0 },
         BankAccountId: data.bankAccountId,
         PaymentType: 'BANK_WIRE',
-        Tag: data.tag ?? 'Novamarkt payout',
+        Tag: data.tag ?? 'Ehren-Deal payout',
     } as Mangopay.payOut.CreatePayOut);
 }
 
@@ -155,7 +155,7 @@ export async function refundPayIn(payInId: string, authorId: string) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/** Berechne Novamarkt-Gebühr: 2.4% des Kaufpreises */
+/** Berechne Ehren-Deal-Gebühr: 2.4% des Kaufpreises */
 export function calculateFee(amountCents: number): number {
     return Math.round(amountCents * 0.024);
 }

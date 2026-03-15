@@ -19,7 +19,7 @@ function getTransport() {
 export async function sendMail(opts: { to: string; subject: string; html: string }) {
   const transport = getTransport();
   return transport.sendMail({
-    from: import.meta.env.SMTP_FROM ?? 'Novamarkt <noreply@novamarkt.de>',
+    from: import.meta.env.SMTP_FROM ?? 'Ehren-Deal <noreply@ehren-deal.de>',
     ...opts,
   });
 }
@@ -28,7 +28,7 @@ export function emailVerifyHtml(url: string) {
   return `
     <div style="font-family:sans-serif;max-width:560px;margin:0 auto">
       <h2 style="color:#06b6d4">E-Mail bestätigen</h2>
-      <p>Klicke auf den Link, um deine E-Mail-Adresse bei Novamarkt zu bestätigen:</p>
+      <p>Klicke auf den Link, um deine E-Mail-Adresse bei Ehren-Deal zu bestätigen:</p>
       <a href="${url}" style="display:inline-block;margin:1rem 0;padding:.75rem 1.5rem;background:#06b6d4;color:#fff;border-radius:8px;text-decoration:none;font-weight:700">
         E-Mail bestätigen
       </a>

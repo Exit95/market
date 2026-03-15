@@ -29,11 +29,11 @@ export const POST: APIRoute = async ({ request }) => {
 
         await sendMail({
             to,
-            subject: subject || '🔧 Novamarkt – Test-E-Mail',
+            subject: subject || '🔧 Ehren-Deal – Test-E-Mail',
             html: `
                 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
-                    <h1 style="color: #06b6d4;">Novamarkt Test-E-Mail ✅</h1>
-                    <p>Dies ist eine Test-Nachricht der Novamarkt-Plattform.</p>
+                    <h1 style="color: #06b6d4;">Ehren-Deal Test-E-Mail ✅</h1>
+                    <p>Dies ist eine Test-Nachricht der Ehren-Deal-Plattform.</p>
                     <hr style="border: 1px solid #e5e7eb; margin: 24px 0;" />
                     <table style="width: 100%; border-collapse: collapse;">
                         <tr>

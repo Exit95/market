@@ -1,0 +1,56 @@
+import express from 'express';
+import nodemailer from 'nodemailer';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const app = express();
+const PORT = 3000;
+
+app.use(express.urlencoded({ extended: false }));
+
+// Statische HTML-Seite ausliefern
+app.get('/', (req, res) => {
+  res.sendFile(join(__dirname, 'index.html'));
+});
+
+// E-Mail-Anmeldung verarbeiten
+app.post('/signup', async (req, res) => {
+  const email = (req.body.email || '').trim();
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.redirect('/?error=1');
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: false,
+    tls: { rejectUnauthorized: false },
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+
+  try {
+    await transporter.sendMail({
+      from: `"Ehren Deal" <${process.env.SMTP_FROM}>`,
+      to: process.env.NOTIFY_EMAIL,
+      subject: '🎉 Neue Anmeldung auf ehren-deal.de',
+      html: `
+        <h2 style="color:#1a3a1a;">Neue Anmeldung auf ehren-deal.de!</h2>
+        <p><strong>E-Mail:</strong> ${email}</p>
+        <p style="color:#888;">Eingetragen am ${new Date().toLocaleString('de-DE', { timeZone: 'Europe/Berlin' })}</p>
+      `,
+    });
+    console.log(`[signup] Mail gesendet für: ${email}`);
+  } catch (err) {
+    console.error('[signup] Mailfehler:', err.message);
+  }
+
+  res.redirect('/?success=1');
+});
+
+app.listen(PORT, () => console.log(`Server läuft auf :${PORT}`));
+

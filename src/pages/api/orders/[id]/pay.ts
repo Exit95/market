@@ -30,7 +30,7 @@ export const POST: APIRoute = async ({ request, cookies, params, clientAddress }
         const pi = await getStripe().paymentIntents.create({
             amount: order.totalAmount,
             currency: order.currency.toLowerCase(),
-            description: `Novamarkt – ${order.listing.title}`,
+            description: `Ehren-Deal – ${order.listing.title}`,
             metadata: {
                 orderId: order.id,
                 listingId: order.listingId,

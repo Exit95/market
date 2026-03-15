@@ -27,7 +27,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
     const url = `${import.meta.env.APP_URL}/api/verify/email/confirm?token=${token}&uid=${auth.userId}`;
 
-    await sendMail({ to: user.email, subject: 'Novamarkt – E-Mail bestätigen', html: emailVerifyHtml(url) });
+    await sendMail({ to: user.email, subject: 'Ehren-Deal – E-Mail bestätigen', html: emailVerifyHtml(url) });
 
     return json({ ok: true });
 };

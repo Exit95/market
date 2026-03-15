@@ -1,18 +1,18 @@
 services:
   db:
     image: postgres:16-alpine
-    container_name: novamarkt_db
+    container_name: ehrendeal_db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: novamarkt
-      POSTGRES_USER: novamarkt
+      POSTGRES_DB: ehrendeal
+      POSTGRES_USER: ehrendeal
       POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
       - "5433:5432"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U novamarkt -d novamarkt" ]
+      test: [ "CMD-SHELL", "pg_isready -U ehrendeal -d ehrendeal" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -20,7 +20,7 @@ services:
 
   minio:
     image: minio/minio:latest
-    container_name: novamarkt_minio
+    container_name: ehrendeal_minio
     restart: unless-stopped
     command: server /data --console-address ":9001"
     environment:
@@ -41,7 +41,7 @@ services:
   # One-shot job: create bucket + set public read policy
   minio-init:
     image: minio/mc:latest
-    container_name: novamarkt_minio_init
+    container_name: ehrendeal_minio_init
     depends_on:
       minio:
         condition: service_healthy
@@ -61,7 +61,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: novamarkt_app
+    container_name: ehrendeal_app
     restart: unless-stopped
     depends_on:
       db:
@@ -71,7 +71,7 @@ services:
     ports:
       - "4321:4321"
     environment:
-      DATABASE_URL: postgresql://novamarkt:${DB_PASSWORD:-changeme}@db:5432/novamarkt
+      DATABASE_URL: postgresql://ehrendeal:${DB_PASSWORD:-changeme}@db:5432/ehrendeal
       APP_URL: ${APP_URL:-http://localhost:4321}
       # MinIO / S3
       S3_ENDPOINT: ${S3_ENDPOINT:-http://minio:9000}
@@ -97,7 +97,7 @@ services:
       SMTP_SECURE: ${SMTP_SECURE:-false}
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASS: ${SMTP_PASS:-}
-      SMTP_FROM: ${SMTP_FROM:-Novamarkt <noreply@novamarkt.de>}
+      SMTP_FROM: ${SMTP_FROM:-Ehren-Deal <noreply@ehren-deal.de>}
     healthcheck:
       test: [ "CMD-SHELL", "wget -qO- http://localhost:4321/api/health || exit 1" ]
       interval: 30s

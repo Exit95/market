@@ -8,7 +8,7 @@ export const GET: APIRoute = async () => {
     return new Response(
         JSON.stringify({
             ok: true,
-            service: 'novamarkt',
+            service: 'ehren-deal',
             ts: new Date().toISOString(),
             env: import.meta.env.MODE,
         }),

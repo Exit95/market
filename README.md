@@ -1,4 +1,4 @@
-# 🛒 Novamarkt
+# 🛒 Ehren-Deal
 
 > **Sichere Kleinanzeigen-Plattform** – Kaufen & Verkaufen mit Käuferschutz, KYC-Verifizierung und Echtzeit-Nachrichten.
 
@@ -53,7 +53,7 @@
 ## 📁 Projektstruktur
 
 ```
-novamarkt/
+ehren-deal/
 ├── prisma/
 │   ├── schema.prisma       # Datenbank-Schema (15+ Modelle)
 │   └── seed.ts             # Seed-Daten
@@ -194,4 +194,4 @@ User ──┬── Session (Lucia)
 
 ## 📜 Lizenz
 
-MIT © 2026 Novamarkt
+MIT © 2026 Ehren-Deal

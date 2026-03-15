@@ -10,15 +10,15 @@ const prisma = new PrismaClient();
 const HASH_OPTS = { memoryCost: 19456, timeCost: 2, outputLen: 32, parallelism: 1 };
 
 async function main() {
-    console.log('🌱 Seeding Novamarkt...');
+    console.log('🌱 Seeding Ehren-Deal...');
 
     // ── Users ──────────────────────────────────────────────────────────────────
     const [admin, seller, buyer] = await Promise.all([
         prisma.user.upsert({
-            where: { email: 'admin@novamarkt.de' },
+            where: { email: 'admin@ehren-deal.de' },
             update: {},
             create: {
-                email: 'admin@novamarkt.de',
+                email: 'admin@ehren-deal.de',
                 passwordHash: await hash('Admin1234!', HASH_OPTS),
                 firstName: 'Nova',
                 lastName: 'Admin',
@@ -29,10 +29,10 @@ async function main() {
             },
         }),
         prisma.user.upsert({
-            where: { email: 'seller@novamarkt.de' },
+            where: { email: 'seller@ehren-deal.de' },
             update: {},
             create: {
-                email: 'seller@novamarkt.de',
+                email: 'seller@ehren-deal.de',
                 passwordHash: await hash('Seller1234!', HASH_OPTS),
                 firstName: 'Klaus',
                 lastName: 'Müller',
@@ -44,10 +44,10 @@ async function main() {
             },
         }),
         prisma.user.upsert({
-            where: { email: 'buyer@novamarkt.de' },
+            where: { email: 'buyer@ehren-deal.de' },
             update: {},
             create: {
-                email: 'buyer@novamarkt.de',
+                email: 'buyer@ehren-deal.de',
                 passwordHash: await hash('Buyer1234!', HASH_OPTS),
                 firstName: 'Anna',
                 lastName: 'Schmidt',

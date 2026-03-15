@@ -9,7 +9,7 @@
  *   npx tsx scripts/auto-release.ts
  *
  * Recommended cron (every 15 minutes):
- *   */15 * * * * cd / opt / novamarkt && npx tsx scripts / auto - release.ts >> /var/log / novamarkt - release.log 2 >& 1
+ *   */15 * * * * cd /opt/ehren-deal && npx tsx scripts/auto-release.ts >> /var/log/ehren-deal-release.log 2>&1
     *
  * Or with node - cron inside a worker process(see scripts / worker.ts).
  * ---------------------------------------------------------------------------

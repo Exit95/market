@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  web:
+    image: "[2a01:4f8:202:1129:2447:2447:1:900]:5000/ehren-deal-de:latest"
+    networks:
+      - public-ingress
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.ehren-deal-de.rule=Host(`ehren-deal.de`) || Host(`www.ehren-deal.de`)"
+        - "traefik.http.routers.ehren-deal-de.entrypoints=websecure"
+        - "traefik.http.routers.ehren-deal-de.tls.certresolver=myresolver"
+        - "traefik.http.services.ehren-deal-de.loadbalancer.server.port=3000"
+
+networks:
+  public-ingress:
+    external: true

@@ -45,7 +45,7 @@ export const POST: APIRoute = async ({ request }) => {
                     <p>Ihre Rückerstattung wurde erfolgreich eingeleitet.</p>
                     ${reason ? `<p><strong>Grund:</strong> ${reason}</p>` : ''}
                     <p>Das Geld wird in 2–5 Werktagen auf Ihrem Konto gutgeschrieben.</p>
-                    <p>Ihr Novamarkt-Team</p>
+                    <p>Ihr Ehren-Deal-Team</p>
                 `.trim(),
             }).catch((e) => console.error('[refund email]', e));
         }
