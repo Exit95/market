@@ -13,11 +13,11 @@
 :root{
   --bg:        #0a0a0b;
   --surface:   #151516;
-  --border:    rgba(232,228,222,.22);
+  --border:    rgba(232,228,222,.20);
   --border-hi: rgba(200,151,58,.28);
   --text:      #e8e4de;
-  --muted:     #6b6b6b;
-  --dim:       rgba(232,228,222,.42);
+  --muted:     rgba(232,228,222,.75);
+  --dim:       rgba(232,228,222,.60);
   --gold:      #c8973a;
   --gold-hi:   #dbb568;
   --gold-dim:  rgba(200,151,58,.15);
@@ -113,7 +113,7 @@ h1 .accent{font-style:italic;font-weight:300;color:var(--gold);}
   max-width:500px;margin-top:1.8rem;text-align:center;font-size:.95rem;line-height:1.85;color:var(--dim);
   opacity:0;animation:appear .6s .9s ease forwards;
 }
-.copy strong{color:rgba(232,228,222,.7);font-weight:400;}
+.copy strong{color:rgba(232,228,222,.9);font-weight:400;}
 
 .countdown{
   display:flex;align-items:flex-end;gap:0;margin:3.5rem 0;
@@ -181,8 +181,8 @@ h1 .accent{font-style:italic;font-weight:300;color:var(--gold);}
 }
 .footer-links{display:flex;gap:2rem;font-family:'Barlow Condensed',sans-serif;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);}
 .footer-links a{color:inherit;text-decoration:none;transition:color .2s;}
-.footer-links a:hover{color:var(--muted);}
-.footer-copy{font-family:'Barlow Condensed',sans-serif;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(232,228,222,.35);}
+.footer-links a:hover{color:var(--text);}
+.footer-copy{font-family:'Barlow Condensed',sans-serif;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(232,228,222,.60);}
 
 @keyframes appear{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 
