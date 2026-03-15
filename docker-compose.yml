@@ -48,14 +48,14 @@ services:
     entrypoint: >
       /bin/sh -c "
         mc alias set local http://minio:9000 $${S3_ACCESS_KEY:-minioadmin} $${S3_SECRET_KEY:-minioadmin};
-        mc mb --ignore-existing local/${S3_BUCKET_PUBLIC:-marketplace-public};
-        mc anonymous set download local/${S3_BUCKET_PUBLIC:-marketplace-public};
+        mc mb --ignore-existing local/${S3_BUCKET_PUBLIC:-ehren-deal};
+        mc anonymous set download local/${S3_BUCKET_PUBLIC:-ehren-deal};
         echo 'Bucket ready.';
       "
     environment:
       S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minioadmin}
       S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin}
-      S3_BUCKET_PUBLIC: ${S3_BUCKET_PUBLIC:-marketplace-public}
+      S3_BUCKET_PUBLIC: ${S3_BUCKET_PUBLIC:-ehren-deal}
 
   app:
     build:
@@ -78,9 +78,9 @@ services:
       S3_REGION: ${S3_REGION:-us-east-1}
       S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minioadmin}
       S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin}
-      S3_BUCKET_PUBLIC: ${S3_BUCKET_PUBLIC:-marketplace-public}
+      S3_BUCKET_PUBLIC: ${S3_BUCKET_PUBLIC:-ehren-deal}
       # Public URL reachable from browser (MinIO exposed on host)
-      S3_PUBLIC_BASE_URL: ${S3_PUBLIC_BASE_URL:-http://localhost:9000/marketplace-public}
+      S3_PUBLIC_BASE_URL: ${S3_PUBLIC_BASE_URL:-http://localhost:9000/ehren-deal}
       # Auth + misc
       IDNOW_API_KEY: ${IDNOW_API_KEY:-}
       IDNOW_COMPANY_ID: ${IDNOW_COMPANY_ID:-}

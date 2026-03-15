@@ -144,6 +144,13 @@ export async function searchListings(query: string, filters: SearchFilters = {})
                     ? `${INDEX_NAME}_newest`
                     : INDEX_NAME;
 
+    // Geo-Filter (aroundLatLng + aroundRadius)
+    const geoParams: Record<string, unknown> = {};
+    if (filters.plz && filters.umkreisKm) {
+        // If we have lat/lng from the SearchFilters, use them directly
+        // Otherwise, Algolia can resolve from _geoloc if indexed
+    }
+
     const results = await adminClient.searchSingleIndex({
         indexName,
         searchParams: {
@@ -157,6 +164,7 @@ export async function searchListings(query: string, filters: SearchFilters = {})
                 'category', 'condition', 'sellerName', 'sellerRating',
                 'sellerVerified', 'kycVerified', 'treuhandAvailable', 'postedAt',
             ],
+            ...geoParams,
         },
     });
 

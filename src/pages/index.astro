@@ -11,7 +11,7 @@ url.searchParams.set("page", "1");
 
 // Forward search params from URL
 for (const [k, v] of Astro.url.searchParams) {
-    if (["query", "category", "minPrice", "maxPrice", "city", "page", "pageSize"].includes(k)) {
+    if (["query", "category", "minPrice", "maxPrice", "city", "lat", "lng", "radius", "page", "pageSize"].includes(k)) {
         url.searchParams.set(k, v);
     }
 }
@@ -46,29 +46,50 @@ const currentCat = Astro.url.searchParams.get("category") ?? "";
 
                 <!-- Search bar -->
                 <div class="pt-10 max-w-3xl mx-auto">
-                    <form method="GET" class="flex flex-col sm:flex-row gap-3 p-3 bg-secondary/50 border border-foreground/[.20]">
-                        <input
-                            name="query"
-                            value={currentQuery}
-                            placeholder="Was suchst du?"
-                            class="input-field flex-grow bg-transparent"
-                        />
-                        <select name="category" class="input-field sm:w-52 bg-transparent">
-                            <option value="">Alle Kategorien</option>
-                            {
-                                categories.map((c) => (
-                                    <option
-                                        value={c.slug.toUpperCase()}
-                                        selected={currentCat === c.slug.toUpperCase()}
-                                    >
-                                        {c.label}
-                                    </option>
-                                ))
-                            }
-                        </select>
-                        <button type="submit" class="btn-primary sm:w-36">
-                            Suchen
-                        </button>
+                    <form id="searchForm" method="GET" class="flex flex-col gap-3 p-3 bg-secondary/50 border border-foreground/[.20]">
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <input
+                                name="query"
+                                value={currentQuery}
+                                placeholder="Was suchst du?"
+                                class="input-field flex-grow bg-transparent"
+                            />
+                            <select name="category" class="input-field sm:w-52 bg-transparent">
+                                <option value="">Alle Kategorien</option>
+                                {
+                                    categories.map((c) => (
+                                        <option
+                                            value={c.slug.toUpperCase()}
+                                            selected={currentCat === c.slug.toUpperCase()}
+                                        >
+                                            {c.label}
+                                        </option>
+                                    ))
+                                }
+                            </select>
+                            <button type="submit" class="btn-primary sm:w-36">
+                                Suchen
+                            </button>
+                        </div>
+                        <!-- Umkreissuche -->
+                        <div class="flex flex-col sm:flex-row gap-3 items-center">
+                            <select id="radiusSelect" name="radius" class="input-field sm:w-44 bg-transparent text-sm">
+                                <option value="">Kein Umkreis</option>
+                                <option value="5">5 km Umkreis</option>
+                                <option value="10">10 km Umkreis</option>
+                                <option value="25">25 km Umkreis</option>
+                                <option value="50">50 km Umkreis</option>
+                                <option value="100">100 km Umkreis</option>
+                                <option value="200">200 km Umkreis</option>
+                            </select>
+                            <button type="button" id="geoLocateBtn" class="flex items-center gap-2 text-sm text-primary hover:text-primary/80 font-condensed uppercase tracking-wider transition-colors whitespace-nowrap">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line></svg>
+                                <span id="geoLocateText">Standort nutzen</span>
+                            </button>
+                            <input type="hidden" name="lat" id="geoLat" />
+                            <input type="hidden" name="lng" id="geoLng" />
+                            <span id="geoStatus" class="text-xs text-primary/80 hidden"></span>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -218,3 +239,55 @@ const currentCat = Astro.url.searchParams.get("category") ?? "";
     </main>
     <Footer />
 </BaseLayout>
+
+<script>
+    const geoBtn = document.getElementById('geoLocateBtn');
+    const geoText = document.getElementById('geoLocateText');
+    const geoStatus = document.getElementById('geoStatus');
+    const latInput = document.getElementById('geoLat') as HTMLInputElement;
+    const lngInput = document.getElementById('geoLng') as HTMLInputElement;
+    const radiusSelect = document.getElementById('radiusSelect') as HTMLSelectElement;
+
+    // Restore radius from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('radius') && radiusSelect) {
+        radiusSelect.value = urlParams.get('radius')!;
+    }
+    if (urlParams.get('lat') && latInput) latInput.value = urlParams.get('lat')!;
+    if (urlParams.get('lng') && lngInput) lngInput.value = urlParams.get('lng')!;
+
+    if (geoBtn) {
+        geoBtn.addEventListener('click', () => {
+            if (!navigator.geolocation) {
+                if (geoStatus) { geoStatus.textContent = 'Geolocation nicht verfügbar'; geoStatus.classList.remove('hidden'); }
+                return;
+            }
+            if (geoText) geoText.textContent = 'Wird ermittelt…';
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    latInput.value = String(pos.coords.latitude);
+                    lngInput.value = String(pos.coords.longitude);
+                    if (geoText) geoText.textContent = 'Standort erkannt';
+                    if (geoStatus) { geoStatus.textContent = `${pos.coords.latitude.toFixed(2)}, ${pos.coords.longitude.toFixed(2)}`; geoStatus.classList.remove('hidden'); }
+                    // Default radius if none selected
+                    if (radiusSelect && !radiusSelect.value) radiusSelect.value = '25';
+                },
+                (err) => {
+                    const msgs: Record<number, string> = { 1: 'Zugriff verweigert', 2: 'Nicht verfügbar', 3: 'Timeout' };
+                    if (geoStatus) { geoStatus.textContent = msgs[err.code] || 'Fehler'; geoStatus.classList.remove('hidden'); geoStatus.style.color = '#e53e3e'; }
+                    if (geoText) geoText.textContent = 'Standort nutzen';
+                },
+                { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
+            );
+        });
+    }
+
+    // Remove empty geo fields before submit
+    document.getElementById('searchForm')?.addEventListener('submit', () => {
+        if (!latInput?.value || !lngInput?.value || !radiusSelect?.value) {
+            latInput.removeAttribute('name');
+            lngInput.removeAttribute('name');
+            if (!radiusSelect.value) radiusSelect.removeAttribute('name');
+        }
+    });
+</script>

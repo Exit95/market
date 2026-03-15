@@ -15,10 +15,33 @@ const ListingQuerySchema = z.object({
     minPrice: z.coerce.number().int().min(0).optional(),
     maxPrice: z.coerce.number().int().min(0).optional(),
     city: z.string().optional(),
+    lat: z.coerce.number().min(-90).max(90).optional(),
+    lng: z.coerce.number().min(-180).max(180).optional(),
+    radius: z.coerce.number().min(1).max(500).optional(), // km
     page: z.coerce.number().int().min(1).default(1),
     pageSize: z.coerce.number().int().min(1).max(100).default(20),
     status: z.enum(['DRAFT', 'ACTIVE', 'RESERVED', 'SOLD', 'ARCHIVED', 'REMOVED']).optional(),
 });
+
+/** Haversine-basierte Bounding Box (schneller Vorfilter) */
+function geoBoundingBox(lat: number, lng: number, radiusKm: number) {
+    const R = 6371; // Erdradius in km
+    const dLat = radiusKm / R * (180 / Math.PI);
+    const dLng = radiusKm / (R * Math.cos(lat * Math.PI / 180)) * (180 / Math.PI);
+    return {
+        minLat: lat - dLat, maxLat: lat + dLat,
+        minLng: lng - dLng, maxLng: lng + dLng,
+    };
+}
+
+/** Haversine-Distanz in km */
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 
 const CreateListingSchema = z.object({
     title: z.string().min(3, 'Titel muss mindestens 3 Zeichen haben.').max(120, 'Titel darf maximal 120 Zeichen haben.'),
@@ -30,6 +53,8 @@ const CreateListingSchema = z.object({
     condition: z.string().optional(),
     treuhand: z.boolean().default(false),
     status: z.enum(['DRAFT', 'ACTIVE']).default('DRAFT'),
+    latitude: z.number().min(-90).max(90).optional(),
+    longitude: z.number().min(-180).max(180).optional(),
 });
 
 // ── GET /api/listings ─────────────────────────────────────────────────────────
@@ -44,8 +69,9 @@ export const GET: APIRoute = async ({ url }) => {
         return json(getFallbackListings(parsed.data));
     }
 
-    const { query, category: rawCategory, minPrice, maxPrice, city, page, pageSize, status } = parsed.data;
+    const { query, category: rawCategory, minPrice, maxPrice, city, lat, lng, radius, page, pageSize, status } = parsed.data;
     const skip = (page - 1) * pageSize;
+    const useGeo = lat !== undefined && lng !== undefined && radius !== undefined;
 
     // Normalize category slug to Prisma enum (uppercase)
     const VALID_CATEGORIES = ['ELEKTRONIK', 'FAHRZEUGE', 'MODE', 'MOEBEL', 'SPORT', 'HAUSHALT', 'BUCHER', 'SPIELZEUG', 'SONSTIGES'];
@@ -54,10 +80,9 @@ export const GET: APIRoute = async ({ url }) => {
 
     const where: Record<string, unknown> = {
         status: status ?? 'ACTIVE',
-        // Hide listings from shadow-banned sellers (they don't know)
         seller: { shadowBanned: false },
         ...(safeCategory && { category: safeCategory }),
-        ...(city && { city: { contains: city, mode: 'insensitive' } }),
+        ...(city && !useGeo && { city: { contains: city, mode: 'insensitive' } }),
         ...(minPrice !== undefined || maxPrice !== undefined
             ? { price: { ...(minPrice !== undefined && { gte: minPrice }), ...(maxPrice !== undefined && { lte: maxPrice }) } }
             : {}),
@@ -69,17 +94,25 @@ export const GET: APIRoute = async ({ url }) => {
         }),
     };
 
+    // Geo-Filter: Bounding-Box als Vorfilter in der DB-Query
+    if (useGeo) {
+        const bbox = geoBoundingBox(lat!, lng!, radius!);
+        where.latitude = { not: null, gte: bbox.minLat, lte: bbox.maxLat };
+        where.longitude = { not: null, gte: bbox.minLng, lte: bbox.maxLng };
+    }
+
     try {
-        const [total, listings] = await Promise.all([
+        const [total, rawListings] = await Promise.all([
             prisma.listing.count({ where }),
             prisma.listing.findMany({
                 where,
                 skip,
-                take: pageSize,
+                take: useGeo ? pageSize * 3 : pageSize, // overfetch for geo-filtering
                 orderBy: { createdAt: 'desc' },
                 select: {
                     id: true, title: true, price: true, currency: true,
                     category: true, city: true, postalCode: true,
+                    latitude: true, longitude: true,
                     status: true, treuhand: true, condition: true,
                     createdAt: true, viewCount: true,
                     seller: { select: { id: true, firstName: true, lastName: true, idVerified: true, trustScore: { select: { score: true, level: true } } } },
@@ -88,7 +121,15 @@ export const GET: APIRoute = async ({ url }) => {
             }),
         ]);
 
-        return json({ listings, pagination: { total, page, pageSize, totalPages: Math.ceil(total / pageSize) } });
+        // Post-filter with exact Haversine distance
+        let listings = rawListings;
+        if (useGeo) {
+            listings = rawListings
+                .filter((l: any) => l.latitude && l.longitude && haversineKm(lat!, lng!, l.latitude, l.longitude) <= radius!)
+                .slice(0, pageSize);
+        }
+
+        return json({ listings, pagination: { total: useGeo ? listings.length : total, page, pageSize, totalPages: useGeo ? 1 : Math.ceil(total / pageSize) } });
     } catch (error) {
         if (shouldUseListingFallback(error)) {
             return json(getFallbackListings(parsed.data));

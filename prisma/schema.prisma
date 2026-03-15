@@ -190,6 +190,10 @@ model Listing {
   condition    String?         // Neu | Sehr gut | Gut | Akzeptabel
   viewCount    Int             @default(0)
 
+  // Geo-Koordinaten (für Umkreissuche)
+  latitude     Float?
+  longitude    Float?
+
   sellerId     String
   seller       User            @relation(fields: [sellerId], references: [id])
 

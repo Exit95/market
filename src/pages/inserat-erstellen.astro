@@ -704,7 +704,11 @@ import { categories } from "../data/listings";
         });
     }
 
-    // Browser Geolocation → Reverse Geocode → PLZ + City
+    // Geo-Koordinaten zwischenspeichern
+    let detectedLat: number | null = null;
+    let detectedLng: number | null = null;
+
+    // Browser Geolocation → Reverse Geocode → PLZ + City + Koordinaten
     if (geoBtn) {
         geoBtn.addEventListener("click", () => {
             if (!navigator.geolocation) {
@@ -718,6 +722,8 @@ import { categories } from "../data/listings";
             navigator.geolocation.getCurrentPosition(
                 async (pos) => {
                     const { latitude, longitude } = pos.coords;
+                    detectedLat = latitude;
+                    detectedLng = longitude;
                     try {
                         const res = await fetchT(
                             `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1&accept-language=de`,
@@ -912,7 +918,10 @@ import { categories } from "../data/listings";
             const listingRes = await fetchT('/api/listings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, description, price, category, city, postalCode, condition, treuhand, status: 'ACTIVE' }),
+                body: JSON.stringify({
+                    title, description, price, category, city, postalCode, condition, treuhand, status: 'ACTIVE',
+                    ...(detectedLat !== null && detectedLng !== null && { latitude: detectedLat, longitude: detectedLng }),
+                }),
             });
             const listingData = await listingRes.json();
             if (!listingRes.ok) throw new Error(listingData.error || 'Fehler beim Erstellen der Anzeige');

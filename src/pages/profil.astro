@@ -53,7 +53,13 @@ function maskPhone(phone: string | null): string {
             <div class="profile-banner">
                 <div class="banner-bg"></div>
                 <div class="profile-info">
-                    <div class="profile-avatar">{initials}</div>
+                    <div class="profile-avatar">
+                        {dbUser.avatarUrl ? (
+                            <img src={dbUser.avatarUrl} alt={fullName} class="w-full h-full object-cover rounded-full" />
+                        ) : (
+                            initials
+                        )}
+                    </div>
                     <div class="profile-details">
                         <div class="profile-name-row">
                             <h1 class="profile-name">{fullName}</h1>

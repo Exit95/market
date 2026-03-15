@@ -15,7 +15,7 @@ const dbUser = await prisma.user.findUnique({
     where: { id: sessionUser.id },
     select: {
         id: true, email: true, firstName: true, lastName: true,
-        phone: true, city: true, postalCode: true,
+        phone: true, city: true, postalCode: true, avatarUrl: true,
         emailVerified: true, phoneVerified: true, idVerified: true,
         createdAt: true,
     },
@@ -44,6 +44,34 @@ if (!dbUser) return Astro.redirect("/anmelden?redirect=/einstellungen");
 
             <!-- Profile Tab -->
             <div class="settings-panel" id="panel-profile">
+                <!-- Avatar Upload -->
+                <div class="avatar-section">
+                    <div class="avatar-preview" id="avatar-preview">
+                        {dbUser.avatarUrl ? (
+                            <img src={dbUser.avatarUrl} alt="Profilbild" class="avatar-img" id="avatar-img" />
+                        ) : (
+                            <span class="avatar-initials" id="avatar-initials">
+                                {dbUser.firstName ? dbUser.firstName[0].toUpperCase() : dbUser.email[0].toUpperCase()}
+                            </span>
+                        )}
+                        <div class="avatar-overlay" id="avatar-overlay">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                                <circle cx="12" cy="13" r="4"/>
+                            </svg>
+                            <span class="text-[.6rem]">Ändern</span>
+                        </div>
+                    </div>
+                    <input type="file" id="avatar-input" accept="image/jpeg,image/png,image/webp" class="hidden" />
+                    <div class="avatar-info">
+                        <h2 class="panel-title">Profilbild</h2>
+                        <p class="panel-desc" style="margin-bottom:0;">JPG, PNG oder WebP. Max. 8 MB.</p>
+                        <div id="avatar-msg" class="form-msg" style="min-height:0;"></div>
+                    </div>
+                </div>
+
+                <hr class="border-foreground/10 my-6" />
+
                 <h2 class="panel-title">Persönliche Daten</h2>
                 <p class="panel-desc">Bearbeite deine Profildaten. Diese werden bei Deals und auf deinem Profil angezeigt.</p>
 
@@ -212,6 +240,16 @@ if (!dbUser) return Astro.redirect("/anmelden?redirect=/einstellungen");
     .notif-toggle input:checked ~ .toggle-slider { @apply bg-primary/60; }
     .notif-toggle input:checked ~ .toggle-slider::after { @apply translate-x-5 bg-primary; }
 
+    /* Avatar */
+    .avatar-section { @apply flex items-center gap-5 mb-2; }
+    .avatar-preview { @apply relative w-20 h-20 rounded-full bg-secondary/60 border border-foreground/20 flex items-center justify-center overflow-hidden cursor-pointer flex-shrink-0; }
+    .avatar-img { @apply w-full h-full object-cover; }
+    .avatar-initials { @apply text-2xl font-headings text-primary font-light; }
+    .avatar-overlay { @apply absolute inset-0 bg-black/60 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity text-foreground/80; }
+    .avatar-info { @apply flex flex-col; }
+    .avatar-progress { @apply h-1 bg-primary/30 rounded-full overflow-hidden mt-1; }
+    .avatar-progress-bar { @apply h-full bg-primary transition-all duration-300; }
+
     @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
     .animate-fadeIn { animation: fadeIn .2s ease; }
 </style>
@@ -226,6 +264,83 @@ document.querySelectorAll('.settings-tab').forEach(tab => {
         const panel = document.getElementById(`panel-${tab.getAttribute('data-tab')}`);
         if (panel) { panel.classList.remove('hidden'); }
     });
+});
+
+// Avatar upload
+const avatarPreview = document.getElementById('avatar-preview')!;
+const avatarInput = document.getElementById('avatar-input') as HTMLInputElement;
+const avatarMsg = document.getElementById('avatar-msg')!;
+
+avatarPreview.addEventListener('click', () => avatarInput.click());
+
+avatarInput.addEventListener('change', async () => {
+    const file = avatarInput.files?.[0];
+    if (!file) return;
+
+    // Validate client-side
+    const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowed.includes(file.type)) {
+        avatarMsg.textContent = 'Nur JPG, PNG oder WebP erlaubt';
+        avatarMsg.className = 'form-msg error';
+        return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+        avatarMsg.textContent = 'Datei zu groß (max. 8 MB)';
+        avatarMsg.className = 'form-msg error';
+        return;
+    }
+
+    avatarMsg.textContent = 'Wird hochgeladen...';
+    avatarMsg.className = 'form-msg';
+
+    try {
+        // 1) Get presigned URL
+        const presignRes = await fetch('/api/uploads/presign', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'avatar', contentType: file.type, size: file.size }),
+        });
+        const presign = await presignRes.json();
+        if (!presignRes.ok) throw new Error(presign.error || 'Presign fehlgeschlagen');
+
+        // 2) Upload to S3
+        const uploadRes = await fetch(presign.uploadUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': file.type },
+            body: file,
+        });
+        if (!uploadRes.ok) throw new Error('Upload fehlgeschlagen');
+
+        // 3) Save URL to profile
+        const saveRes = await fetch('/api/auth/update-profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ avatarUrl: presign.publicUrl }),
+        });
+        const saveData = await saveRes.json();
+        if (!saveData.ok) throw new Error(saveData.error || 'Speichern fehlgeschlagen');
+
+        // 4) Update preview
+        const initials = document.getElementById('avatar-initials');
+        if (initials) initials.remove();
+        let img = document.getElementById('avatar-img') as HTMLImageElement | null;
+        if (!img) {
+            img = document.createElement('img');
+            img.id = 'avatar-img';
+            img.className = 'avatar-img';
+            img.alt = 'Profilbild';
+            const overlay = document.getElementById('avatar-overlay');
+            avatarPreview.insertBefore(img, overlay);
+        }
+        img.src = presign.publicUrl;
+
+        avatarMsg.textContent = 'Profilbild gespeichert';
+        avatarMsg.className = 'form-msg success';
+    } catch (e: any) {
+        avatarMsg.textContent = e.message || 'Fehler beim Upload';
+        avatarMsg.className = 'form-msg error';
+    }
+    avatarInput.value = '';
 });
 
 // Profile form

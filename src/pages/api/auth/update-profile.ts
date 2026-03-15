@@ -9,6 +9,7 @@ const UpdateSchema = z.object({
     phone: z.string().max(30).optional(),
     city: z.string().max(100).optional(),
     postalCode: z.string().max(10).optional(),
+    avatarUrl: z.string().url().max(500).optional(),
 });
 
 /**
@@ -32,6 +33,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     if (parsed.data.lastName !== undefined) data.lastName = parsed.data.lastName || undefined;
     if (parsed.data.city !== undefined) data.city = parsed.data.city || undefined;
     if (parsed.data.postalCode !== undefined) data.postalCode = parsed.data.postalCode || undefined;
+    if (parsed.data.avatarUrl !== undefined) data.avatarUrl = parsed.data.avatarUrl || undefined;
 
     // If phone changes, reset phoneVerified
     if (parsed.data.phone !== undefined) {
@@ -45,7 +47,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const user = await prisma.user.update({
         where: { id: auth.userId },
         data,
-        select: { firstName: true, lastName: true, phone: true, city: true, postalCode: true },
+        select: { firstName: true, lastName: true, phone: true, city: true, postalCode: true, avatarUrl: true },
     });
 
     return new Response(JSON.stringify({ ok: true, user }), {
