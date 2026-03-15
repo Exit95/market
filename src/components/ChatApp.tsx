@@ -18,6 +18,7 @@ export default function ChatApp({ currentUserId }: { currentUserId: string }) {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const channelRef = useRef<Ably.RealtimeChannel | null>(null);
     const ablyRef = useRef<Ably.Realtime | null>(null);
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // 1. Fetch conversations
     useEffect(() => {
@@ -72,19 +73,48 @@ export default function ChatApp({ currentUserId }: { currentUserId: string }) {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
-    // Client-side scam scanner
+    // KI-gestützter Echtzeit-Scan mit Debounce (500ms)
     const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const val = e.target.value;
         setInputText(val);
 
+        // Sofortige lokale Keywords-Prüfung (instant feedback)
         const lowerVal = val.toLowerCase();
-        const scamKeywords = ['paypal freunde', 'family & friends', 'vorkasse', 'western union', 'crypto', 'whatsapp', 't.me'];
-        if (scamKeywords.some(kw => lowerVal.includes(kw))) {
-            setFraudWarning("⚠️ Achtung: Bitte bleibe für die sichere Abwicklung auf der Plattform. Der Wechsel zu anderen Messengern oder riskanten Zahlungsarten gefährdet deinen Käuferschutz.");
-        } else {
-            setFraudWarning('');
+        const instantKeywords = ['paypal freunde', 'family & friends', 'vorkasse', 'western union'];
+        if (instantKeywords.some(kw => lowerVal.includes(kw))) {
+            setFraudWarning('Achtung: Bitte bleibe für die sichere Abwicklung auf der Plattform. Der Wechsel zu riskanten Zahlungsarten gefährdet deinen Käuferschutz.');
+            return;
         }
+
+        // Debounced KI-Scan via API (500ms Verzögerung)
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+
+        if (val.trim().length < 3) {
+            setFraudWarning('');
+            return;
+        }
+
+        debounceRef.current = setTimeout(async () => {
+            try {
+                const res = await fetch('/api/detect/message', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: val }),
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    setFraudWarning(data.warning ?? '');
+                }
+            } catch {
+                // Netzwerkfehler – kein Warning anzeigen
+            }
+        }, 500);
     };
+
+    // Cleanup debounce timer on unmount
+    useEffect(() => {
+        return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+    }, []);
 
     const sendMessage = async () => {
         if (!inputText.trim() || !activeConvId) return;

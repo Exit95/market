@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { requireAuth, isAuthContext } from '../../../../lib/auth-middleware';
 import { checkRateLimit, rateLimitResponse } from '../../../../lib/rate-limit';
 import { filterMessage } from '../../../../lib/message-filter';
+import { scanChatMessageKI } from '../../../../lib/ai-fraud-scanner';
 import { publishMessage } from '../../../../lib/ably';
 import { prisma } from '../../../../lib/auth';
 
@@ -57,22 +58,31 @@ export const POST: APIRoute = async ({ request, cookies, params, clientAddress }
     const parsed = MessageSchema.safeParse(body);
     if (!parsed.success) return err(400, parsed.error.issues[0]?.message ?? 'Validation error');
 
-    // Content filter & Ehren-Deal Scam Scanner
+    // Content filter & Ehren-Deal Scam Scanner (Regel + KI)
     const { blocked, reason } = filterMessage(parsed.data.body);
     const { scanChatMessage } = await import('../../../../lib/security');
     const { isSafe, flags } = scanChatMessage(parsed.data.body);
+    const kiResult = scanChatMessageKI(parsed.data.body);
 
-    if (blocked || !isSafe) {
-        const blockReason = blocked ? reason : `Potenzieller Betrugsversuch erkannt: ${flags.join(', ')}`;
-        
-        // Log severe flags as fraud signals for the user
-        if (!isSafe && (flags.includes("OFF_PLATFORM_WHATSAPP") || flags.includes("SUSPICIOUS_LINK"))) {
+    // Combine: blocked by regex filter OR security scanner OR KI hard-block
+    const isBlocked = blocked || !isSafe || !kiResult.isSafe;
+
+    if (isBlocked) {
+        const allFlags = [...new Set([...flags, ...kiResult.flags])];
+        const blockReason = blocked
+            ? reason
+            : !isSafe
+                ? `Potenzieller Betrugsversuch erkannt: ${flags.join(', ')}`
+                : kiResult.warning;
+
+        // FraudSignal bei schweren Verstößen
+        if (allFlags.length > 0) {
             await prisma.fraudSignal.create({
                 data: {
                     userId: auth.userId,
-                    type: flags.join(','),
-                    severity: 'HIGH',
-                    metaJson: { conversationId: params.id, flags },
+                    type: 'KI_CHAT_BLOCKED',
+                    severity: kiResult.score >= 0.7 ? 'CRITICAL' : 'HIGH',
+                    metaJson: { conversationId: params.id, flags: allFlags, kiScore: kiResult.score },
                 },
             });
         }
@@ -82,10 +92,22 @@ export const POST: APIRoute = async ({ request, cookies, params, clientAddress }
                 actorId: auth.userId,
                 action: 'message_blocked',
                 ip: clientAddress,
-                metaJson: { conversationId: params.id, reason: blockReason, flags },
+                metaJson: { conversationId: params.id, reason: blockReason, flags: allFlags, kiScore: kiResult.score },
             },
         });
         return err(400, 'Sicherheitsrichtlinie: Diese Nachricht verstößt gegen unsere Sicherheits- und Anti-Scam-Richtlinien (z.B. Weiterleitung auf externe Messenger oder verdächtige Links).');
+    }
+
+    // KI-Warnung (nicht blockiert, aber verdächtig) – als Soft-Signal loggen
+    if (kiResult.warning) {
+        await prisma.auditLog.create({
+            data: {
+                actorId: auth.userId,
+                action: 'message_ki_warning',
+                ip: clientAddress,
+                metaJson: { conversationId: params.id, flags: kiResult.flags, kiScore: kiResult.score },
+            },
+        });
     }
 
     const message = await prisma.message.create({

@@ -5,6 +5,7 @@ import { checkRateLimit, rateLimitResponse } from '../../../lib/rate-limit';
 import { listingDayLimit } from '../../../lib/trust-score';
 import { prisma } from '../../../lib/auth';
 import { getFallbackListings, shouldUseListingFallback } from '../../../lib/listing-fallback';
+import { analyzeListingContent } from '../../../lib/ai-fraud-scanner';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -136,15 +137,72 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
         }
     }
 
+    // KI-Betrugserkennung: Anzeige analysieren
+    const fraudResult = await analyzeListingContent(
+        parsed.data.title,
+        parsed.data.description,
+        parsed.data.price,
+        parsed.data.category,
+    );
+
+    if (fraudResult.action === 'BLOCK') {
+        // Hart blockiert – FraudSignal + AuditLog erstellen, Anzeige ablehnen
+        await Promise.all([
+            prisma.fraudSignal.create({
+                data: {
+                    userId: auth.userId,
+                    type: 'KI_LISTING_BLOCKED',
+                    severity: 'CRITICAL',
+                    metaJson: { flags: fraudResult.flags, score: fraudResult.score, title: parsed.data.title },
+                },
+            }),
+            prisma.auditLog.create({
+                data: {
+                    actorId: auth.userId,
+                    action: 'listing_blocked_ki',
+                    ip: clientAddress,
+                    metaJson: { flags: fraudResult.flags, score: fraudResult.score },
+                },
+            }),
+        ]);
+        return jsonErr(403, fraudResult.reason ?? 'Anzeige wurde aus Sicherheitsgründen blockiert.');
+    }
+
+    // Bei REVIEW: Status auf DRAFT forcieren (unabhängig von User-Wunsch)
+    const finalStatus = fraudResult.action === 'REVIEW' ? 'DRAFT' : parsed.data.status;
+
     const listing = await prisma.listing.create({
-        data: { ...parsed.data, sellerId: auth.userId },
+        data: { ...parsed.data, status: finalStatus, sellerId: auth.userId },
     });
+
+    // FraudSignal bei REVIEW erstellen (für Admin-Queue)
+    if (fraudResult.action === 'REVIEW') {
+        await prisma.fraudSignal.create({
+            data: {
+                userId: auth.userId,
+                type: 'KI_LISTING_REVIEW',
+                severity: 'HIGH',
+                metaJson: { listingId: listing.id, flags: fraudResult.flags, score: fraudResult.score },
+            },
+        });
+    }
 
     await prisma.auditLog.create({
-        data: { actorId: auth.userId, action: 'listing_create', ip: clientAddress, metaJson: { listingId: listing.id } },
+        data: {
+            actorId: auth.userId,
+            action: 'listing_create',
+            ip: clientAddress,
+            metaJson: {
+                listingId: listing.id,
+                kiScan: { action: fraudResult.action, score: fraudResult.score, flags: fraudResult.flags },
+            },
+        },
     });
 
-    return json({ listing }, 201);
+    return json({
+        listing,
+        ...(fraudResult.action === 'REVIEW' && { notice: fraudResult.reason }),
+    }, 201);
 };
 
 function json(data: unknown, status = 200) {
