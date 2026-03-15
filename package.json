@@ -1,0 +1,50 @@
+{
+  "name": "novamarkt",
+  "version": "1.0.0",
+  "description": "Sichere Kleinanzeigen-Plattform",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push"
+  },
+  "dependencies": {
+    "@astrojs/node": "^9.5.4",
+    "@astrojs/react": "^4.2.0",
+    "@astrojs/tailwind": "^6.0.0",
+    "@aws-sdk/client-s3": "^3.995.0",
+    "@aws-sdk/s3-request-presigner": "^3.995.0",
+    "@lucia-auth/adapter-prisma": "^4.0.1",
+    "@node-rs/argon2": "^2.0.2",
+    "@prisma/client": "^6.4.1",
+    "@types/nodemailer": "^7.0.11",
+    "ably": "^2.17.1",
+    "algoliasearch": "^5.49.0",
+    "astro": "^5.0.0",
+    "framer-motion": "^12.4.7",
+    "html5-qrcode": "^2.3.8",
+    "lucia": "^3.2.2",
+    "lucide-react": "^0.475.0",
+    "mangopay2-nodejs-sdk": "^1.42.0",
+    "nodemailer": "^8.0.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-qr-code": "^2.0.18",
+    "stripe": "^20.3.1",
+    "tailwindcss": "^3.4.17",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "prisma": "^6.4.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
+}

@@ -1,0 +1,977 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { listings } from "../../data/listings";
+
+export function getStaticPaths() {
+    return listings.map((l) => ({
+        params: { id: l.id },
+        props: { listing: l },
+    }));
+}
+
+const { listing } = Astro.props;
+const stars =
+    "★".repeat(Math.round(listing.sellerRating)) +
+    "☆".repeat(5 - Math.round(listing.sellerRating));
+const relatedListings = listings
+    .filter((l) => l.id !== listing.id && l.category === listing.category)
+    .slice(0, 3);
+---
+
+<BaseLayout title={`${listing.title} – Novamarkt`}>
+    <Header />
+    <main class="detail-main">
+        <div class="container">
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb">
+                <a href="/">Startseite</a>
+                <span>›</span>
+                <a href={`/kategorie/${listing.category.toLowerCase()}`}
+                    >{listing.category}</a
+                >
+                <span>›</span>
+                <span>{listing.title}</span>
+            </nav>
+
+            <div class="detail-grid">
+                <!-- Left: Images & Description -->
+                <div class="detail-left">
+                    <!-- Image Gallery -->
+                    <div class="img-gallery">
+                        <div class="img-main-wrap">
+                            <img
+                                src={listing.image}
+                                alt={listing.title}
+                                class="img-main"
+                                id="mainImg"
+                            />
+                            {
+                                listing.condition === "Neu" && (
+                                    <span class="badge badge-success img-badge-large">
+                                        Neu
+                                    </span>
+                                )
+                            }
+                            {
+                                listing.treuhandAvailable && (
+                                    <div class="treuhand-ribbon">
+                                        <svg
+                                            width="14"
+                                            height="14"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2.5"
+                                        >
+                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                        </svg>
+                                        Käuferschutz aktiv
+                                    </div>
+                                )
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="card" style="margin-top:var(--space-5);">
+                        <h2
+                            style="font-size:var(--text-lg); font-weight:700; margin-bottom:var(--space-4);"
+                        >
+                            Beschreibung
+                        </h2>
+                        <p
+                            style="color:var(--color-text-muted); line-height:1.8; font-size:var(--text-sm);"
+                        >
+                            {listing.description}
+                        </p>
+                    </div>
+
+                    <!-- Details Table -->
+                    <div class="card" style="margin-top:var(--space-4);">
+                        <h2
+                            style="font-size:var(--text-lg); font-weight:700; margin-bottom:var(--space-4);"
+                        >
+                            Details
+                        </h2>
+                        <div class="detail-table">
+                            <div class="detail-row">
+                                <span class="detail-key">Zustand</span>
+                                <span
+                                    class={`badge ${listing.condition === "Neu" ? "badge-success" : listing.condition === "Sehr gut" ? "badge-primary" : "badge-warning"}`}
+                                    >{listing.condition}</span
+                                >
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Kategorie</span>
+                                <span class="detail-val"
+                                    >{listing.category}</span
+                                >
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Standort</span>
+                                <span class="detail-val"
+                                    >{listing.location}</span
+                                >
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Inserat-ID</span>
+                                <span
+                                    class="detail-val"
+                                    style="color:var(--color-text-faint);"
+                                    >#{listing.id.padStart(8, "0")}</span
+                                >
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-key">Eingestellt</span>
+                                <span class="detail-val"
+                                    >{listing.postedAt}</span
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Safety Tips -->
+                    <div
+                        class="card safety-tips-card"
+                        style="margin-top:var(--space-4);"
+                    >
+                        <div class="safety-tips-header">
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                ><path
+                                    d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                                ></path><line x1="12" y1="9" x2="12" y2="13"
+                                ></line><line x1="12" y1="17" x2="12.01" y2="17"
+                                ></line></svg
+                            >
+                            <strong>Sicherheitstipps für Käufer</strong>
+                        </div>
+                        <ul class="safety-list">
+                            <li>
+                                Kaufe nur über unser <strong
+                                    >Treuhandkonto</strong
+                                > – nie direkt via PayPal Freunde & Familie
+                            </li>
+                            <li>
+                                Triff Verkäufer <strong
+                                    >persönlich an öffentlichen Orten</strong
+                                > oder nutze Versand mit Treuhand
+                            </li>
+                            <li>
+                                Lass dich <strong
+                                    >nie zu schnellen Entscheidungen drängen</strong
+                                > – seriöse Verkäufer haben Zeit
+                            </li>
+                            <li>
+                                Kaufe <strong
+                                    >keine Codes oder Geschenkgutscheine</strong
+                                > als Zahlungsmittel
+                            </li>
+                            <li>
+                                Melde verdächtige Anzeigen sofort über den <strong
+                                    >"Melden"-Button</strong>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Right: Purchase Box -->
+                <div class="detail-right">
+                    <div
+                        class="purchase-box card-glass"
+                        style="padding:var(--space-6);"
+                    >
+                        <div class="price-row">
+                            <span class="detail-price"
+                                >{listing.price.toLocaleString("de-DE")} €</span
+                            >
+                            {
+                                listing.treuhandAvailable && (
+                                    <span
+                                        class="trust-badge trust-verified"
+                                        style="font-size:0.7rem;"
+                                    >
+                                        Treuhand
+                                    </span>
+                                )
+                            }
+                        </div>
+                        <div class="location-row">
+                            <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                ><path
+                                    d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
+                                ></path><circle cx="12" cy="10" r="3"
+                                ></circle></svg
+                            >
+                            {listing.location}
+                            <span class="listing-date-badge"
+                                >{listing.postedAt}</span
+                            >
+                        </div>
+
+                        {
+                            listing.treuhandAvailable && (
+                                <div class="treuhand-info-box">
+                                    <div class="treuhand-info-header">
+                                        <svg
+                                            width="16"
+                                            height="16"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2.5"
+                                        >
+                                            <>
+                                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                                <polyline points="9 12 11 14 15 10" />
+                                            </>
+                                        </svg>
+                                        Käuferschutz verfügbar
+                                    </div>
+                                    <p>
+                                        Dein Geld liegt sicher auf dem
+                                        Treuhandkonto und wird erst nach
+                                        bestätigtem Warenerhalt freigegeben.
+                                    </p>
+                                </div>
+                            )
+                        }
+
+                        <div class="action-buttons">
+                            <button
+                                class="btn btn-primary w-full btn-lg"
+                                id="contactBtn"
+                            >
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    ><path
+                                        d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                                    ></path></svg
+                                >
+                                Verkäufer kontaktieren
+                            </button>
+                            {
+                                listing.treuhandAvailable && (
+                                    <button
+                                        class="btn btn-secondary w-full"
+                                        id="buyBtn"
+                                    >
+                                        <svg
+                                            width="16"
+                                            height="16"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2.5"
+                                        >
+                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                        </svg>
+                                        Sicher kaufen (Treuhand)
+                                    </button>
+                                )
+                            }
+                            <button
+                                class="btn btn-ghost w-full"
+                                style="color:var(--color-text-muted); font-size:var(--text-sm);"
+                            >
+                                <svg
+                                    width="14"
+                                    height="14"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    ><path
+                                        d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                                    ></path></svg
+                                >
+                                Merken
+                            </button>
+                        </div>
+
+                        <div class="report-row">
+                            <button
+                                class="btn btn-ghost btn-sm"
+                                style="color:var(--color-danger); font-size:var(--text-xs);"
+                            >
+                                <svg
+                                    width="12"
+                                    height="12"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    ><path
+                                        d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                                    ></path></svg
+                                >
+                                Anzeige melden
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Risk Score -->
+                    <div
+                        class="card"
+                        style="margin-top:var(--space-4); padding:var(--space-5);"
+                    >
+                        <div class="risk-header">
+                            <span
+                                style="font-size:var(--text-sm); font-weight:700;"
+                                >Sicherheits-Score</span
+                            >
+                            <span
+                                class="badge badge-success"
+                                style="font-size:0.65rem;">Niedrig</span
+                            >
+                        </div>
+                        <div class="risk-bar-wrap">
+                            <div class="risk-bar" style="width: 88%"></div>
+                        </div>
+                        <div class="risk-labels">
+                            <span>Risiko</span>
+                            <span
+                                style="color:var(--color-success); font-weight:600;"
+                                >88 / 100</span
+                            >
+                        </div>
+                        <div class="risk-checks">
+                            <div class="risk-check ok">
+                                <svg
+                                    width="12"
+                                    height="12"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2.5"
+                                    ><polyline points="20 6 9 17 4 12"
+                                    ></polyline></svg
+                                > Verifizierter Verkäufer
+                            </div>
+                            <div class="risk-check ok">
+                                <svg
+                                    width="12"
+                                    height="12"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2.5"
+                                    ><polyline points="20 6 9 17 4 12"
+                                    ></polyline></svg
+                                > Preis im marktüblichen Bereich
+                            </div>
+                            <div class="risk-check ok">
+                                <svg
+                                    width="12"
+                                    height="12"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2.5"
+                                    ><polyline points="20 6 9 17 4 12"
+                                    ></polyline></svg
+                                > Keine Betrugsmuster erkannt
+                            </div>
+                            {
+                                listing.treuhandAvailable && (
+                                    <div class="risk-check ok">
+                                        <svg
+                                            width="12"
+                                            height="12"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2.5"
+                                        >
+                                            <polyline points="20 6 9 17 4 12" />
+                                        </svg>{" "}
+                                        Treuhandkonto verfügbar
+                                    </div>
+                                )
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Seller Card -->
+                    <div
+                        class="card"
+                        style="margin-top:var(--space-4); padding:var(--space-5);"
+                    >
+                        <h3
+                            style="font-size:var(--text-sm); font-weight:700; margin-bottom:var(--space-4); color:var(--color-text-muted); text-transform:uppercase; letter-spacing:0.06em;"
+                        >
+                            Über den Verkäufer
+                        </h3>
+                        <div class="seller-block">
+                            <div class="seller-avatar-lg">
+                                {listing.sellerName.charAt(0)}
+                            </div>
+                            <div>
+                                <div class="seller-name-detail">
+                                    {listing.sellerName}
+                                </div>
+                                <div class="seller-badges">
+                                    {
+                                        listing.sellerKYC && (
+                                            <span
+                                                class="trust-badge trust-kyc"
+                                                style="font-size:0.65rem; padding:3px 7px;"
+                                            >
+                                                KYC-verifiziert
+                                            </span>
+                                        )
+                                    }
+                                    {
+                                        listing.sellerVerified && (
+                                            <span
+                                                class="trust-badge trust-verified"
+                                                style="font-size:0.65rem; padding:3px 7px;"
+                                            >
+                                                ✓ Bestätigt
+                                            </span>
+                                        )
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="seller-stats">
+                            <div class="seller-stat-item">
+                                <span class="stars" style="font-size:1rem;"
+                                    >{stars}</span
+                                >
+                                <span
+                                    style="font-size:var(--text-sm); font-weight:600;"
+                                    >{listing.sellerRating.toFixed(1)}</span
+                                >
+                            </div>
+                            <div class="seller-stats-meta">
+                                <span
+                                    style="font-size:var(--text-xs); color:var(--color-text-muted);"
+                                    >Mitglied seit 2022 · 47 Bewertungen</span
+                                >
+                            </div>
+                        </div>
+                        <a
+                            href="/profil"
+                            class="btn btn-secondary w-full btn-sm"
+                            style="margin-top:var(--space-4); justify-content:center;"
+                            >Profil ansehen</a
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- Related Listings -->
+            {
+                relatedListings.length > 0 && (
+                    <section style="margin-top:var(--space-12);">
+                        <h2
+                            class="section-title"
+                            style="margin-bottom:var(--space-6);"
+                        >
+                            Ähnliche Anzeigen
+                        </h2>
+                        <div class="related-grid">
+                            {relatedListings.map((l) => (
+                                <a
+                                    href={`/inserat/${l.id}`}
+                                    class="related-card"
+                                >
+                                    <img
+                                        src={l.image}
+                                        alt={l.title}
+                                        class="related-img"
+                                    />
+                                    <div class="related-body">
+                                        <div class="related-title">
+                                            {l.title}
+                                        </div>
+                                        <div class="related-price">
+                                            {l.price.toLocaleString("de-DE")} €
+                                        </div>
+                                        <div class="related-loc">
+                                            {l.location}
+                                        </div>
+                                    </div>
+                                </a>
+                            ))}
+                        </div>
+                    </section>
+                )
+            }
+        </div>
+    </main>
+
+    <!-- Contact Modal -->
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal card-glass">
+            <div class="modal-header">
+                <h3>Nachricht an {listing.sellerName}</h3>
+                <button class="btn btn-ghost btn-icon" id="closeModal">
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        ><line x1="18" y1="6" x2="6" y2="18"></line><line
+                            x1="6"
+                            y1="6"
+                            x2="18"
+                            y2="18"></line></svg
+                    >
+                </button>
+            </div>
+            <p class="modal-note">
+                <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    ><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                    ></path></svg
+                >
+                Gib niemals deine Bankdaten oder zahle nicht außerhalb der Plattform.
+            </p>
+            <textarea
+                class="input"
+                rows="5"
+                placeholder="Hallo, ich interessiere mich für dein Inserat..."
+            ></textarea>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="closeModal2"
+                    >Abbrechen</button
+                >
+                <button class="btn btn-primary">Nachricht senden</button>
+            </div>
+        </div>
+    </div>
+
+    <Footer />
+</BaseLayout>
+
+<style>
+    .detail-main {
+        padding: var(--space-8) 0 var(--space-16);
+    }
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: var(--text-sm);
+        color: var(--color-text-muted);
+        margin-bottom: var(--space-8);
+        flex-wrap: wrap;
+    }
+    .breadcrumb a:hover {
+        color: var(--color-primary);
+    }
+    .breadcrumb span {
+        color: var(--color-text-faint);
+    }
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: var(--space-8);
+        align-items: start;
+    }
+    .img-main-wrap {
+        position: relative;
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        background: var(--color-surface-2);
+        aspect-ratio: 4/3;
+    }
+    .img-main {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .img-badge-large {
+        position: absolute;
+        top: var(--space-4);
+        left: var(--space-4);
+        font-size: var(--text-sm);
+        padding: 0.4rem 0.9rem;
+    }
+    .treuhand-ribbon {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(0deg, rgba(16, 185, 129, 0.9), transparent);
+        color: white;
+        padding: var(--space-4) var(--space-4) var(--space-3);
+        font-size: var(--text-sm);
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+    }
+    .detail-table {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: var(--space-3);
+        border-bottom: 1px solid var(--color-border);
+        font-size: var(--text-sm);
+    }
+    .detail-row:last-child {
+        border: none;
+        padding: 0;
+    }
+    .detail-key {
+        color: var(--color-text-muted);
+        font-weight: 500;
+    }
+    .detail-val {
+        color: var(--color-text);
+        font-weight: 500;
+    }
+    .safety-tips-card {
+        background: rgba(245, 158, 11, 0.04);
+        border-color: rgba(245, 158, 11, 0.2) !important;
+    }
+    .safety-tips-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        color: var(--color-warning);
+        font-size: var(--text-sm);
+        margin-bottom: var(--space-4);
+    }
+    .safety-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+    .safety-list li {
+        font-size: var(--text-sm);
+        color: var(--color-text-muted);
+        padding-left: var(--space-4);
+        position: relative;
+        line-height: 1.6;
+    }
+    .safety-list li::before {
+        content: "→";
+        position: absolute;
+        left: 0;
+        color: var(--color-warning);
+    }
+
+    /* Purchase Box */
+    .price-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: var(--space-2);
+    }
+    .detail-price {
+        font-size: 2rem;
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        color: var(--color-text);
+    }
+    .location-row {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: var(--text-sm);
+        color: var(--color-text-muted);
+        margin-bottom: var(--space-5);
+    }
+    .listing-date-badge {
+        margin-left: auto;
+        font-size: var(--text-xs);
+        background: var(--color-surface-3);
+        padding: 2px 8px;
+        border-radius: var(--radius-full);
+    }
+    .treuhand-info-box {
+        background: rgba(16, 185, 129, 0.08);
+        border: 1px solid rgba(16, 185, 129, 0.25);
+        border-radius: var(--radius);
+        padding: var(--space-4);
+        margin-bottom: var(--space-4);
+    }
+    .treuhand-info-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        color: var(--color-success);
+        font-size: var(--text-sm);
+        font-weight: 700;
+        margin-bottom: var(--space-2);
+    }
+    .treuhand-info-box p {
+        font-size: var(--text-xs);
+        color: var(--color-text-muted);
+        line-height: 1.6;
+    }
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+        margin-bottom: var(--space-3);
+    }
+    .report-row {
+        display: flex;
+        justify-content: center;
+    }
+
+    /* Risk Score */
+    .risk-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-3);
+    }
+    .risk-bar-wrap {
+        background: var(--color-surface-2);
+        border-radius: var(--radius-full);
+        height: 8px;
+        margin-bottom: var(--space-2);
+        overflow: hidden;
+    }
+    .risk-bar {
+        height: 100%;
+        background: linear-gradient(90deg, var(--color-success), #34d399);
+        border-radius: var(--radius-full);
+        transition: width 1s ease;
+    }
+    .risk-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: var(--text-xs);
+        color: var(--color-text-muted);
+        margin-bottom: var(--space-4);
+    }
+    .risk-checks {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+    .risk-check {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: var(--text-xs);
+        color: var(--color-text-muted);
+    }
+    .risk-check.ok {
+        color: var(--color-success);
+    }
+    .risk-check.ok svg {
+        color: var(--color-success);
+    }
+
+    /* Seller */
+    .seller-block {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        margin-bottom: var(--space-4);
+    }
+    .seller-avatar-lg {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(
+            135deg,
+            var(--color-primary),
+            var(--color-accent)
+        );
+        border-radius: var(--radius-full);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #0b1120;
+        flex-shrink: 0;
+    }
+    .seller-name-detail {
+        font-size: var(--text-base);
+        font-weight: 700;
+        margin-bottom: var(--space-1);
+    }
+    .seller-badges {
+        display: flex;
+        gap: var(--space-1);
+        flex-wrap: wrap;
+    }
+    .seller-stats {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-1);
+        padding-top: var(--space-3);
+        border-top: 1px solid var(--color-border);
+    }
+    .seller-stat-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+    }
+
+    /* Related */
+    .related-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-4);
+    }
+    .related-card {
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        transition: all var(--transition);
+        display: flex;
+        flex-direction: column;
+    }
+    .related-card:hover {
+        border-color: var(--color-border-hover);
+        transform: translateY(-2px);
+    }
+    .related-img {
+        width: 100%;
+        aspect-ratio: 16/9;
+        object-fit: cover;
+    }
+    .related-body {
+        padding: var(--space-4);
+    }
+    .related-title {
+        font-size: var(--text-sm);
+        font-weight: 600;
+        color: var(--color-text);
+        margin-bottom: var(--space-1);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .related-price {
+        font-size: var(--text-lg);
+        font-weight: 800;
+        color: var(--color-primary);
+        margin-bottom: var(--space-1);
+    }
+    .related-loc {
+        font-size: var(--text-xs);
+        color: var(--color-text-muted);
+    }
+
+    /* Modal */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-6);
+    }
+    .modal-overlay.open {
+        display: flex;
+        animation: fadeIn 0.2s ease;
+    }
+    .modal {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-xl);
+        padding: var(--space-8);
+        width: 100%;
+        max-width: 520px;
+    }
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-4);
+    }
+    .modal-header h3 {
+        font-size: var(--text-lg);
+        font-weight: 700;
+    }
+    .modal-note {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: var(--text-xs);
+        color: var(--color-warning);
+        background: rgba(245, 158, 11, 0.08);
+        border: 1px solid rgba(245, 158, 11, 0.2);
+        padding: var(--space-3);
+        border-radius: var(--radius);
+        margin-bottom: var(--space-4);
+    }
+    .modal-actions {
+        display: flex;
+        gap: var(--space-3);
+        justify-content: flex-end;
+        margin-top: var(--space-4);
+    }
+
+    @media (max-width: 1024px) {
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+        .detail-right {
+            order: -1;
+        }
+        .related-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    @media (max-width: 600px) {
+        .related-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script>
+    const contactBtn = document.getElementById("contactBtn");
+    const modal = document.getElementById("contactModal");
+    const closeModal = document.getElementById("closeModal");
+    const closeModal2 = document.getElementById("closeModal2");
+
+    contactBtn?.addEventListener("click", () => modal?.classList.add("open"));
+    closeModal?.addEventListener("click", () =>
+        modal?.classList.remove("open"),
+    );
+    closeModal2?.addEventListener("click", () =>
+        modal?.classList.remove("open"),
+    );
+    modal?.addEventListener("click", (e) => {
+        if (e.target === modal) modal.classList.remove("open");
+    });
+</script>

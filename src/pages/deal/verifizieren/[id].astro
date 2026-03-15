@@ -1,0 +1,97 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Header from "../../../components/Header.astro";
+import Footer from "../../../components/Footer.astro";
+import HandshakeApp from "../../../components/HandshakeApp";
+import { requireAuth, isAuthContext } from "../../../lib/auth-middleware";
+import { prisma } from "../../../lib/auth";
+import { ShieldAlert } from "lucide-react";
+
+// 1. Authenticate user
+const auth = await requireAuth(Astro.request, Astro.cookies);
+if (!isAuthContext(auth)) return auth;
+
+// 2. Fetch Deal
+const dealId = Astro.params.id;
+if (!dealId) {
+    return new Response("Deal ID missing", { status: 400 });
+}
+
+const deal = await prisma.deal.findUnique({
+    where: { id: dealId },
+    include: {
+        listing: { select: { title: true, price: true } },
+        buyer: { select: { firstName: true } },
+        seller: { select: { firstName: true } }
+    }
+});
+
+if (!deal) {
+    return new Response("Deal not found", { status: 404 });
+}
+
+if (deal.buyerId !== auth.userId && deal.sellerId !== auth.userId) {
+    return new Response("Forbidden", { status: 403 });
+}
+
+const role = deal.buyerId === auth.userId ? 'buyer' : 'seller';
+const partnerName = role === 'buyer' ? deal.seller.firstName : deal.buyer.firstName;
+---
+
+<BaseLayout title="Handschlag-Verifizierung – Ehren-Deal">
+    <Header />
+    <main class="min-h-[calc(100vh-140px)] py-12 px-4">
+        <div class="max-w-3xl mx-auto">
+            <div class="mb-8 text-center">
+                <h1 class="text-2xl md:text-3xl font-headings font-light text-foreground tracking-wide mb-3">
+                    Ehren-Deal abschließen
+                </h1>
+                <p class="text-foreground/35 max-w-lg mx-auto font-light">
+                    Triff dich mit <strong class="text-foreground/60">{partnerName}</strong> zur Übergabe von <strong class="text-foreground/60">"{deal.listing.title}"</strong>.
+                </p>
+            </div>
+
+            {deal.handshakeStatus === 'VERIFIED' ? (
+                <div class="bg-secondary/40 border border-foreground/[.04] p-8 text-center">
+                    <div class="w-20 h-20 bg-success/[.08] border border-success/20 flex items-center justify-center mb-6 mx-auto">
+                        <svg class="w-10 h-10 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <h2 class="text-xl font-headings font-light text-foreground mb-2">Bereits Abgeschlossen</h2>
+                    <p class="text-foreground/35 mb-8 max-w-sm mx-auto font-light">
+                        Dieser Deal wurde bereits erfolgreich über den digitalen Handschlag bestätigt.
+                    </p>
+                    <a href="/dashboard" class="inline-block bg-primary text-background px-8 py-3 font-condensed uppercase tracking-[.1em] text-sm hover:bg-primary/80 transition-all">
+                        Zum Dashboard
+                    </a>
+                </div>
+            ) : deal.verificationMethod !== 'QR_CODE' && deal.verificationMethod !== 'SHIPPING' ? (
+               <div class="bg-warning/[.04] text-foreground/60 border border-warning/10 p-6 flex items-start gap-4">
+                   <ShieldAlert class="w-8 h-8 shrink-0 text-warning" />
+                   <div>
+                       <h3 class="font-medium text-foreground/70 text-base mb-1">Falsche Verifizierungsmethode</h3>
+                       <p class="text-foreground/40 font-light">Für diesen Deal ist der digitale Handschlag (QR-Code) nicht aktiviert. Die Abwicklung erfolgt über den Standard-Käuferschutz.</p>
+                       <a href="/dashboard" class="inline-block mt-4 text-xs font-condensed uppercase tracking-wider text-primary hover:text-primary/80">Zurück zur Übersicht</a>
+                   </div>
+               </div>
+            ) : (
+                <div style="animation-delay: 100ms;">
+                    <HandshakeApp
+                        client:only="react"
+                        dealId={deal.id}
+                        currentUserId={auth.userId}
+                        role={role}
+                        initialStatus={deal.handshakeStatus}
+                    />
+                </div>
+            )}
+
+            <div class="mt-12 text-center text-xs font-condensed tracking-wider text-foreground/20">
+                Probleme bei der Übergabe?
+                <a href="/hilfe" class="text-primary/60 hover:text-primary ml-1">Support kontaktieren</a>
+            </div>
+        </div>
+    </main>
+    <Footer />
+</BaseLayout>
