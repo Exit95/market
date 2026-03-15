@@ -1,0 +1,93 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import ChatApp from "../components/ChatApp";
+import { requireAuth, isAuthContext } from "../lib/auth-middleware";
+
+const auth = await requireAuth(Astro.request, Astro.cookies);
+if (!isAuthContext(auth)) return auth;
+
+const currentUserId = auth.userId;
+---
+
+<BaseLayout title="Nachrichten – Ehren-Deal">
+    <Header />
+    <main class="h-[calc(100vh-70px)] sm:h-[calc(100vh-80px)] w-full overflow-hidden bg-slate-50">
+        <ChatApp client:load currentUserId={currentUserId} />
+    </main>
+    <Footer />
+</BaseLayout>
+
+<style>
+    /* Global styles already in Tailwind, keeping minimal layout scope */
+    main {
+        container-type: inline-size;
+    }
+</style>
+
+<script>
+    // Close fraud banner
+    document.getElementById("closeFraud")?.addEventListener("click", () => {
+        const banner = document.getElementById("fraudBanner");
+        if (banner) banner.style.display = "none";
+    });
+
+    // Fraud word detection
+    const fraudKeywords = [
+        "paypal freunde",
+        "family & friends",
+        "vorkasse",
+        "western union",
+        "paysafecard",
+        "bitcoin",
+        "crypto",
+    ];
+    document.getElementById("msgInput")?.addEventListener("input", (e) => {
+        const val = (e.target as HTMLTextAreaElement).value.toLowerCase();
+        const warning = document.getElementById("inputWarning");
+        if (!warning) return;
+        if (fraudKeywords.some((kw) => val.includes(kw))) {
+            warning.textContent =
+                "⚠️ Achtung: Keine Zahlung außerhalb des Treuhandkontos! Dies ist ein typischer Betrugsversuch.";
+        } else {
+            warning.textContent = "";
+        }
+        // Auto-resize
+        const el = e.target as HTMLTextAreaElement;
+        el.style.height = "auto";
+        el.style.height = Math.min(el.scrollHeight, 120) + "px";
+    });
+
+    // Send message
+    document.getElementById("sendBtn")?.addEventListener("click", () => {
+        const input = document.getElementById(
+            "msgInput",
+        ) as HTMLTextAreaElement;
+        const text = input.value.trim();
+        if (!text) return;
+
+        const area = document.getElementById("messagesArea");
+        if (!area) return;
+
+        const msgEl = document.createElement("div");
+        msgEl.className = "message outgoing animate-fade-up";
+        const now = new Date();
+        const time = `${now.getHours()}:${now.getMinutes().toString().padStart(2, "0")}`;
+        msgEl.innerHTML = `<div class="msg-bubble"><p>${text}</p><span class="msg-time">${time}</span></div>`;
+        area.appendChild(msgEl);
+        input.value = "";
+        input.style.height = "44px";
+        area.scrollTop = area.scrollHeight;
+    });
+
+    // Conversation switching
+    document.querySelectorAll(".conversation-item").forEach((item) => {
+        item.addEventListener("click", () => {
+            document
+                .querySelectorAll(".conversation-item")
+                .forEach((i) => i.classList.remove("active"));
+            item.classList.add("active");
+        });
+    });
+</script>

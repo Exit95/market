@@ -1,0 +1,211 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { categories } from "../data/listings";
+
+// Server-side: fetch first page from our own API
+const url = new URL("/api/listings", Astro.url.origin);
+url.searchParams.set("pageSize", "20");
+url.searchParams.set("page", "1");
+
+// Forward search params from URL
+for (const [k, v] of Astro.url.searchParams) {
+    if (["query", "category", "minPrice", "maxPrice", "city", "page", "pageSize"].includes(k)) {
+        url.searchParams.set(k, v);
+    }
+}
+
+const res = await fetch(url.toString());
+const data = res.ok
+    ? await res.json()
+    : { listings: [], pagination: { total: 0, totalPages: 1, page: 1 } };
+const { listings, pagination } = data;
+
+const currentPage = pagination.page ?? 1;
+const totalPages = pagination.totalPages ?? 1;
+const currentQuery = Astro.url.searchParams.get("query") ?? "";
+const currentCat = Astro.url.searchParams.get("category") ?? "";
+---
+
+<BaseLayout title="Ehren-Deal – Sicher Handeln mit Handschlag">
+    <Header />
+    <main class="min-h-screen pt-12 pb-24 bg-background">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Hero Section / Search -->
+            <div class="mb-16 text-center space-y-6">
+                <h1 class="text-4xl md:text-5xl lg:text-7xl font-headings font-extrabold tracking-tight">
+                    <span class="text-primary block mb-2">Willkommen bei</span>
+                    <span class="text-gradient">Ehren-Deal</span>
+                </h1>
+                <p class="text-lg md:text-xl text-foreground/70 max-w-2xl mx-auto font-body">
+                    Die sicherste C2C-Plattform für lokale Deals. Echte Identitäten, 
+                    digitaler Handschlag und garantierter Käuferschutz.
+                </p>
+
+                <div class="pt-10 max-w-4xl mx-auto">
+                    <form method="GET" class="glass-panel p-3 flex flex-col sm:flex-row gap-3 shadow-2xl shadow-primary/5">
+                        <input
+                            name="query"
+                            value={currentQuery}
+                            placeholder="Was suchst du?"
+                            class="input-field flex-grow text-lg bg-background/50 border-transparent focus:bg-background"
+                        />
+                        <select name="category" class="input-field sm:w-56 text-lg bg-background/50 border-transparent focus:bg-background">
+                            <option value="">Alle Kategorien</option>
+                            {
+                                categories.map((c) => (
+                                    <option
+                                        value={c.slug.toUpperCase()}
+                                        selected={currentCat === c.slug.toUpperCase()}
+                                    >
+                                        {c.label}
+                                    </option>
+                                ))
+                            }
+                        </select>
+                        <div class="flex gap-3 sm:w-64">
+                            <input
+                                name="minPrice"
+                                type="number"
+                                placeholder="Min €"
+                                class="input-field text-lg bg-background/50 border-transparent focus:bg-background"
+                                value={Astro.url.searchParams.get("minPrice") ?? ""}
+                            />
+                            <input
+                                name="maxPrice"
+                                type="number"
+                                placeholder="Max €"
+                                class="input-field text-lg bg-background/50 border-transparent focus:bg-background"
+                                value={Astro.url.searchParams.get("maxPrice") ?? ""}
+                            />
+                        </div>
+                        <button type="submit" class="btn-primary sm:w-40 text-lg shadow-primary/20">
+                            Suchen
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Result summary -->
+            <div class="flex justify-between items-end mb-8 border-b border-secondary pb-4">
+                <div>
+                    <h2 class="text-3xl font-headings font-bold text-primary">
+                        {currentQuery ? `Ergebnisse für "${currentQuery}"` : "Aktuelle Angebote"}
+                    </h2>
+                    <p class="text-foreground/60 font-body text-sm mt-1">
+                        {pagination.total} Anzeige{pagination.total !== 1 ? "n" : ""} gefunden
+                    </p>
+                </div>
+                <div class="hidden sm:flex items-center gap-2">
+                    <span class="trust-badge">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Sicher Handeln
+                    </span>
+                </div>
+            </div>
+
+            <!-- Listings Grid -->
+            {
+                listings.length > 0 ? (
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {listings.map((l: any) => (
+                            <a href={`/listing/${l.id}`} class="group block h-full">
+                                <article class="bg-background rounded-default border border-secondary overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 transform group-hover:-translate-y-1 h-full flex flex-col relative">
+                                    
+                                    <!-- Badges -->
+                                    <div class="absolute top-3 right-3 flex flex-col gap-2 z-10">
+                                        {l.treuhand && (
+                                            <span class="bg-success/90 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full font-bold shadow-sm">
+                                                Treuhand
+                                            </span>
+                                        )}
+                                        {l.seller?.trustScore?.level === 'VERIFIED' && (
+                                            <span class="bg-primary/90 backdrop-blur-sm text-primary-foreground text-xs px-2.5 py-1 rounded-full font-bold shadow-sm flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                                Verifizierter User
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <!-- Image -->
+                                    <div class="aspect-[4/3] w-full bg-secondary relative overflow-hidden flex-shrink-0">
+                                        {l.images[0] ? (
+                                            <img
+                                                src={l.images[0].url}
+                                                alt={l.title}
+                                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                                                loading="lazy"
+                                            />
+                                        ) : (
+                                            <div class="w-full h-full flex items-center justify-center text-5xl">
+                                                📦
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <!-- Content -->
+                                    <div class="p-5 flex flex-col flex-grow">
+                                        <div class="text-2xl font-headings font-black text-primary mb-2">
+                                            {(l.price / 100).toLocaleString("de-DE", { style: "currency", currency: "EUR" })}
+                                        </div>
+                                        <h3 class="font-bold text-foreground mb-2 line-clamp-2 leading-tight">
+                                            {l.title}
+                                        </h3>
+                                        <div class="mt-auto pt-4 flex items-center justify-between text-xs font-bold text-foreground/50">
+                                            <div class="flex items-center gap-1.5">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                                {l.city}
+                                            </div>
+                                            <div class="bg-secondary px-2.5 py-1 rounded-sm text-foreground/70">
+                                                {l.category}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            </a>
+                        ))}
+                    </div>
+                ) : (
+                    <div class="text-center py-24 bg-background rounded-default border-2 border-dashed border-secondary">
+                        <div class="text-6xl mb-6">🔍</div>
+                        <h3 class="text-2xl font-headings font-bold text-primary mb-3">Keine Angebote gefunden</h3>
+                        <p class="text-foreground/60 max-w-sm mx-auto font-body text-lg">
+                            Versuche andere Suchbegriffe oder erweitere deine Filterkriterien, 
+                            um mehr sichere Deals zu entdecken.
+                        </p>
+                    </div>
+                )
+            }
+
+            <!-- Pagination -->
+            {
+                totalPages > 1 && (
+                    <nav class="flex items-center justify-center gap-4 mt-20 pb-8">
+                        {currentPage > 1 && (
+                            <a
+                                href={`?${new URLSearchParams({ ...Object.fromEntries(Astro.url.searchParams), page: String(currentPage - 1) })}`}
+                                class="px-6 py-3 rounded-default border border-secondary bg-background text-foreground font-bold hover:border-primary hover:text-primary transition-colors"
+                            >
+                                ← Zurück
+                            </a>
+                        )}
+                        <span class="text-foreground/50 font-bold px-4">
+                            Seite {currentPage} von {totalPages}
+                        </span>
+                        {currentPage < totalPages && (
+                            <a
+                                href={`?${new URLSearchParams({ ...Object.fromEntries(Astro.url.searchParams), page: String(currentPage + 1) })}`}
+                                class="px-6 py-3 rounded-default border border-secondary bg-background text-primary font-bold hover:bg-primary hover:text-primary-foreground transition-colors"
+                            >
+                                Weiter →
+                            </a>
+                        )}
+                    </nav>
+                )
+            }
+        </div>
+    </main>
+    <Footer />
+</BaseLayout>

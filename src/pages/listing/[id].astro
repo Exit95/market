@@ -1,0 +1,158 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+
+const { id } = Astro.params;
+
+const res = await fetch(`${Astro.url.origin}/api/listings/${id}`);
+if (!res.ok) return Astro.redirect("/");
+const listing = await res.json();
+
+const priceEur = (listing.price / 100).toLocaleString("de-DE", {
+    style: "currency",
+    currency: "EUR",
+});
+const seller = listing.seller ?? {};
+---
+
+<BaseLayout title={`${listing.title} – Novamarkt`}>
+    <Header />
+    <main class="container detail-wrap">
+        <!-- Images -->
+        <div class="images-section">
+            {
+                listing.images?.length > 0 ? (
+                    listing.images.map((img: any, i: number) => (
+                        <img
+                            src={img.url}
+                            alt={`${listing.title} Bild ${i + 1}`}
+                            class={`detail-img ${i === 0 ? "main-img" : "thumb"}`}
+                            loading={i === 0 ? "eager" : "lazy"}
+                        />
+                    ))
+                ) : (
+                    <div class="no-img">Kein Bild vorhanden</div>
+                )
+            }
+        </div>
+
+        <div class="detail-body">
+            <!-- Main info -->
+            <div class="detail-main">
+                <div class="badge-row">
+                    <span class="badge">{listing.category}</span>
+                    {
+                        listing.treuhand && (
+                            <span class="badge badge-success">🔒 Treuhand</span>
+                        )
+                    }
+                    {
+                        listing.condition && (
+                            <span class="badge">{listing.condition}</span>
+                        )
+                    }
+                </div>
+                <h1 class="detail-title">{listing.title}</h1>
+                <div class="detail-price">{priceEur}</div>
+                <p class="detail-loc">
+                    📍 {listing.city}, {listing.postalCode}
+                </p>
+                <div class="detail-desc">{listing.description}</div>
+
+                <a
+                    href={`/nachrichten?listing=${listing.id}&seller=${seller.id}`}
+                    class="btn btn-primary btn-lg cta-btn"
+                >
+                    Verkäufer kontaktieren
+                </a>
+                {
+                    listing.treuhand && (
+                        <a
+                            href={`/checkout/${listing.id}`}
+                            class="btn btn-secondary btn-lg cta-btn"
+                        >
+                            Sicher kaufen (Treuhand)
+                        </a>
+                    )
+                }
+            </div>
+
+            <!-- Seller card -->
+            <aside class="seller-card">
+                <div class="seller-header">Verkäufer</div>
+                <div class="seller-name">
+                    {seller.firstName}
+                    {seller.lastName?.[0]}.
+                    {
+                        seller.idVerified && (
+                            <span
+                                class="badge badge-primary"
+                                title="KYC verifiziert"
+                            >
+                                ✓ Verifiziert
+                            </span>
+                        )
+                    }
+                </div>
+                <div class="seller-meta">
+                    Dabei seit {
+                        new Date(seller.createdAt).toLocaleDateString("de-DE", {
+                            month: "long",
+                            year: "numeric",
+                        })
+                    }
+                </div>
+                <div class="seller-stats">
+                    {
+                        seller.emailVerified && (
+                            <span class="verify-chip">✉ E-Mail</span>
+                        )
+                    }
+                    {
+                        seller.idVerified && (
+                            <span class="verify-chip verified">🪪 ID</span>
+                        )
+                    }
+                </div>
+            </aside>
+        </div>
+    </main>
+    <Footer />
+</BaseLayout>
+
+<style>
+    .detail-wrap { @apply py-10 pb-16 bg-background min-h-screen text-foreground font-body max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
+    
+    .images-section { @apply flex flex-wrap gap-4 mb-8; }
+    .detail-img { @apply rounded-default object-cover shadow-sm border border-secondary; }
+    .main-img { @apply w-full max-h-[500px]; }
+    .thumb { @apply w-[120px] h-[90px] cursor-pointer opacity-80 hover:opacity-100 transition-opacity duration-200 border-secondary hover:border-primary/50; }
+    .no-img { @apply w-full h-[300px] bg-secondary/50 rounded-default flex items-center justify-center text-foreground/50 border-2 border-dashed border-secondary; }
+    
+    .detail-body { @apply grid grid-cols-1 md:grid-cols-[1fr_320px] gap-8 items-start; }
+    
+    .badge-row { @apply flex flex-wrap gap-2 mb-4; }
+    .badge { @apply inline-flex items-center px-2.5 py-1 rounded-sm text-xs font-bold uppercase tracking-wide bg-secondary text-foreground/70; }
+    .badge-success { @apply bg-success/10 text-success border border-success/20; }
+    .badge-primary { @apply bg-primary/10 text-primary border border-primary/20; }
+    
+    .detail-title { @apply text-3xl sm:text-4xl font-headings font-bold text-foreground mb-2 leading-tight; }
+    .detail-price { @apply text-3xl font-headings font-black text-primary mb-2; }
+    .detail-loc { @apply text-foreground/60 mb-6 font-medium flex items-center gap-1; }
+    .detail-desc { @apply text-foreground/80 leading-relaxed whitespace-pre-wrap mb-8 text-lg; }
+    
+    .cta-btn { @apply w-full justify-center mb-4 transition-all duration-300; }
+    .btn-lg { @apply px-8 py-4 text-lg shadow-xl shadow-primary/10; }
+    .btn-primary { @apply inline-flex items-center justify-center rounded-default font-bold text-primary-foreground bg-primary hover:bg-primary-hover; }
+    .btn-secondary { @apply inline-flex items-center justify-center rounded-default font-bold text-foreground bg-secondary hover:bg-secondary/70; }
+    
+    .seller-card { @apply bg-background border border-secondary rounded-default p-6 sticky top-24 shadow-sm; }
+    .seller-header { @apply text-xs font-bold uppercase tracking-wider text-foreground/50 mb-4; }
+    .seller-name { @apply font-bold text-xl mb-1 flex items-center gap-2 text-foreground; }
+    .seller-meta { @apply text-sm text-foreground/60 mb-4; }
+    
+    .seller-stats { @apply flex flex-wrap gap-2; }
+    .verify-chip { @apply text-xs px-2.5 py-1 rounded-full bg-secondary text-foreground/70 border border-secondary font-medium; }
+    .verify-chip.verified { @apply border-primary text-primary bg-primary/5 font-bold; }
+</style>

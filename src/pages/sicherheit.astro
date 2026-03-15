@@ -1,0 +1,512 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<BaseLayout title="Sicherheit – Novamarkt">
+    <Header />
+    <main class="security-page-main">
+        <!-- Hero -->
+        <section class="sec-hero">
+            <div class="sec-hero-bg"></div>
+            <div
+                class="container text-center"
+                style="position:relative; z-index:1; padding-top:var(--space-20); padding-bottom:var(--space-16);"
+            >
+                <div
+                    class="hero-badge"
+                    style="display:inline-flex; align-items:center; gap:0.5rem; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); color:var(--color-success); font-size:0.8rem; font-weight:600; padding:0.4rem 1rem; border-radius:9999px; margin-bottom:var(--space-5);"
+                >
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        ><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                        ></path></svg
+                    >
+                    Sicherheitszentrum
+                </div>
+                <h1
+                    class="section-title"
+                    style="font-size:clamp(2rem,5vw,3.5rem); margin-bottom:var(--space-5);"
+                >
+                    Deine Sicherheit<br /><span class="gradient-text"
+                        >ist unsere Priorität</span>
+                </h1>
+                <p
+                    class="section-subtitle"
+                    style="max-width:600px; margin:0 auto;"
+                >
+                    Wir haben ein mehrschichtiges Sicherheitssystem entwickelt,
+                    das Betrug nahezu unmöglich macht — von der Registrierung
+                    bis zur Zahlung.
+                </p>
+            </div>
+        </section>
+
+        <!-- Pillars -->
+        <section
+            style="padding:var(--space-16) 0; background:var(--color-surface); border-top:1px solid var(--color-border);"
+        >
+            <div class="container">
+                <div class="pillars-grid">
+                    <div class="pillar-card">
+                        <div
+                            class="pillar-icon"
+                            style="background:rgba(6,182,212,0.1); color:var(--color-primary);"
+                        >
+                            <svg
+                                width="32"
+                                height="32"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                ><path
+                                    d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+                                ></path><circle cx="12" cy="7" r="4"
+                                ></circle></svg
+                            >
+                        </div>
+                        <h3>KYC-Identitätsprüfung</h3>
+                        <p>
+                            Jeder Nutzer muss sich mit einem gültigen
+                            Ausweisdokument verifizieren. Anonyme Betrugsprofile
+                            sind damit nicht möglich.
+                        </p>
+                        <a href="#kyc" class="pillar-link">Mehr erfahren →</a>
+                    </div>
+                    <div class="pillar-card">
+                        <div
+                            class="pillar-icon"
+                            style="background:rgba(16,185,129,0.1); color:var(--color-success);"
+                        >
+                            <svg
+                                width="32"
+                                height="32"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                ><path
+                                    d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                                ></path></svg
+                            >
+                        </div>
+                        <h3>Treuhandkonto</h3>
+                        <p>
+                            Bei jedem Versandkauf liegt dein Geld sicher auf
+                            unserem Treuhandkonto und wird erst nach Warenerhalt
+                            freigegeben.
+                        </p>
+                        <a href="#treuhand" class="pillar-link"
+                            >Mehr erfahren →</a
+                        >
+                    </div>
+                    <div class="pillar-card">
+                        <div
+                            class="pillar-icon"
+                            style="background:rgba(245,158,11,0.1); color:var(--color-warning);"
+                        >
+                            <svg
+                                width="32"
+                                height="32"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                ><polyline
+                                    points="22 12 18 12 15 21 9 3 6 12 2 12"
+                                ></polyline></svg
+                            >
+                        </div>
+                        <h3>KI-Betrugserkennung</h3>
+                        <p>
+                            Unsere KI analysiert Anzeigen, Preise und
+                            Nachrichten in Echtzeit auf typische Betrugsmuster
+                            und warnt sofort.
+                        </p>
+                        <a href="#ki" class="pillar-link">Mehr erfahren →</a>
+                    </div>
+                    <div class="pillar-card">
+                        <div
+                            class="pillar-icon"
+                            style="background:rgba(59,130,246,0.1); color:var(--color-accent);"
+                        >
+                            <svg
+                                width="32"
+                                height="32"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                ><path
+                                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.99 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.9 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"
+                                ></path></svg
+                            >
+                        </div>
+                        <h3>2-Faktor-Authentifizierung</h3>
+                        <p>
+                            Alle sensiblen Aktionen (Anmeldung, Zahlung,
+                            Passwortänderung) erfordern einen zweiten
+                            Bestätigungsschritt per SMS.
+                        </p>
+                        <a href="#2fa" class="pillar-link">Mehr erfahren →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Treuhand Section -->
+        <section id="treuhand" class="detail-section">
+            <div class="container">
+                <div class="detail-section-grid">
+                    <div>
+                        <span
+                            class="badge badge-success"
+                            style="margin-bottom:var(--space-4);"
+                            >Treuhandkonto</span
+                        >
+                        <h2
+                            class="section-title"
+                            style="margin-bottom:var(--space-4);"
+                        >
+                            So funktioniert unser Käuferschutz
+                        </h2>
+                        <p
+                            class="section-subtitle"
+                            style="margin-bottom:var(--space-8);"
+                        >
+                            Das Treuhandkonto ist der Kern unseres
+                            Sicherheitssystems für Versandkäufe. Dein Geld ist
+                            jederzeit geschützt.
+                        </p>
+
+                        <div class="flow-steps">
+                            <div class="flow-step">
+                                <div class="flow-num">1</div>
+                                <div>
+                                    <strong>Käufer zahlt</strong><p>
+                                        Du zahlst den Betrag auf unser
+                                        gesichertes Treuhandkonto. Der Verkäufer
+                                        sieht, dass die Zahlung eingegangen ist.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="flow-num">2</div>
+                                <div>
+                                    <strong>Verkäufer versendet</strong><p>
+                                        Der Verkäufer versendet die Ware und
+                                        hinterlegt die Sendungsverfolgungsnummer
+                                        auf der Plattform.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="flow-num">3</div>
+                                <div>
+                                    <strong>Käufer bestätigt</strong><p>
+                                        Du erhältst die Ware und bestätigst den
+                                        Eingang. Erst jetzt wird das Geld an den
+                                        Verkäufer freigegeben.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flow-step">
+                                <div class="flow-num">4</div>
+                                <div>
+                                    <strong>Geld freigegeben</strong><p>
+                                        Nach deiner Bestätigung überweist
+                                        Novamarkt das Geld an den Verkäufer.
+                                        Deal abgeschlossen!
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="info-box success"
+                            style="margin-top:var(--space-6);"
+                        >
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                ><path
+                                    d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                                ></path><polyline points="9 12 11 14 15 10"
+                                ></polyline></svg
+                            >
+                            <div>
+                                Bei einem Problem nach dem Kauf (z.B. Ware
+                                entspricht nicht der Beschreibung) wird das Geld
+                                automatisch zurückerstattet. <strong
+                                    >Ohne Diskussion.</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="treuhand-visual">
+                        <div class="visual-card">
+                            <div class="visual-stat">
+                                <div class="stat-ico">🔒</div>
+                                <div class="stat-body">
+                                    <div class="stat-big">0,0%</div>
+                                    <div class="stat-sub">
+                                        Betrugsrate bei Treuhand-Käufen
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="visual-stat">
+                                <div class="stat-ico">⚡</div>
+                                <div class="stat-body">
+                                    <div class="stat-big">2,4%</div>
+                                    <div class="stat-sub">
+                                        Günstige Servicegebühr (statt
+                                        Verlustrisiko)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="visual-stat">
+                                <div class="stat-ico">📦</div>
+                                <div class="stat-body">
+                                    <div class="stat-big">48h</div>
+                                    <div class="stat-sub">
+                                        Durchschnittliche Rückerstattungszeit
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- KYC Section -->
+        <section
+            id="kyc"
+            class="detail-section"
+            style="background:var(--color-surface); border-top:1px solid var(--color-border);"
+        >
+            <div class="container">
+                <div class="kyc-content">
+                    <span
+                        class="badge badge-primary"
+                        style="margin-bottom:var(--space-4);"
+                        >Identitätsprüfung</span
+                    >
+                    <h2
+                        class="section-title"
+                        style="margin-bottom:var(--space-4);"
+                    >
+                        Kein anonymer Betrug möglich
+                    </h2>
+                    <p
+                        class="section-subtitle"
+                        style="max-width:660px; margin-bottom:var(--space-10);"
+                    >
+                        Alle Nutzer auf Novamarkt werden durch unser
+                        KYC-Verfahren (Know Your Customer) vollständig
+                        identifiziert. So kann niemand anonym betrügen.
+                    </p>
+
+                    <div class="kyc-steps-grid">
+                        <div class="kyc-step-card">
+                            <div class="ks-icon">📧</div>
+                            <h4>1. E-Mail bestätigen</h4>
+                            <p>
+                                Du erhältst einen Bestätigungslink an deine
+                                E-Mail-Adresse und musst diesen anklicken.
+                            </p>
+                        </div>
+                        <div class="kyc-step-card">
+                            <div class="ks-icon">📱</div>
+                            <h4>2. Handynummer verifizieren</h4>
+                            <p>
+                                Du erhältst einen SMS-Code an deine Handynummer.
+                                Jede Nummer kann nur für ein Konto verwendet
+                                werden.
+                            </p>
+                        </div>
+                        <div class="kyc-step-card">
+                            <div class="ks-icon">🪪</div>
+                            <h4>3. Ausweis hochladen</h4>
+                            <p>
+                                Ein Foto deines Personalausweises oder
+                                Reisepasses wird durch unseren Partner-Service
+                                automatisch geprüft.
+                            </p>
+                        </div>
+                        <div class="kyc-step-card special">
+                            <div class="ks-icon">🏆</div>
+                            <h4>4. KYC-Badge erhalten</h4>
+                            <p>
+                                Du erhältst das blaue KYC-Badge, das anderen
+                                Nutzern deine Vertrauenswürdigkeit signalisiert.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div
+                        class="info-box primary"
+                        style="margin-top:var(--space-8);"
+                    >
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            ><circle cx="12" cy="12" r="10"></circle><line
+                                x1="12"
+                                y1="8"
+                                x2="12"
+                                y2="12"></line><line
+                                x1="12"
+                                y1="16"
+                                x2="12.01"
+                                y2="16"></line></svg
+                        >
+                        <div>
+                            Deine Ausweisdaten werden <strong
+                                >verschlüsselt gespeichert</strong
+                            >, niemals an Dritte weitergegeben und können
+                            jederzeit auf Antrag gelöscht werden
+                            (DSGVO-konform).
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Safety Tips -->
+        <section id="tipps" class="detail-section">
+            <div class="container">
+                <div class="text-center" style="margin-bottom:var(--space-12);">
+                    <span
+                        class="badge badge-warning"
+                        style="margin-bottom:var(--space-4);">Tipps</span
+                    >
+                    <h2 class="section-title">
+                        Erkenne Betrug auf den ersten Blick
+                    </h2>
+                    <p class="section-subtitle">
+                        Diese Warnsignale deuten auf einen Betrugsversuch hin:
+                    </p>
+                </div>
+                <div class="tips-grid">
+                    <div class="tip-card danger">
+                        <div class="tip-icon">🚫</div>
+                        <h4>Zahlung außerhalb der Plattform</h4>
+                        <p>
+                            "Bitte zahle per PayPal Freunde & Familie / Western
+                            Union / Bitcoin..." → <strong
+                                >Sofort abbrechen und melden!</strong>
+                        </p>
+                    </div>
+                    <div class="tip-card danger">
+                        <div class="tip-icon">⚠️</div>
+                        <h4>Ungewöhnlich niedriger Preis</h4>
+                        <p>
+                            iPhone 15 Pro für 50€? Ein Preis unter dem Marktwert
+                            ist fast immer ein Betrugszeichen.
+                        </p>
+                    </div>
+                    <div class="tip-card danger">
+                        <div class="tip-icon">🏃</div>
+                        <h4>Zeitdruck & Dringlichkeit</h4>
+                        <p>
+                            "Nur heute verfügbar!" oder "Kaufe sofort oder ich
+                            vergebe es." → Seriöse Verkäufer lassen dir Zeit.
+                        </p>
+                    </div>
+                    <div class="tip-card danger">
+                        <div class="tip-icon">🌍</div>
+                        <h4>Verkäufer im Ausland</h4>
+                        <p>
+                            Verkäufer behauptet plötzlich, im Ausland zu sein
+                            und kann Ware nur per Versand übergeben.
+                        </p>
+                    </div>
+                    <div class="tip-card safe">
+                        <div class="tip-icon">✅</div>
+                        <h4>Immer Treuhandkonto nutzen</h4>
+                        <p>
+                            Nutze bei Versandkäufen immer unser Treuhandkonto.
+                            Es kostet nur 2,4% und schützt dich zu 100%.
+                        </p>
+                    </div>
+                    <div class="tip-card safe">
+                        <div class="tip-icon">🤝</div>
+                        <h4>Persönliche Übergabe bevorzugen</h4>
+                        <p>
+                            Bei lokalen Händlern: Ware in der Öffentlichkeit
+                            treffen, Ware prüfen, dann bar bezahlen.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <Footer />
+</BaseLayout>
+
+<style>
+    .sec-hero { @apply relative overflow-hidden; }
+    .sec-hero-bg { @apply absolute inset-0; background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(16, 185, 129, 0.1) 0%, transparent 70%); }
+
+    .pillars-grid { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5; }
+    .pillar-card { @apply bg-white border border-zinc-100 rounded-xl p-6 transition-all duration-300 hover:border-primary/30 hover:-translate-y-1 hover:shadow-md; }
+    .pillar-icon { @apply w-16 h-16 rounded-xl flex items-center justify-center mb-4; }
+    .pillar-card h3 { @apply text-base font-bold text-zinc-950 mb-3; }
+    .pillar-card p { @apply text-sm text-zinc-950/70 leading-relaxed mb-4; }
+    .pillar-link { @apply text-sm text-primary font-bold hover:underline; }
+
+    .detail-section { @apply py-20; }
+    .detail-section-grid { @apply grid grid-cols-1 lg:grid-cols-2 gap-16 items-start; }
+
+    .flow-steps { @apply flex flex-col gap-5; }
+    .flow-step { @apply flex gap-4 items-start; }
+    .flow-num { @apply w-9 h-9 bg-gradient-to-br from-success to-[#34d399] rounded-full flex items-center justify-center text-sm font-black text-white flex-shrink-0; }
+    .flow-step strong { @apply block font-bold text-zinc-950 mb-1; }
+    .flow-step p { @apply text-sm text-zinc-950/70 leading-relaxed; }
+
+    .info-box { @apply flex gap-3 p-4 rounded-lg text-sm leading-relaxed; }
+    .info-box.success { @apply bg-success/10 border border-success/20 text-success; }
+    .info-box.success svg { @apply text-success flex-shrink-0 mt-0.5; }
+    .info-box.primary { @apply bg-primary/10 border border-primary/20 text-zinc-950/70; }
+    .info-box.primary svg { @apply text-primary flex-shrink-0 mt-0.5; }
+
+    .treuhand-visual { @apply lg:sticky lg:top-[100px]; }
+    .visual-card { @apply bg-white border border-zinc-100 rounded-xl p-6 flex flex-col gap-5; }
+    .visual-stat { @apply flex gap-4 items-center p-4 bg-zinc-100/30 rounded-lg; }
+    .stat-ico { @apply text-3xl flex-shrink-0; }
+    .stat-big { @apply text-2xl font-headings font-black tracking-tight text-primary; }
+    .stat-sub { @apply text-xs text-zinc-950/50 mt-0.5; }
+
+    .kyc-content { @apply max-w-3xl mx-auto text-center; }
+    .kyc-steps-grid { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4; }
+    .kyc-step-card { @apply bg-white border border-zinc-100 rounded-xl p-5 text-center transition-all duration-300 hover:border-primary/30; }
+    .kyc-step-card.special { @apply border-primary/30 bg-primary/5; }
+    .ks-icon { @apply text-4xl mb-3; }
+    .kyc-step-card h4 { @apply text-sm font-bold text-zinc-950 mb-2; }
+    .kyc-step-card p { @apply text-xs text-zinc-950/60 leading-relaxed; }
+
+    .tips-grid { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5; }
+    .tip-card { @apply rounded-xl p-6; }
+    .tip-card.danger { @apply bg-danger/5 border border-danger/20; }
+    .tip-card.safe { @apply bg-success/5 border border-success/20; }
+    .tip-icon { @apply text-3xl mb-3; }
+    .tip-card h4 { @apply text-base font-bold text-zinc-950 mb-2; }
+    .tip-card.danger h4 { @apply text-danger; }
+    .tip-card.safe h4 { @apply text-success; }
+    .tip-card p { @apply text-sm text-zinc-950/70 leading-relaxed; }
+</style>

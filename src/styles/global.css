@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Brand Identity Core Colors */
+    --color-primary: 0 0 0; /* #000000 */
+    --color-primary-hover: 51 51 51; /* #333333 */
+    --color-primary-foreground: 255 255 255; /* #FFFFFF */
+    
+    --color-secondary: 244 244 245; /* #F4F4F5 */
+    --color-secondary-foreground: 24 24 27; /* #18181B */
+    
+    --color-background: 255 255 255; /* #FFFFFF */
+    --color-foreground: 9 9 11; /* #09090B */
+    
+    --color-muted: 244 244 245; /* #F4F4F5 */
+    --color-accent: 244 244 245; /* #F4F4F5 */
+    
+    --color-destructive: 239 68 68; /* #EF4444 */
+    --color-success: 16 185 129; /* #10B981 */
+
+    /* Legacy Ehren-Deal Core Colors (Keep for backwards compatibility during migration) */
+    --ehren-blue: #0a192f;
+    --ehren-blue-light: #112240;
+    --ehren-green: #10b981;
+    --ehren-green-dark: #059669;
+    --ehren-light: #f8fafc;
+    --ehren-accent: #3b82f6;
+    --ehren-warning: #f59e0b;
+    --ehren-danger: #ef4444;
+    
+    /* Surface & Borders */
+    --ehren-surface: #ffffff;
+    --ehren-border: #e2e8f0;
+    --ehren-text: #0f172a;
+    --ehren-text-muted: #64748b;
+  }
+
+  .dark {
+    /* Base dark mode adjustments */
+    --color-background: 9 9 11;
+    --color-foreground: 250 250 250;
+    --color-primary: 250 250 250;
+    --color-primary-foreground: 9 9 11;
+    --color-secondary: 39 39 42;
+    --color-secondary-foreground: 250 250 250;
+
+    /* Legacy Dark Mode Overrides */
+    --ehren-light: #0f172a;
+    --ehren-surface: #1e293b;
+    --ehren-border: #334155;
+    --ehren-text: #f8fafc;
+    --ehren-text-muted: #94a3b8;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased selection:bg-primary/20;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-headings tracking-tight;
+  }
+}
+
+@layer components {
+  /* Premium Reusable Components */
+  
+  .glass-panel {
+    @apply bg-background/80 backdrop-blur-md border border-secondary shadow-xl rounded-default;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-default font-bold text-primary-foreground bg-primary hover:bg-primary-focus shadow-md hover:shadow-lg transition-all duration-300;
+  }
+
+  .btn-success {
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-default font-bold text-white bg-success hover:brightness-110 shadow-md hover:shadow-lg transition-all duration-300;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 rounded-default border border-secondary bg-background text-foreground placeholder-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200;
+  }
+
+  .trust-badge {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 bg-success/10 text-success border border-success/20 rounded-full text-xs font-bold uppercase tracking-wider;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-foreground/50;
+  }
+}

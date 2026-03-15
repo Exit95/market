@@ -1,0 +1,491 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { listings } from "../data/listings";
+const myListings = listings.slice(0, 3);
+---
+
+<BaseLayout title="Mein Profil – Novamarkt">
+    <Header />
+    <main class="profile-main">
+        <div class="container">
+            <!-- Profile Header -->
+            <div class="profile-banner">
+                <div class="banner-bg"></div>
+                <div class="profile-info">
+                    <div class="profile-avatar">M</div>
+                    <div class="profile-details">
+                        <div class="profile-name-row">
+                            <h1 class="profile-name">Max Mustermann</h1>
+                            <span class="trust-badge trust-kyc"
+                                >🪪 KYC-verifiziert</span
+                            >
+                            <span class="trust-badge trust-verified"
+                                >✓ Bestätigt</span
+                            >
+                        </div>
+                        <p class="profile-since">
+                            Mitglied seit Februar 2023 · Hamburg
+                        </p>
+                        <div class="profile-stats-row">
+                            <div class="pstat">
+                                <span class="pstat-val">47</span><span
+                                    class="pstat-label">Bewertungen</span>
+                            </div>
+                            <div class="pstat">
+                                <span class="pstat-val">4.9</span><span
+                                    class="pstat-label">⭐ Ø</span>
+                            </div>
+                            <div class="pstat">
+                                <span class="pstat-val">23</span><span
+                                    class="pstat-label">Verkäufe</span>
+                            </div>
+                            <div class="pstat">
+                                <span class="pstat-val">98%</span><span
+                                    class="pstat-label">Positiv</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-actions hide-mobile">
+                        <a href="/inserat-erstellen" class="btn btn-primary"
+                            >+ Anzeige aufgeben</a
+                        >
+                        <a href="/nachrichten" class="btn btn-secondary"
+                            >Nachrichten</a
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-grid">
+                <!-- Left: Verification + Settings -->
+                <div class="profile-left">
+                    <!-- Verification Status -->
+                    <div class="card">
+                        <h3 class="card-section-title">Verifizierungsstatus</h3>
+                        <div class="verif-list">
+                            <div class="verif-item done">
+                                <div class="verif-icon success">
+                                    <svg
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2.5"
+                                        ><polyline points="20 6 9 17 4 12"
+                                        ></polyline></svg>
+                                </div>
+                                <div>
+                                    <div class="verif-name">E-Mail-Adresse</div>
+                                    <div class="verif-sub">
+                                        max.mustermann@email.de
+                                    </div>
+                                </div>
+                                <span class="badge badge-success"
+                                    >Bestätigt</span
+                                >
+                            </div>
+                            <div class="verif-item done">
+                                <div class="verif-icon success">
+                                    <svg
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2.5"
+                                        ><polyline points="20 6 9 17 4 12"
+                                        ></polyline></svg>
+                                </div>
+                                <div>
+                                    <div class="verif-name">Handynummer</div>
+                                    <div class="verif-sub">+49 151 ***78</div>
+                                </div>
+                                <span class="badge badge-success"
+                                    >Bestätigt</span
+                                >
+                            </div>
+                            <div class="verif-item done">
+                                <div class="verif-icon success">
+                                    <svg
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2.5"
+                                        ><polyline points="20 6 9 17 4 12"
+                                        ></polyline></svg>
+                                </div>
+                                <div>
+                                    <div class="verif-name">
+                                        Personalausweis (KYC)
+                                    </div>
+                                    <div class="verif-sub">
+                                        Vollständig verifiziert
+                                    </div>
+                                </div>
+                                <span class="badge badge-success">KYC</span>
+                            </div>
+                            <div class="verif-item pending">
+                                <div class="verif-icon warning">
+                                    <svg
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        ><circle cx="12" cy="12" r="10"
+                                        ></circle><line
+                                            x1="12"
+                                            y1="8"
+                                            x2="12"
+                                            y2="12"></line><line
+                                            x1="12"
+                                            y1="16"
+                                            x2="12.01"
+                                            y2="16"></line></svg>
+                                </div>
+                                <div>
+                                    <div class="verif-name">
+                                        IBAN verifizieren
+                                    </div>
+                                    <div class="verif-sub">
+                                        Erforderlich für Auszahlungen
+                                    </div>
+                                </div>
+                                <button class="btn btn-secondary btn-sm"
+                                    >→ Jetzt</button
+                                >
+                            </div>
+                        </div>
+                        <div class="trust-score">
+                            <div class="trust-score-label">
+                                <span>Vertrauens-Score</span>
+                                <span
+                                    style="color:var(--color-success); font-weight:700;"
+                                    >Exzellent</span
+                                >
+                            </div>
+                            <div class="trust-score-bar-wrap">
+                                <div class="trust-score-bar" style="width:92%">
+                                </div>
+                            </div>
+                            <div
+                                style="display:flex; justify-content:space-between; font-size:var(--text-xs); color:var(--color-text-faint); margin-top:4px;"
+                            >
+                                <span>0</span>
+                                <span
+                                    style="font-weight:700; color:var(--color-success);"
+                                    >92 / 100</span
+                                >
+                                <span>100</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div class="card" style="margin-top:var(--space-4);">
+                        <h3 class="card-section-title">Konto</h3>
+                        <div class="quick-links">
+                            <a href="/einstellungen" class="quick-link">
+                                <svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    ><circle cx="12" cy="12" r="3"
+                                    ></circle><path
+                                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+                                    ></path></svg
+                                >
+                                Einstellungen
+                            </a>
+                            <a href="/sicherheit" class="quick-link">
+                                <svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    ><path
+                                        d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                                    ></path></svg
+                                >
+                                Sicherheitscenter
+                            </a>
+                            <a href="/nachrichten" class="quick-link">
+                                <svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    ><path
+                                        d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                                    ></path></svg
+                                >
+                                Nachrichten
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Listings + Reviews -->
+                <div class="profile-right">
+                    <!-- My Listings -->
+                    <div class="card">
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-5);"
+                        >
+                            <h3 class="card-section-title" style="margin:0;">
+                                Meine Anzeigen
+                            </h3>
+                            <a
+                                href="/inserat-erstellen"
+                                class="btn btn-primary btn-sm">+ Neu</a
+                            >
+                        </div>
+                        <div class="my-listings-list">
+                            {
+                                myListings.map((l) => (
+                                    <div class="my-listing-item">
+                                        <img
+                                            src={l.image}
+                                            alt={l.title}
+                                            class="my-listing-img"
+                                        />
+                                        <div class="my-listing-info">
+                                            <div class="my-listing-title">
+                                                {l.title}
+                                            </div>
+                                            <div class="my-listing-price">
+                                                {l.price.toLocaleString(
+                                                    "de-DE",
+                                                )}{" "}
+                                                €
+                                            </div>
+                                            <div class="my-listing-meta">
+                                                {l.location} · {l.postedAt}
+                                            </div>
+                                        </div>
+                                        <div class="my-listing-actions">
+                                            <span
+                                                class="badge badge-success"
+                                                style="font-size:0.6rem;"
+                                            >
+                                                Aktiv
+                                            </span>
+                                            <button
+                                                class="btn btn-ghost btn-sm"
+                                                style="color:var(--color-text-muted);"
+                                            >
+                                                Bearbeiten
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Reviews -->
+                    <div class="card" style="margin-top:var(--space-5);">
+                        <div
+                            style="display:flex; align-items:center; gap:var(--space-3); margin-bottom:var(--space-5);"
+                        >
+                            <h3 class="card-section-title" style="margin:0;">
+                                Bewertungen
+                            </h3>
+                            <div class="review-summary">
+                                <span class="stars">★★★★★</span>
+                                <span style="font-weight:700;">4.9</span>
+                                <span
+                                    class="text-muted"
+                                    style="font-size:var(--text-xs);">(47)</span
+                                >
+                            </div>
+                        </div>
+                        <div class="reviews-list">
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <div class="reviewer-avatar">C</div>
+                                    <div>
+                                        <div class="reviewer-name">
+                                            Christine M.
+                                        </div>
+                                        <div
+                                            class="stars"
+                                            style="font-size:0.8rem;"
+                                        >
+                                            ★★★★★
+                                        </div>
+                                    </div>
+                                    <span class="review-date">vor 3 Tagen</span>
+                                </div>
+                                <p class="review-text">
+                                    Super Verkäufer! Artikel genau wie
+                                    beschrieben, schnelle und unkomplizierte
+                                    Übergabe. Sehr empfehlenswert!
+                                </p>
+                                <span
+                                    class="badge badge-neutral"
+                                    style="font-size:0.6rem;"
+                                    >Käufer-Bewertung</span
+                                >
+                            </div>
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <div class="reviewer-avatar">P</div>
+                                    <div>
+                                        <div class="reviewer-name">
+                                            Peter K.
+                                        </div>
+                                        <div
+                                            class="stars"
+                                            style="font-size:0.8rem;"
+                                        >
+                                            ★★★★★
+                                        </div>
+                                    </div>
+                                    <span class="review-date">vor 1 Woche</span>
+                                </div>
+                                <p class="review-text">
+                                    Alles hat perfekt geklappt. Artikel war in
+                                    besserem Zustand als beschrieben. Gerne
+                                    wieder!
+                                </p>
+                                <span
+                                    class="badge badge-neutral"
+                                    style="font-size:0.6rem;"
+                                    >Käufer-Bewertung</span
+                                >
+                            </div>
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <div class="reviewer-avatar">S</div>
+                                    <div>
+                                        <div class="reviewer-name">
+                                            Sandra L.
+                                        </div>
+                                        <div
+                                            class="stars"
+                                            style="font-size:0.8rem;"
+                                        >
+                                            ★★★★☆
+                                        </div>
+                                    </div>
+                                    <span class="review-date">vor 2 Wochen</span
+                                    >
+                                </div>
+                                <p class="review-text">
+                                    Reibungslose Abwicklung über das
+                                    Treuhandkonto. Hat alles super funktioniert!
+                                </p>
+                                <span
+                                    class="badge badge-neutral"
+                                    style="font-size:0.6rem;"
+                                    >Käufer-Bewertung</span
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <Footer />
+</BaseLayout>
+
+<style>
+    .profile-main { @apply pb-16 bg-white min-h-screen text-zinc-950 font-body; }
+    
+    .profile-banner { @apply bg-white border-b border-zinc-100 relative overflow-hidden; }
+    .banner-bg { @apply absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-50; }
+    
+    .profile-info { @apply relative flex flex-wrap items-center gap-6 py-10 px-6 sm:px-12 max-w-7xl mx-auto z-10; }
+    .profile-avatar { @apply w-24 h-24 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-4xl font-headings font-black text-primary-foreground flex-shrink-0 border-4 border-white shadow-lg; }
+    
+    .profile-details { @apply flex-1; }
+    .profile-name-row { @apply flex flex-wrap items-center gap-3 mb-2; }
+    .profile-name { @apply text-3xl font-headings font-black tracking-tight text-zinc-950 m-0; }
+    
+    .trust-badge { @apply text-[11px] font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1 uppercase tracking-wider; }
+    .trust-kyc { @apply bg-zinc-100/80 text-zinc-950/80 border border-zinc-100; }
+    .trust-verified { @apply bg-primary/10 text-primary border border-primary/20; }
+    
+    .profile-since { @apply text-sm text-zinc-950/60 mb-5; }
+    
+    .profile-stats-row { @apply flex flex-wrap gap-8; }
+    .pstat { @apply flex flex-col gap-0.5; }
+    .pstat-val { @apply text-2xl font-headings font-black text-zinc-950; }
+    .pstat-label { @apply text-xs font-bold uppercase tracking-wider text-zinc-950/50; }
+    
+    .profile-actions { @apply flex flex-col gap-3; }
+    
+    /* Profile Grid */
+    .profile-grid { @apply grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8 mt-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
+    
+    .card { @apply bg-white border border-zinc-100 rounded-default p-6 shadow-sm; }
+    .card-section-title { @apply text-xs font-bold uppercase tracking-wider text-zinc-950/50 mb-5 m-0; }
+    
+    /* Verification */
+    .verif-list { @apply flex flex-col gap-3; }
+    .verif-item { @apply flex items-center gap-4 p-4 rounded-default bg-zinc-100/30 transition-colors; }
+    .verif-item.done { @apply bg-success/5 border border-success/10; }
+    .verif-item.pending { @apply bg-warning/5 border border-warning/10; }
+    
+    .verif-icon { @apply w-10 h-10 rounded-default flex items-center justify-center flex-shrink-0; }
+    .verif-icon.success { @apply bg-success/10 text-success; }
+    .verif-icon.warning { @apply bg-warning/10 text-warning; }
+    
+    .verif-name { @apply text-sm font-bold text-zinc-950 mb-0.5; }
+    .verif-sub { @apply text-xs text-zinc-950/60; }
+    .verif-item > :last-child { @apply ml-auto flex-shrink-0; }
+    
+    .trust-score { @apply mt-6 pt-5 border-t border-zinc-100; }
+    .trust-score-label { @apply flex justify-between text-sm font-bold text-zinc-950 mb-3; }
+    .trust-score-bar-wrap { @apply bg-zinc-100/60 rounded-full h-2 overflow-hidden mb-1.5; }
+    .trust-score-bar { @apply h-full rounded-full bg-gradient-to-r from-success to-[#34d399]; }
+    
+    /* Quick Links */
+    .quick-links { @apply flex flex-col gap-1; }
+    .quick-link { @apply flex items-center gap-3 p-3 rounded-default text-sm font-bold text-zinc-950/60 transition-all hover:bg-zinc-100/50 hover:text-zinc-950; }
+    
+    /* My Listings */
+    .my-listings-list { @apply flex flex-col gap-4; }
+    .my-listing-item { @apply flex items-center gap-4 p-3 rounded-default border border-zinc-100 transition-all hover:border-primary/30 hover:bg-zinc-100/20 hover:shadow-sm; }
+    .my-listing-img { @apply w-20 h-16 object-cover rounded-sm flex-shrink-0 bg-zinc-100/50; }
+    .my-listing-info { @apply flex-1 min-w-0; }
+    .my-listing-title { @apply text-sm font-bold text-zinc-950 truncate mb-1; }
+    .my-listing-price { @apply text-lg font-headings font-black text-primary; }
+    .my-listing-meta { @apply text-xs text-zinc-950/50 mt-1; }
+    .my-listing-actions { @apply flex flex-col items-end gap-2 flex-shrink-0; }
+    
+    /* Reviews */
+    .review-summary { @apply flex items-center gap-2; }
+    .reviews-list { @apply flex flex-col gap-5; }
+    .review-item { @apply p-5 bg-zinc-100/30 rounded-default border border-zinc-100/50; }
+    .review-header { @apply flex items-center gap-3 mb-4; }
+    .reviewer-avatar { @apply w-10 h-10 bg-zinc-100 rounded-full flex items-center justify-center text-sm font-bold text-zinc-950/70 flex-shrink-0; }
+    .reviewer-name { @apply text-sm font-bold text-zinc-950 mb-0.5; }
+    .review-date { @apply ml-auto text-xs text-zinc-950/40; }
+    .review-text { @apply text-sm text-zinc-950/80 leading-relaxed mb-3; }
+    
+    @media (max-width: 1024px) {
+        .profile-info { @apply px-6; }
+    }
+    @media (max-width: 600px) {
+        .profile-info { @apply flex-col text-center; }
+        .profile-stats-row, .profile-name-row { @apply justify-center; }
+        .hide-mobile { @apply w-full; }
+        .profile-actions { @apply w-full; }
+    }
+</style>

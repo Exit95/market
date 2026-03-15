@@ -1,0 +1,169 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { requireAuth, isAuthContext } from "../../lib/auth-middleware";
+
+const auth = await requireAuth(Astro.request, Astro.cookies);
+if (!isAuthContext(auth)) return Astro.redirect("/anmelden");
+
+const res = await fetch(`${Astro.url.origin}/api/conversations`, {
+    headers: Astro.request.headers,
+});
+const convs: any[] = res.ok ? await res.json() : [];
+const myId = auth.userId;
+---
+
+<BaseLayout title="Nachrichten – Novamarkt">
+    <Header />
+    <main class="container msgs-wrap">
+        <h1 class="msgs-title">Nachrichten</h1>
+
+        {
+            convs.length === 0 && (
+                <div class="empty-state">
+                    Noch keine Nachrichten. Kontaktiere einen Verkäufer!
+                </div>
+            )
+        }
+
+        <ul class="conv-list">
+            {
+                convs.map((c: any) => {
+                    const other = c.buyerId === myId ? c.seller : c.buyer;
+                    const last = c.messages[0];
+                    return (
+                        <li>
+                            <a href={`/messages/${c.id}`} class="conv-item">
+                                <div class="conv-avatar">
+                                    {other.firstName?.[0] ?? "?"}
+                                </div>
+                                <div class="conv-info">
+                                    <div class="conv-header">
+                                        <span class="conv-name">
+                                            {other.firstName}{" "}
+                                            {other.lastName?.[0]}.
+                                        </span>
+                                        {last && (
+                                            <span class="conv-time">
+                                                {new Date(
+                                                    last.createdAt,
+                                                ).toLocaleDateString("de-DE")}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div class="conv-listing">
+                                        {c.listing.title}
+                                    </div>
+                                    {last && (
+                                        <div class="conv-preview">
+                                            {last.senderId === myId
+                                                ? "Du: "
+                                                : ""}
+                                            {last.body}
+                                        </div>
+                                    )}
+                                </div>
+                                <div class="conv-price">
+                                    {(c.listing.price / 100).toLocaleString(
+                                        "de-DE",
+                                        { style: "currency", currency: "EUR" },
+                                    )}
+                                </div>
+                            </a>
+                        </li>
+                    );
+                })
+            }
+        </ul>
+    </main>
+    <Footer />
+</BaseLayout>
+
+<style>
+    .msgs-wrap {
+        padding: 2rem 0 4rem;
+    }
+    .msgs-title {
+        font-size: var(--text-2xl);
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: var(--color-text-muted);
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+    }
+    .conv-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .conv-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 1.25rem;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.15s;
+    }
+    .conv-item:hover {
+        border-color: var(--color-border-hover);
+        transform: translateX(2px);
+    }
+    .conv-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--color-primary-glow);
+        color: var(--color-primary);
+        font-weight: 800;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .conv-info {
+        flex: 1;
+        min-width: 0;
+    }
+    .conv-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+    }
+    .conv-name {
+        font-weight: 700;
+        font-size: var(--text-sm);
+    }
+    .conv-time {
+        font-size: var(--text-xs);
+        color: var(--color-text-muted);
+    }
+    .conv-listing {
+        font-size: var(--text-xs);
+        color: var(--color-primary);
+        margin: 0.15rem 0;
+    }
+    .conv-preview {
+        font-size: var(--text-xs);
+        color: var(--color-text-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .conv-price {
+        font-weight: 700;
+        font-size: var(--text-sm);
+        color: var(--color-primary);
+        white-space: nowrap;
+    }
+</style>

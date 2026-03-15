@@ -1,0 +1,129 @@
+---
+interface Props {
+    id: string;
+    title: string;
+    price: number;
+    location: string;
+    category: string;
+    image: string;
+    sellerName: string;
+    sellerRating: number;
+    sellerVerified: boolean;
+    sellerKYC: boolean;
+    postedAt: string;
+    condition: "Neu" | "Sehr gut" | "Gut" | "Akzeptabel";
+    treuhandAvailable?: boolean;
+}
+
+const {
+    id,
+    title,
+    price,
+    location,
+    category,
+    image,
+    sellerName,
+    sellerRating,
+    sellerVerified,
+    sellerKYC,
+    postedAt,
+    condition,
+    treuhandAvailable = false,
+} = Astro.props;
+
+const stars =
+    "★".repeat(Math.round(sellerRating)) +
+    "☆".repeat(5 - Math.round(sellerRating));
+
+const conditionColors = {
+    "Neu": "bg-green-100 text-green-700 border-green-200",
+    "Sehr gut": "bg-blue-100 text-blue-700 border-blue-200",
+    "Gut": "bg-amber-100 text-amber-700 border-amber-200",
+    "Akzeptabel": "bg-slate-100 text-slate-700 border-slate-200",
+};
+const currentConditionColor = conditionColors[condition] || conditionColors["Gut"];
+---
+
+<a href={`/inserat/${id}`} class="group block h-full">
+    <article class="bg-white rounded-2xl border border-[var(--ehren-border)] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-1 h-full flex flex-col relative">
+        
+        <!-- Badges -->
+        <div class="absolute top-3 right-3 flex flex-col gap-2 z-10">
+            {treuhandAvailable && (
+                <span class="bg-green-100/90 backdrop-blur text-green-700 text-xs px-2.5 py-1 rounded-full font-bold border border-green-200 shadow-sm flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                    Treuhand
+                </span>
+            )}
+        </div>
+        
+        <!-- Condition Badge Left -->
+        <div class="absolute top-3 left-3 z-10">
+            <span class={`text-[10px] uppercase font-bold px-2 py-0.5 rounded border ${currentConditionColor}`}>
+                {condition}
+            </span>
+        </div>
+
+        <!-- Image -->
+        <div class="aspect-[4/3] w-full bg-slate-100 relative overflow-hidden flex-shrink-0">
+            {image ? (
+                <img
+                    src={image}
+                    alt={title}
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                />
+            ) : (
+                <div class="w-full h-full flex items-center justify-center text-5xl opacity-50">
+                    📦
+                </div>
+            )}
+        </div>
+
+        <!-- Content -->
+        <div class="p-5 flex flex-col flex-grow">
+            <!-- Price -->
+            <div class="text-2xl font-black text-[var(--ehren-blue)] mb-2">
+                {price.toLocaleString("de-DE")} €
+            </div>
+            
+            <!-- Title -->
+            <h3 class="font-bold text-gray-900 mb-2 line-clamp-2 leading-tight">
+                {title}
+            </h3>
+
+            <!-- Meta: Location & Category -->
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-medium text-slate-500 mb-4">
+                <div class="flex items-center gap-1.5 line-clamp-1">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    {location}
+                </div>
+                <div class="bg-slate-100 px-2.5 py-1 rounded-md">
+                    {category}
+                </div>
+            </div>
+
+            <!-- Seller Info -->
+            <div class="mt-auto border-t border-[var(--ehren-border)] pt-3 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--ehren-accent)] to-[var(--ehren-blue)] text-white flex flex-shrink-0 items-center justify-center font-bold text-sm">
+                    {sellerName.charAt(0).toUpperCase()}
+                </div>
+                <div class="flex flex-col min-w-0">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xs font-semibold text-slate-700 truncate">{sellerName}</span>
+                        {sellerKYC && (
+                            <span class="bg-blue-50 text-blue-600 border border-blue-200 text-[10px] font-bold px-1.5 py-0.5 rounded">KYC</span>
+                        )}
+                        {sellerVerified && (
+                            <svg class="w-3.5 h-3.5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                        )}
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] text-amber-500 tracking-widest">{stars}</span>
+                        <span class="text-[10px] text-slate-400">{postedAt}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+</a>
