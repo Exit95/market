@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Book shadow -->
+  <ellipse cx="50" cy="90" rx="40" ry="3.5" fill="#a37a2e" opacity="0.3"/>
+  <!-- Left page — fg light -->
+  <path d="M50 18 L10 26 L10 84 L50 82 Z" fill="#e8e4de" stroke="#c8973a" stroke-width="1.8" stroke-linejoin="round"/>
+  <!-- Right page — slightly warmer -->
+  <path d="M50 18 L90 26 L90 84 L50 82 Z" fill="#e8e4de" stroke="#c8973a" stroke-width="1.8" stroke-linejoin="round"/>
+  <!-- Spine — gold -->
+  <rect x="46" y="18" width="8" height="64" rx="2" fill="#c8973a" stroke="#a37a2e" stroke-width="1"/>
+  <!-- Text lines — dark on light page -->
+  <line x1="16" y1="36" x2="44" y2="35" stroke="#0a0a0b" stroke-width="2" stroke-linecap="round"/>
+  <line x1="16" y1="43" x2="44" y2="42" stroke="#6b6b6b" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="16" y1="50" x2="44" y2="49" stroke="#6b6b6b" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="16" y1="57" x2="44" y2="56" stroke="#0a0a0b" stroke-width="2" stroke-linecap="round"/>
+  <line x1="16" y1="64" x2="36" y2="63" stroke="#6b6b6b" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="16" y1="71" x2="44" y2="70" stroke="#6b6b6b" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Play circle — dark bg, gold icon -->
+  <circle cx="70" cy="54" r="20" fill="#0a0a0b" stroke="#c8973a" stroke-width="2.2"/>
+  <polygon points="63,44 63,64 81,54" fill="#c8973a"/>
+  <polygon points="63,44 63,48 69,49" fill="#dbb568" opacity="0.5"/>
+  <!-- Headphones -->
+  <path d="M56 34 Q70 28 84 34" fill="none" stroke="#6b6b6b" stroke-width="1.5" stroke-linecap="round"/>
+  <rect x="54" y="32" width="5" height="7" rx="2" fill="#6b6b6b"/>
+  <rect x="81" y="32" width="5" height="7" rx="2" fill="#6b6b6b"/>
+</svg>

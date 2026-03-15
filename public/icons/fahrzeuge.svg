@@ -1,6 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M5 17H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1l2-3h10l2 3h1a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-2"/>
-  <circle cx="7.5" cy="17" r="2.5"/>
-  <circle cx="16.5" cy="17" r="2.5"/>
-  <line x1="10" y1="17" x2="14" y2="17"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Ground shadow -->
+  <ellipse cx="50" cy="86" rx="38" ry="3" fill="#a37a2e" opacity="0.4"/>
+  <!-- Body lower — GOLD -->
+  <rect x="8" y="57" width="84" height="16" rx="5" fill="#c8973a" stroke="#a37a2e" stroke-width="1.5"/>
+  <!-- Cabin — gold -->
+  <path d="M28 57 L34 38 L66 38 L72 57 Z" fill="#c8973a" stroke="#a37a2e" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Windows — dark, clearly visible inside gold -->
+  <path d="M32 56 L37 42 L48 42 L48 56 Z" fill="#0a0a0b" stroke="#a37a2e" stroke-width="1" stroke-linejoin="round"/>
+  <path d="M52 56 L52 42 L63 42 L68 56 Z" fill="#0a0a0b" stroke="#a37a2e" stroke-width="1" stroke-linejoin="round"/>
+  <!-- Window shine -->
+  <line x1="34" y1="44" x2="38" y2="55" stroke="#dbb568" stroke-width="1.2" opacity="0.5" stroke-linecap="round"/>
+  <line x1="53" y1="44" x2="57" y2="55" stroke="#dbb568" stroke-width="1.2" opacity="0.5" stroke-linecap="round"/>
+  <!-- B-pillar -->
+  <rect x="48" y="42" width="4" height="14" fill="#a37a2e"/>
+  <!-- Headlight — bright -->
+  <rect x="88" y="59" width="5" height="9" rx="2" fill="#e8e4de" stroke="#a37a2e" stroke-width="1"/>
+  <!-- Taillight -->
+  <rect x="7" y="59" width="5" height="9" rx="2" fill="#a37a2e" stroke="#c8973a" stroke-width="1"/>
+  <!-- Wheels — dark with gold rim -->
+  <circle cx="26" cy="73" r="11" fill="#1a1a1b" stroke="#dbb568" stroke-width="2.2"/>
+  <circle cx="26" cy="73" r="7" fill="#0a0a0b"/>
+  <circle cx="26" cy="73" r="3.5" fill="#c8973a"/>
+  <line x1="26" y1="66" x2="26" y2="80" stroke="#6b6b6b" stroke-width="1"/>
+  <line x1="19" y1="73" x2="33" y2="73" stroke="#6b6b6b" stroke-width="1"/>
+  <circle cx="74" cy="73" r="11" fill="#1a1a1b" stroke="#dbb568" stroke-width="2.2"/>
+  <circle cx="74" cy="73" r="7" fill="#0a0a0b"/>
+  <circle cx="74" cy="73" r="3.5" fill="#c8973a"/>
+  <line x1="74" y1="66" x2="74" y2="80" stroke="#6b6b6b" stroke-width="1"/>
+  <line x1="67" y1="73" x2="81" y2="73" stroke="#6b6b6b" stroke-width="1"/>
+  <!-- Door line -->
+  <line x1="50" y1="57" x2="50" y2="68" stroke="#a37a2e" stroke-width="1.5"/>
+  <!-- Door handles -->
+  <rect x="37" y="62" width="9" height="2.5" rx="1" fill="#0a0a0b"/>
+  <rect x="54" y="62" width="9" height="2.5" rx="1" fill="#0a0a0b"/>
 </svg>

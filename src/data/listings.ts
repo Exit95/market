@@ -21,12 +21,13 @@ export interface Listing {
 export const categories = [
     { slug: 'elektronik', label: 'Elektronik', icon: '/icons/elektronik.svg', count: 2841 },
     { slug: 'fahrzeuge', label: 'Fahrzeuge', icon: '/icons/fahrzeuge.svg', count: 1923 },
-    { slug: 'mode', label: 'Mode & Kleidung', icon: '/icons/mode.svg', count: 3102 },
-    { slug: 'moebel', label: 'Möbel & Wohnen', icon: '/icons/moebel.svg', count: 1547 },
-    { slug: 'sport', label: 'Sport & Freizeit', icon: '/icons/sport.svg', count: 982 },
+    { slug: 'mode', label: 'Mode & Kleidung', icon: '/icons/mode-bekleidung.svg', count: 3102 },
+    { slug: 'moebel', label: 'Möbel & Wohnen', icon: '/icons/moebel-wohnen.svg', count: 1547 },
+    { slug: 'sport', label: 'Sport & Freizeit', icon: '/icons/sport-freizeit.svg', count: 982 },
     { slug: 'haushalt', label: 'Haushalt', icon: '/icons/haushalt.svg', count: 1238 },
-    { slug: 'bucher', label: 'Bücher & Medien', icon: '/icons/bucher.svg', count: 741 },
+    { slug: 'bucher', label: 'Bücher & Medien', icon: '/icons/buecher-medien.svg', count: 741 },
     { slug: 'spielzeug', label: 'Spielzeug', icon: '/icons/spielzeug.svg', count: 634 },
+    { slug: 'immobilien', label: 'Mieten & Kaufen', icon: '/icons/mieten-kaufen.svg', count: 1085 },
 ];
 
 

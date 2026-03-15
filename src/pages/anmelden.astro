@@ -358,39 +358,39 @@ import Footer from "../components/Footer.astro";
 
     .auth-logo { @apply text-xl font-headings font-light flex items-center gap-3 mb-10 text-foreground tracking-wide; }
 
-    .auth-tabs { @apply flex bg-foreground/[.04] p-1 mb-8; }
-    .auth-tab { @apply flex-1 py-3 px-4 text-xs font-condensed font-medium uppercase tracking-[.1em] text-foreground/40 cursor-pointer transition-all duration-300 outline-none; border: none; background: transparent; }
-    .auth-tab:hover:not(.active) { @apply text-foreground/60; }
-    .auth-tab.active { @apply bg-secondary text-foreground border border-foreground/[.06]; }
+    .auth-tabs { @apply flex bg-foreground/[.12] p-1 mb-8; }
+    .auth-tab { @apply flex-1 py-3 px-4 text-xs font-condensed font-medium uppercase tracking-[.1em] text-foreground/75 cursor-pointer transition-all duration-300 outline-none; border: none; background: transparent; }
+    .auth-tab:hover:not(.active) { @apply text-foreground/75; }
+    .auth-tab.active { @apply bg-secondary text-foreground border border-foreground/[.20]; }
 
     .auth-form { @apply flex flex-col gap-5; }
     .form-group { @apply flex flex-col gap-2; }
 
     .input-icon-wrap { @apply relative flex items-center; }
-    .input-icon-wrap > svg { @apply absolute left-4 text-foreground/25 pointer-events-none; }
+    .input-icon-wrap > svg { @apply absolute left-4 text-foreground/75 pointer-events-none; }
     .input-with-icon { @apply pl-12; }
 
-    .pw-toggle { @apply absolute right-3 p-2 bg-transparent border-none text-foreground/30 cursor-pointer transition-colors hover:text-foreground; }
+    .pw-toggle { @apply absolute right-3 p-2 bg-transparent border-none text-foreground/80 cursor-pointer transition-colors hover:text-foreground; }
 
     .twofa-info { @apply flex items-center gap-2 text-xs text-primary/70 bg-primary/[.04] border border-primary/10 py-2.5 px-3 mb-4 font-condensed tracking-wider uppercase; }
 
-    .or-divider { @apply flex items-center gap-4 my-6 text-xs text-foreground/20 font-condensed uppercase tracking-[.15em]; }
-    .or-divider::before, .or-divider::after { @apply content-[''] flex-1 h-[1px] bg-foreground/[.06]; }
+    .or-divider { @apply flex items-center gap-4 my-6 text-xs text-foreground/75 font-condensed uppercase tracking-[.15em]; }
+    .or-divider::before, .or-divider::after { @apply content-[''] flex-1 h-[1px] bg-foreground/[.12]; }
 
     .phone-wrap { @apply flex gap-3; }
     .phone-prefix { @apply w-[90px] flex-shrink-0; }
 
-    .pw-strength-wrap { @apply h-1 bg-foreground/[.06] mt-2 overflow-hidden; }
+    .pw-strength-wrap { @apply h-1 bg-foreground/[.12] mt-2 overflow-hidden; }
     .pw-strength-bar { @apply h-full transition-all duration-300 w-0; }
     .pw-strength-label { @apply text-xs mt-1.5 font-condensed; }
 
     .kyc-info-box { @apply bg-primary/[.03] border border-primary/10 p-5 my-3; }
     .kyc-info-header { @apply flex items-center gap-2 text-primary/80 font-condensed font-medium text-xs tracking-[.1em] uppercase mb-3; }
-    .kyc-info-box p { @apply text-xs text-foreground/35 font-light leading-relaxed mb-4; }
+    .kyc-info-box p { @apply text-xs text-foreground/80 font-light leading-relaxed mb-4; }
 
     .kyc-steps { @apply flex flex-wrap items-center gap-2; }
-    .kyc-step { @apply text-[10px] font-condensed uppercase tracking-wider bg-foreground/[.04] px-2.5 py-1 text-foreground/50 border border-foreground/[.06]; }
-    .kyc-arrow { @apply text-foreground/20 text-xs; }
+    .kyc-step { @apply text-[10px] font-condensed uppercase tracking-wider bg-foreground/[.12] px-2.5 py-1 text-foreground/75 border border-foreground/[.22]; }
+    .kyc-arrow { @apply text-foreground/75 text-xs; }
 
     .checklist-item { @apply flex items-start gap-3 cursor-pointer; }
 
@@ -398,7 +398,7 @@ import Footer from "../components/Footer.astro";
     .form-row { @apply flex flex-col sm:flex-row gap-4; }
 
     /* Benefits Side */
-    .auth-benefits-side { @apply relative hidden md:flex items-center justify-center p-12 bg-secondary/60 border-l border-foreground/[.04] overflow-hidden; }
+    .auth-benefits-side { @apply relative hidden md:flex items-center justify-center p-12 bg-secondary/60 border-l border-foreground/[.20] overflow-hidden; }
     .auth-benefits-side::before {
         content: "";
         @apply absolute -top-1/2 -right-[30%] w-[600px] h-[600px] opacity-10 pointer-events-none;
@@ -409,14 +409,14 @@ import Footer from "../components/Footer.astro";
     .benefits-title { @apply text-2xl font-headings font-light mb-10 text-foreground; }
     .benefits-list { @apply flex flex-col gap-8 mb-12; }
     .benefit-item { @apply flex items-start gap-5; }
-    .benefit-icon { @apply flex-shrink-0 w-10 h-10 flex items-center justify-center border border-foreground/[.06] bg-foreground/[.02]; }
-    .benefit-item strong { @apply block font-medium text-foreground/80 mb-1 text-sm; }
-    .benefit-item p { @apply text-xs text-foreground/35 font-light leading-relaxed; }
+    .benefit-icon { @apply flex-shrink-0 w-10 h-10 flex items-center justify-center border border-foreground/[.22] bg-foreground/[.12]; }
+    .benefit-item strong { @apply block font-medium text-foreground mb-1 text-sm; }
+    .benefit-item p { @apply text-xs text-foreground/80 font-light leading-relaxed; }
 
-    .stat-row { @apply flex flex-wrap gap-8 p-6 border border-foreground/[.04] bg-foreground/[.02]; }
+    .stat-row { @apply flex flex-wrap gap-8 p-6 border border-foreground/[.22] bg-foreground/[.12]; }
     .auth-stat { @apply flex flex-col gap-1; }
     .stat-num { @apply text-2xl font-headings font-light text-primary tracking-tight; }
-    .stat-label { @apply text-[10px] font-condensed uppercase tracking-[.12em] text-foreground/30; }
+    .stat-label { @apply text-[10px] font-condensed uppercase tracking-[.12em] text-foreground/80; }
 </style>
 
 <script>

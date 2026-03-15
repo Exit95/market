@@ -58,7 +58,7 @@
 
 @layer components {
   .glass-panel {
-    @apply bg-background/80 backdrop-blur-md border border-foreground/[.06] shadow-xl rounded-default;
+    @apply bg-background/80 backdrop-blur-md border border-foreground/[.22] shadow-xl rounded-default;
   }
 
   .btn-primary {
@@ -79,7 +79,7 @@
   }
 
   .input-field {
-    @apply w-full px-4 py-3 rounded-default border border-foreground/[.08] bg-transparent text-foreground placeholder-foreground/30 focus:outline-none focus:border-primary/50 transition-all duration-200;
+    @apply w-full px-4 py-3 rounded-default border border-foreground/[.22] bg-transparent text-foreground placeholder-foreground/60 focus:outline-none focus:border-primary/50 transition-all duration-200;
   }
 
   .trust-badge {

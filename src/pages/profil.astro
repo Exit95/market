@@ -407,38 +407,38 @@ const myListings = listings.slice(0, 3);
 <style>
     .profile-main { @apply pb-16 min-h-screen text-foreground font-body; }
 
-    .profile-banner { @apply border-b border-foreground/[.04] relative overflow-hidden; }
+    .profile-banner { @apply border-b border-foreground/[.20] relative overflow-hidden; }
     .banner-bg { @apply absolute inset-0 bg-secondary/40 opacity-50; }
 
     .profile-info { @apply relative flex flex-wrap items-center gap-6 py-10 px-6 sm:px-12 max-w-7xl mx-auto z-10; }
-    .profile-avatar { @apply w-24 h-24 bg-secondary border border-foreground/[.08] flex items-center justify-center text-3xl font-headings font-light text-primary flex-shrink-0; }
+    .profile-avatar { @apply w-24 h-24 bg-secondary border border-foreground/[.22] flex items-center justify-center text-3xl font-headings font-light text-primary flex-shrink-0; }
 
     .profile-details { @apply flex-1; }
     .profile-name-row { @apply flex flex-wrap items-center gap-3 mb-2; }
     .profile-name { @apply text-2xl font-headings font-light tracking-wide text-foreground m-0; }
 
     .trust-badge { @apply text-[10px] font-condensed font-medium px-2.5 py-1 inline-flex items-center gap-1 uppercase tracking-[.1em] border; }
-    .trust-kyc { @apply bg-foreground/[.03] text-foreground/50 border-foreground/[.06]; }
+    .trust-kyc { @apply bg-foreground/[.12] text-foreground/75 border-foreground/[.20]; }
     .trust-verified { @apply bg-primary/[.04] text-primary/70 border-primary/10; }
 
-    .profile-since { @apply text-xs text-foreground/30 mb-5 font-condensed tracking-wider; }
+    .profile-since { @apply text-xs text-foreground/80 mb-5 font-condensed tracking-wider; }
 
     .profile-stats-row { @apply flex flex-wrap gap-8; }
     .pstat { @apply flex flex-col gap-0.5; }
     .pstat-val { @apply text-xl font-headings font-light text-foreground; }
-    .pstat-label { @apply text-[10px] font-condensed uppercase tracking-[.12em] text-foreground/30; }
+    .pstat-label { @apply text-[10px] font-condensed uppercase tracking-[.12em] text-foreground/80; }
 
     .profile-actions { @apply flex flex-col gap-3; }
 
     /* Profile Grid */
     .profile-grid { @apply grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8 mt-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
 
-    .card { @apply bg-secondary/40 border border-foreground/[.04] p-6; }
-    .card-section-title { @apply text-[10px] font-condensed uppercase tracking-[.15em] text-foreground/30 mb-5 m-0; }
+    .card { @apply bg-secondary/40 border border-foreground/[.20] p-6; }
+    .card-section-title { @apply text-[10px] font-condensed uppercase tracking-[.15em] text-foreground/80 mb-5 m-0; }
 
     /* Verification */
     .verif-list { @apply flex flex-col gap-3; }
-    .verif-item { @apply flex items-center gap-4 p-4 bg-foreground/[.02] border border-foreground/[.04] transition-colors; }
+    .verif-item { @apply flex items-center gap-4 p-4 bg-foreground/[.12] border border-foreground/[.22] transition-colors; }
     .verif-item.done { @apply bg-success/[.03] border-success/10; }
     .verif-item.pending { @apply bg-warning/[.03] border-warning/10; }
 
@@ -446,39 +446,39 @@ const myListings = listings.slice(0, 3);
     .verif-icon.success { @apply bg-success/[.08] text-success; }
     .verif-icon.warning { @apply bg-warning/[.08] text-warning; }
 
-    .verif-name { @apply text-sm font-medium text-foreground/70 mb-0.5; }
-    .verif-sub { @apply text-xs text-foreground/30; }
+    .verif-name { @apply text-sm font-medium text-foreground/80 mb-0.5; }
+    .verif-sub { @apply text-xs text-foreground/80; }
     .verif-item > :last-child { @apply ml-auto flex-shrink-0; }
 
-    .trust-score { @apply mt-6 pt-5 border-t border-foreground/[.04]; }
-    .trust-score-label { @apply flex justify-between text-xs font-condensed uppercase tracking-wider text-foreground/50 mb-3; }
-    .trust-score-bar-wrap { @apply bg-foreground/[.06] h-1.5 overflow-hidden mb-1.5; }
+    .trust-score { @apply mt-6 pt-5 border-t border-foreground/[.20]; }
+    .trust-score-label { @apply flex justify-between text-xs font-condensed uppercase tracking-wider text-foreground/80 mb-3; }
+    .trust-score-bar-wrap { @apply bg-foreground/[.12] h-1.5 overflow-hidden mb-1.5; }
     .trust-score-bar { @apply h-full bg-success/60; }
 
     /* Quick Links */
     .quick-links { @apply flex flex-col gap-1; }
-    .quick-link { @apply flex items-center gap-3 p-3 text-xs font-condensed uppercase tracking-wider text-foreground/35 transition-all hover:bg-foreground/[.03] hover:text-foreground/60; }
+    .quick-link { @apply flex items-center gap-3 p-3 text-xs font-condensed uppercase tracking-wider text-foreground/80 transition-all hover:bg-foreground/[.12] hover:text-foreground/80; }
 
     /* My Listings */
     .my-listings-list { @apply flex flex-col gap-4; }
-    .my-listing-item { @apply flex items-center gap-4 p-3 border border-foreground/[.04] transition-all hover:border-primary/20 hover:bg-foreground/[.02]; }
+    .my-listing-item { @apply flex items-center gap-4 p-3 border border-foreground/[.22] transition-all hover:border-primary/30 hover:bg-foreground/[.12]; }
     .my-listing-img { @apply w-20 h-16 object-cover flex-shrink-0 bg-secondary; }
     .my-listing-info { @apply flex-1 min-w-0; }
-    .my-listing-title { @apply text-sm font-medium text-foreground/70 truncate mb-1; }
+    .my-listing-title { @apply text-sm font-medium text-foreground/80 truncate mb-1; }
     .my-listing-price { @apply text-base font-headings font-light text-primary; }
-    .my-listing-meta { @apply text-[10px] text-foreground/25 mt-1 font-condensed tracking-wider; }
+    .my-listing-meta { @apply text-[10px] text-foreground/80 mt-1 font-condensed tracking-wider; }
     .my-listing-actions { @apply flex flex-col items-end gap-2 flex-shrink-0; }
 
     /* Reviews */
     .review-summary { @apply flex items-center gap-2; }
     .stars { color: var(--gold); }
     .reviews-list { @apply flex flex-col gap-5; }
-    .review-item { @apply p-5 bg-foreground/[.02] border border-foreground/[.04]; }
+    .review-item { @apply p-5 bg-foreground/[.12] border border-foreground/[.22]; }
     .review-header { @apply flex items-center gap-3 mb-4; }
-    .reviewer-avatar { @apply w-9 h-9 bg-secondary border border-foreground/[.06] flex items-center justify-center text-xs font-condensed text-foreground/40 flex-shrink-0; }
-    .reviewer-name { @apply text-sm font-medium text-foreground/60 mb-0.5; }
-    .review-date { @apply ml-auto text-[10px] text-foreground/20 font-condensed tracking-wider; }
-    .review-text { @apply text-sm text-foreground/50 font-light leading-relaxed mb-3; }
+    .reviewer-avatar { @apply w-9 h-9 bg-secondary border border-foreground/[.22] flex items-center justify-center text-xs font-condensed text-foreground/75 flex-shrink-0; }
+    .reviewer-name { @apply text-sm font-medium text-foreground/75 mb-0.5; }
+    .review-date { @apply ml-auto text-[10px] text-foreground/80 font-condensed tracking-wider; }
+    .review-text { @apply text-sm text-foreground/80 font-light leading-relaxed mb-3; }
 
     @media (max-width: 1024px) {
         .profile-info { @apply px-6; }

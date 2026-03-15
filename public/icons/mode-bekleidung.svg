@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Hanger hook — bright fg -->
+  <path d="M50 22 L50 16 Q50 9 57 9 Q65 9 65 16 Q65 22 58 23"
+        fill="none" stroke="#e8e4de" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Hanger arms + bar -->
+  <path d="M50 22 L18 38" fill="none" stroke="#e8e4de" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M50 22 L82 38" fill="none" stroke="#e8e4de" stroke-width="2.2" stroke-linecap="round"/>
+  <line x1="16" y1="38" x2="84" y2="38" stroke="#e8e4de" stroke-width="2.8" stroke-linecap="round"/>
+  <!-- Dress body — GOLD fill -->
+  <path d="M24 38 Q20 52 18 90 L82 90 Q80 52 76 38"
+        fill="#c8973a" stroke="#a37a2e" stroke-width="1.8" stroke-linejoin="round"/>
+  <!-- V-neckline — dark cut-out feel -->
+  <path d="M34 38 L50 52 L66 38 L72 57 L28 57 Z" fill="#a37a2e" stroke="none"/>
+  <path d="M34 38 L50 52 L66 38" fill="none" stroke="#dbb568" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Waist seam -->
+  <path d="M26 58 Q50 68 74 58" fill="none" stroke="#dbb568" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- Skirt pleat lines -->
+  <line x1="36" y1="67" x2="30" y2="90" stroke="#a37a2e" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="50" y1="68" x2="50" y2="90" stroke="#a37a2e" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="64" y1="67" x2="70" y2="90" stroke="#a37a2e" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Buttons -->
+  <circle cx="50" cy="44" r="2.2" fill="#0a0a0b"/>
+  <circle cx="50" cy="51" r="2.2" fill="#0a0a0b"/>
+  <!-- Hem -->
+  <line x1="18" y1="90" x2="82" y2="90" stroke="#dbb568" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

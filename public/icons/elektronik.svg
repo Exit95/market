@@ -1,6 +1,41 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-  <rect x="5" y="2" width="14" height="20" rx="2"/>
-  <circle cx="12" cy="17" r="1"/>
-  <line x1="8" y1="6" x2="16" y2="6"/>
-  <line x1="8" y1="9" x2="14" y2="9"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Corner traces -->
+  <path d="M15 15 L22 15 L22 24" fill="none" stroke="#dbb568" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M85 15 L78 15 L78 24" fill="none" stroke="#dbb568" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M15 85 L22 85 L22 76" fill="none" stroke="#dbb568" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M85 85 L78 85 L78 76" fill="none" stroke="#dbb568" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="15" cy="15" r="2" fill="#dbb568"/>
+  <circle cx="85" cy="15" r="2" fill="#dbb568"/>
+  <circle cx="15" cy="85" r="2" fill="#dbb568"/>
+  <circle cx="85" cy="85" r="2" fill="#dbb568"/>
+  <!-- Chip body — GOLD fill -->
+  <rect x="27" y="27" width="46" height="46" rx="5" fill="#c8973a" stroke="#dbb568" stroke-width="2"/>
+  <!-- Inner die — dark for contrast -->
+  <rect x="35" y="35" width="30" height="30" rx="3" fill="#0a0a0b" stroke="#a37a2e" stroke-width="1.2"/>
+  <!-- Grid lines on die -->
+  <line x1="35" y1="43" x2="65" y2="43" stroke="#a37a2e" stroke-width="0.8" opacity="0.7"/>
+  <line x1="35" y1="57" x2="65" y2="57" stroke="#a37a2e" stroke-width="0.8" opacity="0.7"/>
+  <line x1="43" y1="35" x2="43" y2="65" stroke="#a37a2e" stroke-width="0.8" opacity="0.7"/>
+  <line x1="57" y1="35" x2="57" y2="65" stroke="#a37a2e" stroke-width="0.8" opacity="0.7"/>
+  <!-- Lightning bolt — bright fg on dark die -->
+  <path d="M52 38 L44 51 L50 51 L47 62 L56 49 L50 49 Z" fill="#e8e4de"/>
+  <!-- Pins — fg color, visible -->
+  <rect x="18" y="34" width="9" height="3.5" rx="1.5" fill="#e8e4de"/>
+  <rect x="18" y="42" width="9" height="3.5" rx="1.5" fill="#e8e4de"/>
+  <rect x="18" y="50" width="9" height="3.5" rx="1.5" fill="#e8e4de"/>
+  <rect x="18" y="58" width="9" height="3.5" rx="1.5" fill="#e8e4de"/>
+  <rect x="73" y="34" width="9" height="3.5" rx="1.5" fill="#e8e4de"/>
+  <rect x="73" y="42" width="9" height="3.5" rx="1.5" fill="#e8e4de"/>
+  <rect x="73" y="50" width="9" height="3.5" rx="1.5" fill="#e8e4de"/>
+  <rect x="73" y="58" width="9" height="3.5" rx="1.5" fill="#e8e4de"/>
+  <rect x="34" y="18" width="3.5" height="9" rx="1.5" fill="#e8e4de"/>
+  <rect x="42" y="18" width="3.5" height="9" rx="1.5" fill="#e8e4de"/>
+  <rect x="50" y="18" width="3.5" height="9" rx="1.5" fill="#e8e4de"/>
+  <rect x="58" y="18" width="3.5" height="9" rx="1.5" fill="#e8e4de"/>
+  <rect x="34" y="73" width="3.5" height="9" rx="1.5" fill="#e8e4de"/>
+  <rect x="42" y="73" width="3.5" height="9" rx="1.5" fill="#e8e4de"/>
+  <rect x="50" y="73" width="3.5" height="9" rx="1.5" fill="#e8e4de"/>
+  <rect x="58" y="73" width="3.5" height="9" rx="1.5" fill="#e8e4de"/>
+  <!-- Pin 1 marker -->
+  <circle cx="31" cy="31" r="2.5" fill="#0a0a0b"/>
 </svg>

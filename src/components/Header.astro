@@ -7,7 +7,7 @@ const navLinks = [
 const currentPath = Astro.url.pathname;
 ---
 
-<header class="sticky top-0 z-50 bg-background/90 backdrop-blur-xl border-b border-foreground/[.04]">
+<header class="sticky top-0 z-50 bg-background/90 backdrop-blur-xl border-b border-foreground/[.20]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             <!-- Logo -->
@@ -47,7 +47,7 @@ const currentPath = Astro.url.pathname;
                         class={`font-condensed text-[.78rem] font-medium tracking-[.08em] uppercase transition-colors duration-200 ${
                             currentPath === link.href
                             ? "text-primary"
-                            : "text-foreground/50 hover:text-foreground"
+                            : "text-foreground/80 hover:text-foreground"
                         }`}
                     >
                         {link.label}
@@ -57,7 +57,7 @@ const currentPath = Astro.url.pathname;
 
             <!-- Right side -->
             <div class="hidden md:flex items-center gap-5">
-                <a href="/anmelden" class="font-condensed text-[.78rem] font-medium tracking-[.08em] uppercase text-foreground/50 hover:text-foreground transition-colors">
+                <a href="/anmelden" class="font-condensed text-[.78rem] font-medium tracking-[.08em] uppercase text-foreground/80 hover:text-foreground transition-colors">
                     Anmelden
                 </a>
                 <a href="/inserat-erstellen" class="btn-outline text-[.72rem] py-1.5 px-4">
@@ -67,7 +67,7 @@ const currentPath = Astro.url.pathname;
 
             <!-- Mobile Menu Button -->
             <button
-                class="md:hidden p-2 text-foreground/60 hover:text-foreground transition-colors focus:outline-none"
+                class="md:hidden p-2 text-foreground/75 hover:text-foreground transition-colors focus:outline-none"
                 id="mobileMenuBtn"
                 aria-label="Menü öffnen"
             >
@@ -77,20 +77,20 @@ const currentPath = Astro.url.pathname;
     </div>
 
     <!-- Mobile Menu -->
-    <div class="md:hidden hidden absolute top-full left-0 w-full bg-background border-b border-foreground/[.04]" id="mobileMenu">
+    <div class="md:hidden hidden absolute top-full left-0 w-full bg-background border-b border-foreground/[.20]" id="mobileMenu">
         <div class="px-6 pt-3 pb-6 space-y-1">
             {navLinks.map((link) => (
                 <a
                     href={link.href}
-                    class={`block py-3 font-condensed text-sm font-medium tracking-wider uppercase border-b border-foreground/[.04] ${
-                        currentPath === link.href ? "text-primary" : "text-foreground/60 hover:text-foreground"
+                    class={`block py-3 font-condensed text-sm font-medium tracking-wider uppercase border-b border-foreground/[.20] ${
+                        currentPath === link.href ? "text-primary" : "text-foreground/75 hover:text-foreground"
                     }`}
                 >
                     {link.label}
                 </a>
             ))}
             <div class="pt-4 space-y-3">
-                <a href="/anmelden" class="block text-center py-3 font-condensed text-sm font-medium text-foreground/60 hover:text-foreground transition-colors uppercase tracking-wider">
+                <a href="/anmelden" class="block text-center py-3 font-condensed text-sm font-medium text-foreground/75 hover:text-foreground transition-colors uppercase tracking-wider">
                     Anmelden
                 </a>
                 <a href="/inserat-erstellen" class="btn-outline w-full flex items-center justify-center py-2.5">

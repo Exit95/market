@@ -1,0 +1,81 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<BaseLayout title="Impressum – Ehren-Deal">
+    <Header />
+    <main class="min-h-screen pt-12 pb-24">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <div class="mb-12">
+                <h1 class="text-4xl md:text-5xl font-headings font-bold text-primary mb-3">Impressum</h1>
+                <p class="text-foreground/80 text-sm font-light">Angaben gemäß § 5 TMG</p>
+            </div>
+
+            <div class="legal-content space-y-10">
+
+                <!-- Anbieter -->
+                <section>
+                    <h2 class="font-headings text-xl font-bold text-primary mb-4">Angaben zum Diensteanbieter</h2>
+                    <div class="text-sm text-foreground/80 font-light leading-relaxed space-y-1">
+                        <div class="bg-secondary/40 border border-foreground/[.20] p-6 space-y-2">
+                            <p class="text-foreground font-medium text-base">Danapfel Digital</p>
+                            <p>Inhaber: Michael Danapfel</p>
+                            <p>Heek, Nordrhein-Westfalen</p>
+                            <p>Deutschland</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Kontakt -->
+                <section>
+                    <h2 class="font-headings text-xl font-bold text-primary mb-4">Kontakt</h2>
+                    <div class="text-sm text-foreground/80 font-light leading-relaxed space-y-2">
+                        <p>Telefon / WhatsApp: <span class="text-foreground">+49 157 57126123</span></p>
+                        <p>E-Mail: <a href="mailto:office@danapfel-digital.de" class="text-primary hover:underline">office@danapfel-digital.de</a></p>
+                        <p>Website: <a href="https://danapfel-digital.de" class="text-primary hover:underline" target="_blank" rel="noopener noreferrer">danapfel-digital.de</a></p>
+                        <p>Kontaktformular: <a href="/kontakt" class="text-primary hover:underline">ehren-deal.de/kontakt</a></p>
+                    </div>
+                </section>
+
+                <!-- Redaktionell Verantwortlicher -->
+                <section>
+                    <h2 class="font-headings text-xl font-bold text-primary mb-4">Redaktionell Verantwortlicher</h2>
+                    <div class="text-sm text-foreground/80 font-light leading-relaxed space-y-2">
+                        <p>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:</p>
+                        <div class="bg-secondary/40 border border-foreground/[.20] p-4 space-y-1 mt-2">
+                            <p class="text-foreground font-medium">Michael Danapfel</p>
+                            <p>Danapfel Digital</p>
+                            <p>Heek, Nordrhein-Westfalen</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- OS-Plattform -->
+                <section>
+                    <h2 class="font-headings text-xl font-bold text-primary mb-4">EU-Streitschlichtung</h2>
+                    <div class="text-sm text-foreground/80 font-light leading-relaxed space-y-3">
+                        <p>Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:</p>
+                        <p><a href="https://ec.europa.eu/consumers/odr" class="text-primary hover:underline" target="_blank" rel="noopener noreferrer">https://ec.europa.eu/consumers/odr</a></p>
+                        <p>Wir sind weder verpflichtet noch bereit, an einem Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
+                    </div>
+                </section>
+
+                <!-- Haftungshinweise -->
+                <section>
+                    <h2 class="font-headings text-xl font-bold text-primary mb-4">Haftungshinweis</h2>
+                    <div class="text-sm text-foreground/80 font-light leading-relaxed space-y-3">
+                        <p><strong class="text-foreground">Haftung für Inhalte:</strong> Als Diensteanbieter sind wir gemäß § 7 Abs. 1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.</p>
+                        <p><strong class="text-foreground">Haftung für Links:</strong> Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich.</p>
+                        <p><strong class="text-foreground">Urheberrecht:</strong> Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechts bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.</p>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+    <Footer />
+</BaseLayout>
+

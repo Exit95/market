@@ -1,4 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-  <polyline points="9 22 9 12 15 12 15 22"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Machine body — fg (light), clear on dark BG -->
+  <rect x="8" y="8" width="84" height="86" rx="9" fill="#e8e4de" stroke="#c8973a" stroke-width="2"/>
+  <!-- Control panel — gold -->
+  <rect x="8" y="8" width="84" height="26" rx="9" fill="#c8973a"/>
+  <rect x="8" y="26" width="84" height="8" fill="#c8973a"/>
+  <!-- Divider -->
+  <line x1="10" y1="34" x2="90" y2="34" stroke="#a37a2e" stroke-width="1"/>
+  <!-- On/off dial -->
+  <circle cx="26" cy="21" r="7" fill="#a37a2e" stroke="#dbb568" stroke-width="1.8"/>
+  <circle cx="26" cy="21" r="4" fill="#0a0a0b"/>
+  <line x1="26" y1="14" x2="26" y2="18" stroke="#dbb568" stroke-width="2" stroke-linecap="round"/>
+  <!-- Program dial -->
+  <circle cx="44" cy="21" r="5" fill="#a37a2e" stroke="#dbb568" stroke-width="1.2"/>
+  <circle cx="44" cy="21" r="2.5" fill="#dbb568"/>
+  <!-- Display -->
+  <rect x="56" y="13" width="30" height="15" rx="4" fill="#0a0a0b" stroke="#a37a2e" stroke-width="1.2"/>
+  <text x="71" y="24" font-family="monospace" font-size="9" fill="#c8973a" text-anchor="middle">40°</text>
+  <!-- Porthole rings -->
+  <circle cx="50" cy="63" r="27" fill="none" stroke="#c8973a" stroke-width="2.5"/>
+  <circle cx="50" cy="63" r="23" fill="#0a0a0b" stroke="#a37a2e" stroke-width="1.2"/>
+  <circle cx="50" cy="63" r="19" fill="#0a0a0b"/>
+  <!-- Waves — gold on dark glass -->
+  <path d="M34 59 Q40 51 50 59 Q60 67 66 59" fill="none" stroke="#c8973a" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M37 67 Q42 61 50 66 Q58 71 63 66" fill="none" stroke="#a37a2e" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Bubbles -->
+  <circle cx="39" cy="54" r="2" fill="#dbb568" opacity="0.7"/>
+  <circle cx="63" cy="59" r="1.5" fill="#dbb568" opacity="0.6"/>
+  <circle cx="43" cy="73" r="1.5" fill="#c8973a" opacity="0.6"/>
+  <!-- Handle -->
+  <path d="M72 58 Q80 63 72 68" fill="none" stroke="#c8973a" stroke-width="3" stroke-linecap="round"/>
 </svg>

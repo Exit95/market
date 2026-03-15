@@ -45,7 +45,7 @@ const currentConditionColor = conditionColors[condition] || conditionColors["Gut
 ---
 
 <a href={`/inserat/${id}`} class="group block h-full">
-    <article class="bg-secondary/40 border border-foreground/[.04] overflow-hidden hover:border-primary/20 transition-all duration-500 h-full flex flex-col relative">
+    <article class="bg-secondary/40 border border-foreground/[.20] overflow-hidden hover:border-primary/20 transition-all duration-500 h-full flex flex-col relative">
         
         <!-- Badges -->
         <div class="absolute top-3 right-3 flex flex-col gap-2 z-10">
@@ -65,7 +65,7 @@ const currentConditionColor = conditionColors[condition] || conditionColors["Gut
         </div>
 
         <!-- Image -->
-        <div class="aspect-[4/3] w-full bg-foreground/[.03] relative overflow-hidden flex-shrink-0">
+        <div class="aspect-[4/3] w-full bg-foreground/[.12] relative overflow-hidden flex-shrink-0">
             {image ? (
                 <img
                     src={image}
@@ -75,7 +75,7 @@ const currentConditionColor = conditionColors[condition] || conditionColors["Gut
                 />
             ) : (
                 <div class="w-full h-full flex items-center justify-center opacity-30">
-                    <svg class="w-12 h-12 text-foreground/20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                    <svg class="w-12 h-12 text-foreground/75" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
                 </div>
             )}
         </div>
@@ -93,24 +93,24 @@ const currentConditionColor = conditionColors[condition] || conditionColors["Gut
             </h3>
 
             <!-- Meta: Location & Category -->
-            <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-light text-foreground/30 mb-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-light text-foreground/80 mb-4">
                 <div class="flex items-center gap-1.5 line-clamp-1">
                     <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     {location}
                 </div>
-                <div class="bg-foreground/[.04] px-2 py-0.5 text-[10px] font-condensed uppercase tracking-wider text-foreground/40">
+                <div class="bg-foreground/[.12] px-2 py-0.5 text-[10px] font-condensed uppercase tracking-wider text-foreground/75">
                     {category}
                 </div>
             </div>
 
             <!-- Seller Info -->
-            <div class="mt-auto border-t border-foreground/[.04] pt-3 flex items-center gap-3">
+            <div class="mt-auto border-t border-foreground/[.20] pt-3 flex items-center gap-3">
                 <div class="w-7 h-7 border border-primary/20 bg-primary/[.05] text-primary flex flex-shrink-0 items-center justify-center font-condensed text-xs">
                     {sellerName.charAt(0).toUpperCase()}
                 </div>
                 <div class="flex flex-col min-w-0">
                     <div class="flex items-center gap-1.5">
-                        <span class="text-xs font-light text-foreground/50 truncate">{sellerName}</span>
+                        <span class="text-xs font-light text-foreground/80 truncate">{sellerName}</span>
                         {sellerKYC && (
                             <span class="bg-primary/[.06] text-primary/70 border border-primary/15 text-[9px] font-condensed uppercase tracking-wider px-1.5 py-0.5">KYC</span>
                         )}
@@ -120,7 +120,7 @@ const currentConditionColor = conditionColors[condition] || conditionColors["Gut
                     </div>
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] text-primary/40 tracking-widest">{stars}</span>
-                        <span class="text-[10px] text-foreground/20">{postedAt}</span>
+                        <span class="text-[10px] text-foreground/75">{postedAt}</span>
                     </div>
                 </div>
             </div>
