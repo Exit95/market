@@ -6,7 +6,7 @@ type Listing = { id: string; title: string; price: number; status: string; image
 type Message = { id?: string; body: string; createdAt: Date | string; senderId: string };
 type Conversation = { id: string; listing: Listing; buyerId: string; sellerId: string; buyer: User; seller: User; messages: Message[] };
 
-export default function ChatApp({ currentUserId }: { currentUserId: string }) {
+export default function ChatApp({ currentUserId, listingId }: { currentUserId: string; listingId?: string }) {
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [activeConvId, setActiveConvId] = useState<string | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -21,16 +21,55 @@ export default function ChatApp({ currentUserId }: { currentUserId: string }) {
     const ablyRef = useRef<Ably.Realtime | null>(null);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    // 1. Fetch conversations
+    // 1. Fetch conversations + auto-create if listingId provided
     useEffect(() => {
-        fetch('/api/conversations')
-            .then(res => res.json())
-            .then(data => {
+        const init = async () => {
+            try {
+                const res = await fetch('/api/conversations');
+                const data: Conversation[] = await res.json();
+
+                // If listingId is provided, create/find the conversation for that listing
+                if (listingId) {
+                    // Check if we already have a conversation for this listing
+                    const existing = data.find(c => c.listing.id === listingId);
+                    if (existing) {
+                        setConversations(data);
+                        setActiveConvId(existing.id);
+                        setShowSidebar(false);
+                        return;
+                    }
+
+                    // Create a new conversation
+                    try {
+                        const createRes = await fetch('/api/conversations', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ listingId }),
+                        });
+                        if (createRes.ok) {
+                            const newConv = await createRes.json();
+                            // Re-fetch full conversation list to get complete data
+                            const refreshRes = await fetch('/api/conversations');
+                            const refreshedData: Conversation[] = await refreshRes.json();
+                            setConversations(refreshedData);
+                            const found = refreshedData.find(c => c.listing.id === listingId);
+                            setActiveConvId(found?.id || newConv.id);
+                            setShowSidebar(false);
+                            return;
+                        }
+                    } catch (err) {
+                        console.error("Error creating conversation:", err);
+                    }
+                }
+
                 setConversations(data);
                 if (data.length > 0) setActiveConvId(data[0].id);
-            })
-            .catch(err => console.error("Error fetching conversations:", err));
-    }, []);
+            } catch (err) {
+                console.error("Error fetching conversations:", err);
+            }
+        };
+        init();
+    }, [listingId]);
 
     const activeConv = conversations.find(c => c.id === activeConvId);
     const otherUser = activeConv ? (activeConv.buyer.id === currentUserId ? activeConv.seller : activeConv.buyer) : null;

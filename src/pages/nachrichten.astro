@@ -8,12 +8,13 @@ const auth = await requireAuth(Astro.request, Astro.cookies);
 if (!isAuthContext(auth)) return auth;
 
 const currentUserId = auth.userId;
+const listingId = Astro.url.searchParams.get("listing") || undefined;
 ---
 
 <BaseLayout title="Nachrichten – Ehren-Deal">
     <Header />
     <main class="messenger-main">
-        <ChatApp client:load currentUserId={currentUserId} />
+        <ChatApp client:load currentUserId={currentUserId} listingId={listingId} />
     </main>
 </BaseLayout>
 

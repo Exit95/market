@@ -2,156 +2,451 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
+import { listings as staticListings } from "../../data/listings";
+import { prisma } from "../../lib/auth";
 
 const { id } = Astro.params;
+if (!id) return Astro.redirect('/404');
 
-const res = await fetch(`${Astro.url.origin}/api/listings/${id}`);
-if (!res.ok) return Astro.redirect("/");
-const listing = await res.json();
+// ── Category labels ──
+const catLabels: Record<string, string> = {
+    ELEKTRONIK: 'Elektronik', FAHRZEUGE: 'Fahrzeuge', MODE: 'Mode & Kleidung',
+    MOEBEL: 'Möbel & Wohnen', SPORT: 'Sport & Freizeit', HAUSHALT: 'Haushalt',
+    BUCHER: 'Bücher & Medien', SPIELZEUG: 'Spielzeug', SONSTIGES: 'Sonstiges',
+};
 
-const priceEur = (listing.price / 100).toLocaleString("de-DE", {
-    style: "currency",
-    currency: "EUR",
+// ── Time-ago helper ──
+function timeAgo(date: Date): string {
+    const ms = Date.now() - date.getTime();
+    const mins = Math.floor(ms / 60000);
+    if (mins < 1) return 'Gerade eben';
+    if (mins < 60) return `vor ${mins} Min.`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `vor ${hrs} Std.`;
+    const days = Math.floor(hrs / 24);
+    if (days === 1) return 'Gestern';
+    if (days < 30) return `vor ${days} Tagen`;
+    const months = Math.floor(days / 30);
+    return `vor ${months} Monat${months > 1 ? 'en' : ''}`;
+}
+
+// ── 1) Try DB first ──
+let listing: any = null;
+let allImages: { url: string; id: string }[] = [];
+let sellerMemberSince = '';
+let sellerListingCount = 0;
+let sellerTrustScore = 0;
+let sellerId = '';
+let isFromDB = false;
+let dbCategory = '';
+
+const dbListing = await prisma.listing.findUnique({
+    where: { id },
+    include: {
+        images: { orderBy: { position: 'asc' } },
+        seller: {
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                idVerified: true,
+                emailVerified: true,
+                phoneVerified: true,
+                createdAt: true,
+                trustScore: true,
+                _count: { select: { listings: true } },
+            },
+        },
+    },
 });
-const seller = listing.seller ?? {};
-const location = [listing.city, listing.postalCode].filter(Boolean).join(", ");
+
+if (dbListing) {
+    isFromDB = true;
+    dbCategory = dbListing.category;
+    sellerId = dbListing.seller.id;
+
+    // Increment view count (fire & forget)
+    prisma.listing.update({ where: { id }, data: { viewCount: { increment: 1 } } }).catch(() => {});
+
+    const s = dbListing.seller;
+    const sellerFirst = s.firstName || '';
+    const sellerLast = s.lastName || '';
+    const sellerName = sellerFirst
+        ? `${sellerFirst} ${sellerLast ? sellerLast.charAt(0) + '.' : ''}`.trim()
+        : 'Verkäufer';
+
+    sellerMemberSince = s.createdAt.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+    sellerListingCount = s._count.listings;
+    sellerTrustScore = s.trustScore?.score ?? 0;
+
+    allImages = dbListing.images.map((img: any) => ({ url: img.url, id: img.id }));
+    const mainImage = allImages[0]?.url || 'https://placehold.co/600x400/1a1a2e/c8973a?text=Kein+Bild';
+
+    listing = {
+        id: dbListing.id,
+        title: dbListing.title,
+        price: dbListing.price / 100,
+        location: [dbListing.postalCode, dbListing.city].filter(Boolean).join(' '),
+        category: catLabels[dbListing.category] || dbListing.category,
+        image: mainImage,
+        sellerName,
+        sellerRating: sellerTrustScore / 20,
+        sellerVerified: s.emailVerified || s.phoneVerified,
+        sellerKYC: s.idVerified,
+        postedAt: timeAgo(dbListing.createdAt),
+        condition: dbListing.condition || 'Gut',
+        treuhandAvailable: dbListing.treuhand,
+        description: dbListing.description,
+        viewCount: dbListing.viewCount + 1,
+        status: dbListing.status,
+    };
+}
+
+// ── 2) Fallback: static demo data ──
+if (!listing) {
+    const staticListing = staticListings.find((l) => l.id === id);
+    if (staticListing) {
+        listing = { ...staticListing, viewCount: 0, status: 'ACTIVE' };
+        allImages = [{ url: staticListing.image, id: 'static-0' }];
+        sellerMemberSince = 'Januar 2024';
+        sellerListingCount = 3;
+        sellerTrustScore = 75;
+    }
+}
+
+// ── 404 ──
+if (!listing) return Astro.redirect('/404');
+
+// ── Stars ──
+const rating = Math.max(0, Math.min(5, Math.round(listing.sellerRating)));
+const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+
+// ── Security Score ──
+let securityScore = 40;
+if (listing.sellerVerified) securityScore += 15;
+if (listing.sellerKYC) securityScore += 20;
+if (listing.treuhandAvailable) securityScore += 15;
+if (sellerTrustScore >= 50) securityScore += 5;
+if (sellerTrustScore >= 80) securityScore += 5;
+securityScore = Math.min(100, securityScore);
+const securityLabel = securityScore >= 80 ? 'Niedrig' : securityScore >= 50 ? 'Mittel' : 'Hoch';
+const securityColor = securityScore >= 80 ? '#52b788' : securityScore >= 50 ? '#d4a843' : '#c45c5c';
+
+// ── Related Listings ──
+let relatedListings: any[] = [];
+if (isFromDB && dbCategory) {
+    const dbRelated = await prisma.listing.findMany({
+        where: { category: dbCategory as any, status: 'ACTIVE', id: { not: id } },
+        include: { images: { orderBy: { position: 'asc' }, take: 1 } },
+        orderBy: { createdAt: 'desc' },
+        take: 3,
+    });
+    relatedListings = dbRelated.map((r: any) => ({
+        id: r.id, title: r.title, price: r.price / 100,
+        location: [r.postalCode, r.city].filter(Boolean).join(' '),
+        image: r.images[0]?.url || 'https://placehold.co/400x300/1a1a2e/c8973a?text=Kein+Bild',
+    }));
+}
+if (relatedListings.length < 3) {
+    const staticRelated = staticListings
+        .filter((l) => l.id !== listing!.id && l.category === listing!.category)
+        .slice(0, 3 - relatedListings.length)
+        .map((l) => ({ id: l.id, title: l.title, price: l.price, location: l.location, image: l.image }));
+    relatedListings = [...relatedListings, ...staticRelated];
+}
 ---
 
 <BaseLayout title={`${listing.title} – Ehren-Deal`}>
     <Header />
-    <main class="container detail-wrap">
-        <!-- Images -->
-        <div class="images-section">
-            {
-                listing.images?.length > 0 ? (
-                    listing.images.map((img: any, i: number) => (
-                        <img
-                            src={img.url}
-                            alt={`${listing.title} Bild ${i + 1}`}
-                            class={`detail-img ${i === 0 ? "main-img" : "thumb"}`}
-                            loading={i === 0 ? "eager" : "lazy"}
-                        />
-                    ))
-                ) : (
-                    <div class="no-img">Kein Bild vorhanden</div>
-                )
-            }
-        </div>
 
-        <div class="detail-body">
-            <!-- Main info -->
-            <div class="detail-main">
-                <div class="badge-row">
-                    <span class="badge">{listing.category}</span>
-                    {
-                        listing.treuhand && (
-                            <span class="badge badge-success">🔒 Treuhand</span>
-                        )
-                    }
-                    {
-                        listing.condition && (
-                            <span class="badge">{listing.condition}</span>
-                        )
-                    }
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20">
+
+        <!-- 1. Breadcrumb -->
+        <nav class="flex items-center gap-2 text-sm text-foreground/50 mb-8 flex-wrap font-condensed tracking-wide uppercase text-xs">
+            <a href="/" class="hover:text-primary transition-colors">Startseite</a>
+            <span class="text-foreground/25">›</span>
+            <a href={`/kategorie/${listing.category.toLowerCase()}`} class="hover:text-primary transition-colors">{listing.category}</a>
+            <span class="text-foreground/25">›</span>
+            <span class="text-foreground/70 normal-case tracking-normal text-sm font-body">{listing.title}</span>
+        </nav>
+
+        <!-- 2. Main Grid: Gallery + Kaufbox -->
+        <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
+
+            <!-- LEFT COLUMN -->
+            <div class="space-y-6">
+
+                <!-- 2a. Image Gallery -->
+                <div>
+                    <div class="relative rounded-default overflow-hidden bg-secondary aspect-[4/3]">
+                        <img src={allImages[0]?.url || listing.image} alt={listing.title} class="w-full h-full object-cover" id="mainImg" />
+                        {listing.condition === "Neu" && (
+                            <span class="absolute top-4 left-4 bg-success text-white text-xs font-condensed font-medium uppercase tracking-wider px-3 py-1 rounded-default">Neu</span>
+                        )}
+                        {listing.treuhandAvailable && (
+                            <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-success/90 to-transparent text-white px-4 pb-3 pt-8 text-sm font-semibold flex items-center gap-2">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                Käuferschutz aktiv
+                            </div>
+                        )}
+                        {allImages.length > 1 && (
+                            <button class="gallery-nav left-3" id="galleryPrev" aria-label="Vorheriges Bild">‹</button>
+                        )}
+                        {allImages.length > 1 && (
+                            <button class="gallery-nav right-3" id="galleryNext" aria-label="Nächstes Bild">›</button>
+                        )}
+                        <div class="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-3 py-0.5 rounded-full z-10" id="imgCounter">
+                            {allImages.length > 1 ? `1 / ${allImages.length}` : ''}
+                        </div>
+                    </div>
+                    {allImages.length > 1 && (
+                        <div class="flex gap-2 mt-3 overflow-x-auto pb-2">
+                            {allImages.map((img, i) => (
+                                <button
+                                    class={`img-thumb shrink-0 w-[72px] h-[54px] rounded-default overflow-hidden border-2 ${i === 0 ? 'border-primary' : 'border-transparent'} bg-secondary p-0 cursor-pointer transition-colors hover:border-foreground/30`}
+                                    data-index={i}
+                                    data-url={img.url}
+                                >
+                                    <img src={img.url} alt={`Bild ${i + 1}`} class="w-full h-full object-cover" />
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
-                <h1 class="detail-title">{listing.title}</h1>
-                <div class="detail-price">{priceEur}</div>
-                <p class="detail-loc">📍 {location}</p>
-                <div class="detail-desc">{listing.description}</div>
 
-                <a
-                    href={`/nachrichten?listing=${listing.id}&seller=${seller.id}`}
-                    class="btn btn-primary btn-lg cta-btn"
-                >
-                    Verkäufer kontaktieren
-                </a>
-                {
-                    listing.treuhand && (
-                        <a
-                            href={`/checkout/${listing.id}`}
-                            class="btn btn-secondary btn-lg cta-btn"
-                        >
-                            Sicher kaufen (Treuhand)
-                        </a>
-                    )
-                }
+                <!-- 2b. Beschreibung -->
+                <div class="bg-secondary/30 border border-foreground/10 rounded-default p-6">
+                    <h2 class="font-headings text-lg font-semibold mb-4">Beschreibung</h2>
+                    <p class="text-foreground/70 text-sm leading-relaxed whitespace-pre-line">{listing.description}</p>
+                </div>
+
+                <!-- 2c. Detailtabelle -->
+                <div class="bg-secondary/30 border border-foreground/10 rounded-default p-6">
+                    <h2 class="font-headings text-lg font-semibold mb-4">Details</h2>
+                    <div class="flex flex-col gap-3">
+                        <div class="detail-row"><span class="text-foreground/60 font-medium text-sm">Zustand</span>
+                            <span class={`text-xs font-condensed font-medium uppercase tracking-wider px-2.5 py-0.5 rounded-default border ${listing.condition === 'Neu' ? 'bg-success/10 text-success border-success/20' : listing.condition === 'Sehr gut' ? 'bg-primary/10 text-primary border-primary/20' : 'bg-warning/10 text-warning border-warning/20'}`}>{listing.condition}</span>
+                        </div>
+                        <div class="detail-row"><span class="text-foreground/60 font-medium text-sm">Kategorie</span><span class="text-foreground font-medium text-sm">{listing.category}</span></div>
+                        <div class="detail-row"><span class="text-foreground/60 font-medium text-sm">Standort</span><span class="text-foreground font-medium text-sm">{listing.location}</span></div>
+                        <div class="detail-row"><span class="text-foreground/60 font-medium text-sm">Eingestellt</span><span class="text-foreground font-medium text-sm">{listing.postedAt}</span></div>
+                        <div class="detail-row"><span class="text-foreground/60 font-medium text-sm">Aufrufe</span><span class="text-foreground font-medium text-sm">{listing.viewCount ?? 0}</span></div>
+                        <div class="detail-row border-none pb-0"><span class="text-foreground/60 font-medium text-sm">Inserat-ID</span>
+                            <span class="text-foreground/40 text-xs font-mono">{listing.id.length > 12 ? listing.id.slice(-8) : listing.id}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2d. Sicherheitstipps -->
+                <div class="bg-warning/[.04] border border-warning/20 rounded-default p-6">
+                    <div class="flex items-center gap-2 text-warning text-sm font-semibold mb-4">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        Sicherheitstipps für Käufer
+                    </div>
+                    <ul class="flex flex-col gap-3">
+                        <li class="text-sm text-foreground/60 pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-warning">Kaufe nur über unser <strong class="text-foreground/80">Treuhandkonto</strong> – nie direkt via PayPal Freunde & Familie</li>
+                        <li class="text-sm text-foreground/60 pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-warning">Triff Verkäufer <strong class="text-foreground/80">persönlich an öffentlichen Orten</strong> oder nutze Versand mit Treuhand</li>
+                        <li class="text-sm text-foreground/60 pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-warning">Lass dich <strong class="text-foreground/80">nie zu schnellen Entscheidungen drängen</strong> – seriöse Verkäufer haben Zeit</li>
+                        <li class="text-sm text-foreground/60 pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-warning">Kaufe <strong class="text-foreground/80">keine Codes oder Geschenkgutscheine</strong> als Zahlungsmittel</li>
+                        <li class="text-sm text-foreground/60 pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-warning">Melde verdächtige Anzeigen sofort über den <strong class="text-foreground/80">"Melden"-Button</strong></li>
+                    </ul>
+                </div>
             </div>
 
-            <!-- Seller card -->
-            <aside class="seller-card">
-                <div class="seller-header">Verkäufer</div>
-                <div class="seller-name">
-                    {seller.firstName}
-                    {seller.lastName?.[0]}.
-                    {
-                        seller.idVerified && (
-                            <span
-                                class="badge badge-primary"
-                                title="KYC verifiziert"
-                            >
-                                ✓ Verifiziert
-                            </span>
-                        )
-                    }
+            <!-- RIGHT COLUMN: Kaufbox + Sidebar -->
+            <div class="space-y-4 lg:sticky lg:top-24">
+
+                <!-- Kaufbox -->
+                <div class="bg-secondary/40 border border-foreground/[.15] rounded-default p-6 backdrop-blur-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-3xl font-black tracking-tight text-foreground">{listing.price.toLocaleString("de-DE")} €</span>
+                        {listing.treuhandAvailable && (
+                            <span class="trust-badge text-[0.65rem]">Treuhand</span>
+                        )}
+                    </div>
+                    <div class="flex items-center gap-2 text-sm text-foreground/60 mb-5">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        {listing.location}
+                        <span class="ml-auto text-xs bg-secondary px-2 py-0.5 rounded-full">{listing.postedAt}</span>
+                    </div>
+
+                    {listing.treuhandAvailable && (
+                        <div class="bg-success/[.08] border border-success/25 rounded-default p-4 mb-4">
+                            <div class="flex items-center gap-2 text-success text-sm font-bold mb-1">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                                Käuferschutz verfügbar
+                            </div>
+                            <p class="text-xs text-foreground/60 leading-relaxed">Dein Geld liegt sicher auf dem Treuhandkonto und wird erst nach bestätigtem Warenerhalt freigegeben.</p>
+                        </div>
+                    )}
+
+                    <div class="flex flex-col gap-3 mb-3">
+                        <a href={`/nachrichten?listing=${listing.id}`} class="btn-primary w-full flex items-center justify-center gap-2 no-underline">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            Verkäufer kontaktieren
+                        </a>
+                        {listing.treuhandAvailable && (
+                            <a href={`/checkout/${listing.id}`} class="btn-outline w-full flex items-center justify-center gap-2 no-underline">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                Sicher kaufen (Treuhand)
+                            </a>
+                        )}
+                        <button class="inline-flex items-center justify-center gap-2 px-4 py-2 text-foreground/50 text-sm hover:text-foreground transition-colors">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                            Merken
+                        </button>
+                    </div>
+
+                    <div class="flex justify-center">
+                        <button class="text-danger text-xs flex items-center gap-1 hover:underline">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                            Anzeige melden
+                        </button>
+                    </div>
                 </div>
-                <div class="seller-meta">
-                    Dabei seit {
-                        new Date(seller.createdAt).toLocaleDateString("de-DE", {
-                            month: "long",
-                            year: "numeric",
-                        })
-                    }
+
+                <!-- Sicherheits-Score -->
+                <div class="bg-secondary/30 border border-foreground/10 rounded-default p-5">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-sm font-bold">Sicherheits-Score</span>
+                        <span class={`text-[0.65rem] font-condensed font-medium uppercase tracking-wider px-2 py-0.5 rounded-default border ${securityScore >= 80 ? 'bg-success/10 text-success border-success/20' : securityScore >= 50 ? 'bg-warning/10 text-warning border-warning/20' : 'bg-danger/10 text-danger border-danger/20'}`}>{securityLabel}</span>
+                    </div>
+                    <div class="bg-secondary rounded-full h-2 mb-2 overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-success to-emerald-400 rounded-full transition-all duration-1000" style={`width:${securityScore}%`}></div>
+                    </div>
+                    <div class="flex justify-between text-xs text-foreground/50 mb-4">
+                        <span>Risiko</span>
+                        <span class="font-semibold" style={`color:${securityColor}`}>{securityScore} / 100</span>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        {[
+                            { ok: listing.sellerVerified, yes: 'Verifizierter Verkäufer', no: 'Verkäufer nicht verifiziert' },
+                            { ok: listing.sellerKYC, yes: 'KYC-Identität bestätigt', no: 'Keine KYC-Verifizierung' },
+                            { ok: listing.treuhandAvailable, yes: 'Treuhandkonto verfügbar', no: 'Kein Treuhandschutz' },
+                        ].map((c) => (
+                            <div class={`flex items-center gap-2 text-xs ${c.ok ? 'text-success' : 'text-warning'}`}>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    {c.ok ? <polyline points="20 6 9 17 4 12"/> : <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>}
+                                </svg>
+                                {c.ok ? c.yes : c.no}
+                            </div>
+                        ))}
+                    </div>
                 </div>
-                <div class="seller-stats">
-                    {
-                        seller.emailVerified && (
-                            <span class="verify-chip">✉ E-Mail</span>
-                        )
-                    }
-                    {
-                        seller.idVerified && (
-                            <span class="verify-chip verified">🪪 ID</span>
-                        )
-                    }
+
+                <!-- Verkäufer-Karte -->
+                <div class="bg-secondary/30 border border-foreground/10 rounded-default p-5">
+                    <h3 class="text-xs font-bold text-foreground/50 uppercase tracking-[.06em] mb-4 font-condensed">Über den Verkäufer</h3>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-xl font-bold text-background shrink-0">
+                            {listing.sellerName.charAt(0)}
+                        </div>
+                        <div>
+                            <div class="font-bold mb-1">{listing.sellerName}</div>
+                            <div class="flex gap-1 flex-wrap">
+                                {listing.sellerKYC && (<span class="trust-badge text-[0.6rem] py-0.5 px-2">KYC</span>)}
+                                {listing.sellerVerified && (<span class="trust-badge text-[0.6rem] py-0.5 px-2">Bestätigt</span>)}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-t border-foreground/10 pt-3 flex flex-col gap-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-primary text-base">{stars}</span>
+                            <span class="text-sm font-semibold">{listing.sellerRating > 0 ? listing.sellerRating.toFixed(1) : '–'}</span>
+                        </div>
+                        <span class="text-xs text-foreground/50">Mitglied seit {sellerMemberSince} · {sellerListingCount} {sellerListingCount === 1 ? 'Anzeige' : 'Anzeigen'}</span>
+                    </div>
+                    <a href={sellerId ? `/profil/${sellerId}` : '/profil'} class="btn-outline w-full flex items-center justify-center mt-4 text-xs no-underline">
+                        Profil ansehen
+                    </a>
                 </div>
-            </aside>
+            </div>
         </div>
+
+        <!-- 3. Ähnliche Anzeigen -->
+        {relatedListings.length > 0 && (
+            <section class="mt-16">
+                <h2 class="font-headings text-2xl font-light mb-6">Ähnliche Anzeigen</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {relatedListings.map((l) => (
+                        <a href={`/listing/${l.id}`} class="group block bg-secondary/40 border border-foreground/10 rounded-default overflow-hidden hover:border-primary/20 transition-all duration-300 no-underline">
+                            <img src={l.image} alt={l.title} class="w-full aspect-video object-cover" />
+                            <div class="p-4">
+                                <div class="text-sm font-semibold text-foreground mb-1 line-clamp-2">{l.title}</div>
+                                <div class="text-lg font-extrabold text-primary mb-1">{l.price.toLocaleString("de-DE")} €</div>
+                                <div class="text-xs text-foreground/50">{l.location}</div>
+                            </div>
+                        </a>
+                    ))}
+                </div>
+            </section>
+        )}
     </main>
+
     <Footer />
 </BaseLayout>
 
 <style>
-    .detail-wrap { @apply py-10 pb-16 bg-background min-h-screen text-foreground font-body max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
+    .gallery-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0,0,0,0.5);
+        color: white;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 9999px;
+        font-size: 1.4rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+        z-index: 5;
+    }
+    .gallery-nav:hover { background: rgba(0,0,0,0.75); }
 
-    .images-section { @apply flex flex-wrap gap-3 mb-8; }
-    .detail-img { @apply object-cover border border-foreground/[.20]; }
-    .main-img { @apply w-full max-h-[500px]; }
-    .thumb { @apply w-[120px] h-[90px] cursor-pointer opacity-60 hover:opacity-100 transition-opacity duration-200 hover:border-primary/30; }
-    .no-img { @apply w-full h-[300px] bg-secondary/50 flex items-center justify-center text-foreground/75 border border-dashed border-foreground/[.20]; }
-
-    .detail-body { @apply grid grid-cols-1 md:grid-cols-[1fr_300px] gap-8 items-start; }
-
-    .badge-row { @apply flex flex-wrap gap-2 mb-4; }
-    .badge { @apply inline-flex items-center px-2 py-0.5 text-[.65rem] font-condensed font-medium uppercase tracking-wider bg-secondary/60 text-foreground/80; }
-    .badge-success { @apply bg-primary/10 text-primary border border-primary/15; }
-    .badge-primary { @apply bg-primary/10 text-primary border border-primary/15; }
-
-    .detail-title { @apply text-3xl sm:text-4xl font-headings font-light text-foreground mb-2 leading-tight; }
-    .detail-price { @apply text-2xl font-headings font-light text-primary mb-3; }
-    .detail-loc { @apply text-foreground/75 mb-6 font-light text-sm flex items-center gap-1; }
-    .detail-desc { @apply text-foreground/75 leading-relaxed whitespace-pre-wrap mb-8 text-base font-light; }
-
-    .cta-btn { @apply w-full justify-center mb-3 transition-all duration-300; }
-    .btn-lg { @apply px-8 py-3.5 text-sm; }
-    .btn-primary { @apply inline-flex items-center justify-center font-condensed font-medium uppercase tracking-wider text-primary-foreground bg-primary hover:bg-primary-focus; }
-    .btn-secondary { @apply inline-flex items-center justify-center font-condensed font-medium uppercase tracking-wider text-foreground/80 bg-secondary hover:bg-secondary/70 border border-foreground/[.22]; }
-
-    .seller-card { @apply bg-secondary/40 border border-foreground/[.20] p-6 sticky top-24; }
-    .seller-header { @apply text-[.65rem] font-condensed font-medium uppercase tracking-[.1em] text-foreground/80 mb-4; }
-    .seller-name { @apply font-headings font-light text-xl mb-1 flex items-center gap-2 text-foreground; }
-    .seller-meta { @apply text-sm text-foreground/75 mb-4 font-light; }
-
-    .seller-stats { @apply flex flex-wrap gap-2; }
-    .verify-chip { @apply text-[.65rem] px-2 py-0.5 bg-secondary/60 text-foreground/75 font-condensed font-medium uppercase tracking-wider; }
-    .verify-chip.verified { @apply border border-primary/20 text-primary bg-primary/5; }
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(232,228,222,0.08);
+        font-size: 0.875rem;
+    }
+    .detail-row:last-child {
+        border: none;
+        padding: 0;
+    }
 </style>
+
+<script>
+    // ── Image Gallery ──
+    const mainImg = document.getElementById("mainImg") as HTMLImageElement | null;
+    const thumbs = document.querySelectorAll<HTMLButtonElement>(".img-thumb");
+    const prevBtn = document.getElementById("galleryPrev");
+    const nextBtn = document.getElementById("galleryNext");
+    const counter = document.getElementById("imgCounter");
+    const urls = Array.from(thumbs).map((t) => t.dataset.url || "");
+    let currentIdx = 0;
+
+    function showImage(idx: number) {
+        if (!mainImg || urls.length === 0) return;
+        currentIdx = (idx + urls.length) % urls.length;
+        mainImg.src = urls[currentIdx];
+        thumbs.forEach((t, i) => t.classList.toggle("border-primary", i === currentIdx));
+        thumbs.forEach((t, i) => t.classList.toggle("border-transparent", i !== currentIdx));
+        if (counter && urls.length > 1) counter.textContent = `${currentIdx + 1} / ${urls.length}`;
+    }
+
+    thumbs.forEach((t) => t.addEventListener("click", () => showImage(Number(t.dataset.index))));
+    prevBtn?.addEventListener("click", () => showImage(currentIdx - 1));
+    nextBtn?.addEventListener("click", () => showImage(currentIdx + 1));
+
+    document.addEventListener("keydown", (e) => {
+        if (urls.length <= 1) return;
+        if (e.key === "ArrowLeft") showImage(currentIdx - 1);
+        if (e.key === "ArrowRight") showImage(currentIdx + 1);
+    });
+</script>
