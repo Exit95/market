@@ -1,0 +1,503 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<BaseLayout title="Sicher kaufen – Ehren-Deal">
+    <Header />
+    <main class="min-h-screen">
+
+        <!-- Hero -->
+        <section class="pt-24 pb-16 text-center">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <p class="font-condensed text-[.7rem] font-medium tracking-[.2em] uppercase text-primary mb-5">Sicher kaufen</p>
+                <h1 class="font-headings font-light text-4xl md:text-5xl lg:text-6xl leading-[1.05] mb-4 text-foreground">
+                    Dein Kauf.<br/><em class="italic text-primary">Dein Schutz.</em>
+                </h1>
+                <hr class="gold-rule" />
+                <p class="text-sm text-foreground/80 font-light max-w-2xl mx-auto leading-relaxed mb-6">
+                    Auf Ehren-Deal kaufst du nie ungeschutzt. Vom ersten Klick bis zur Ubergabe steht dir unser mehrschichtiges Sicherheitssystem zur Seite: Treuhandkonto, verifizierte Identitaten, KI-Betrugsschutz und ein verbindlicher Ehren-Handschlag.
+                </p>
+                <div class="flex flex-wrap justify-center gap-3 mt-8">
+                    <a href="#ablauf" class="btn-outline text-[.72rem] py-1.5 px-4">Kaufablauf</a>
+                    <a href="#treuhand" class="btn-outline text-[.72rem] py-1.5 px-4">Treuhandkonto</a>
+                    <a href="#kaeuferschutz" class="btn-outline text-[.72rem] py-1.5 px-4">Kauferschutz</a>
+                    <a href="#verifizierung" class="btn-outline text-[.72rem] py-1.5 px-4">Verifizierung</a>
+                    <a href="#ki-schutz" class="btn-outline text-[.72rem] py-1.5 px-4">KI-Schutz</a>
+                    <a href="#garantie" class="btn-outline text-[.72rem] py-1.5 px-4">Geld-zuruck-Garantie</a>
+                    <a href="#faq" class="btn-outline text-[.72rem] py-1.5 px-4">FAQ</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trust Pillars -->
+        <section class="py-16 border-t border-foreground/[.20]">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-10">
+                    <p class="font-condensed text-[.7rem] font-medium tracking-[.2em] uppercase text-primary/70 mb-4">Warum Ehren-Deal</p>
+                    <h2 class="font-headings font-light text-2xl md:text-3xl leading-tight mb-3 text-foreground">Vier Saulen deiner Sicherheit</h2>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <div class="p-6 border border-primary/20 bg-primary/[.03] hover:border-primary/30 transition-all duration-500 text-center">
+                        <svg class="w-6 h-6 text-primary mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        <h3 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-foreground/80 mb-2">Treuhandkonto</h3>
+                        <p class="text-sm text-foreground/80 font-light leading-relaxed">Dein Geld wird erst nach Warenerhalt freigegeben. Kein Risiko.</p>
+                    </div>
+                    <div class="p-6 border border-foreground/[.20] bg-secondary/40 hover:border-primary/20 transition-all duration-500 text-center">
+                        <svg class="w-6 h-6 text-primary/60 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <h3 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-foreground/80 mb-2">Verifizierte Verkaufer</h3>
+                        <p class="text-sm text-foreground/80 font-light leading-relaxed">Jeder Verkaufer ist per KYC identifiziert. Keine anonymen Profile.</p>
+                    </div>
+                    <div class="p-6 border border-foreground/[.20] bg-secondary/40 hover:border-primary/20 transition-all duration-500 text-center">
+                        <svg class="w-6 h-6 text-primary/60 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                        <h3 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-foreground/80 mb-2">KI-Betrugsschutz</h3>
+                        <p class="text-sm text-foreground/80 font-light leading-relaxed">Algorithmen analysieren Preise, Anzeigen und Nachrichten in Echtzeit.</p>
+                    </div>
+                    <div class="p-6 border border-foreground/[.20] bg-secondary/40 hover:border-primary/20 transition-all duration-500 text-center">
+                        <svg class="w-6 h-6 text-primary/60 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M7 11l5-5 5 5M7 17l5-5 5 5"/></svg>
+                        <h3 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-foreground/80 mb-2">Ehren-Handschlag</h3>
+                        <p class="text-sm text-foreground/80 font-light leading-relaxed">Verbindliche Vereinbarung zwischen Kaufer und Verkaufer.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- KAUFABLAUF -->
+        <section id="ablauf" class="py-20 border-t border-foreground/[.20]">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+                    <div>
+                        <p class="font-condensed text-[.7rem] font-medium tracking-[.2em] uppercase text-primary mb-4">Schritt fur Schritt</p>
+                        <h2 class="font-headings font-light text-2xl md:text-3xl leading-tight mb-4 text-foreground">So kaufst du sicher auf Ehren-Deal</h2>
+                        <p class="text-sm text-foreground/80 font-light leading-relaxed mb-8">
+                            Jeder Kauf auf Ehren-Deal folgt einem klaren, geschutzten Ablauf. Von der Kontaktaufnahme bis zur Bewertung ist jeder Schritt dokumentiert und abgesichert.
+                        </p>
+
+                        <div class="flex flex-col gap-5">
+                            <div class="flex gap-4 items-start">
+                                <div class="w-8 h-8 border border-primary/30 flex items-center justify-center text-xs font-condensed text-primary flex-shrink-0">1</div>
+                                <div>
+                                    <strong class="block text-sm font-medium text-foreground/80 mb-1">Angebot finden</strong>
+                                    <p class="text-sm text-foreground/80 font-light leading-relaxed">Durchsuche verifizierte Angebote. Achte auf das KYC-Badge und den Ehren-Score des Verkaufers. Filter nach Kategorie, Preis und Standort.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="w-8 h-8 border border-primary/30 flex items-center justify-center text-xs font-condensed text-primary flex-shrink-0">2</div>
+                                <div>
+                                    <strong class="block text-sm font-medium text-foreground/80 mb-1">Verkaufer kontaktieren</strong>
+                                    <p class="text-sm text-foreground/80 font-light leading-relaxed">Nutze den integrierten Messenger. Alle Nachrichten werden durch den KI-Betrugsfilter geschutzt. Klare Fragen, faire Verhandlung.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="w-8 h-8 border border-primary/30 flex items-center justify-center text-xs font-condensed text-primary flex-shrink-0">3</div>
+                                <div>
+                                    <strong class="block text-sm font-medium text-foreground/80 mb-1">Ehren-Handschlag bestatigen</strong>
+                                    <p class="text-sm text-foreground/80 font-light leading-relaxed">Beide Parteien bestatigen den Deal verbindlich. Preis, Zustand und Ubergabemethode werden festgelegt. Kein Zuruckrudern.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="w-8 h-8 border border-primary/30 flex items-center justify-center text-xs font-condensed text-primary flex-shrink-0">4</div>
+                                <div>
+                                    <strong class="block text-sm font-medium text-foreground/80 mb-1">Sicher bezahlen</strong>
+                                    <p class="text-sm text-foreground/80 font-light leading-relaxed">Bei Versand: Zahlung auf das Treuhandkonto. Bei lokaler Ubergabe: Bezahlung nach Prufung der Ware. Beides vollstandig abgesichert.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="w-8 h-8 border border-primary/30 flex items-center justify-center text-xs font-condensed text-primary flex-shrink-0">5</div>
+                                <div>
+                                    <strong class="block text-sm font-medium text-foreground/80 mb-1">Ware erhalten und bestatigen</strong>
+                                    <p class="text-sm text-foreground/80 font-light leading-relaxed">Prufe die Ware. Bestatige den Erhalt auf der Plattform. Erst dann wird das Geld an den Verkaufer freigegeben.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="w-8 h-8 border border-primary/30 flex items-center justify-center text-xs font-condensed text-primary flex-shrink-0">6</div>
+                                <div>
+                                    <strong class="block text-sm font-medium text-foreground/80 mb-1">Bewerten</strong>
+                                    <p class="text-sm text-foreground/80 font-light leading-relaxed">Bewerte den Verkaufer ehrlich. Deine Bewertung hilft der Community und fliesst in den Ehren-Score ein.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:sticky lg:top-[100px] space-y-6">
+                        <div class="border border-primary/20 bg-primary/[.03] p-6">
+                            <h3 class="font-condensed font-semibold text-sm uppercase tracking-[.12em] text-primary mb-4">Dein Vorteil als Kaufer</h3>
+                            <div class="space-y-4">
+                                <div class="flex gap-3 items-start">
+                                    <svg class="w-4 h-4 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    <div>
+                                        <strong class="text-sm text-foreground/80 block mb-0.5">100% Geld-zuruck-Garantie</strong>
+                                        <p class="text-xs text-foreground/75 font-light leading-relaxed">Ware nicht wie beschrieben? Volle Ruckerstattung uber das Treuhandkonto.</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3 items-start">
+                                    <svg class="w-4 h-4 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    <div>
+                                        <strong class="text-sm text-foreground/80 block mb-0.5">Verifizierte Gegenseite</strong>
+                                        <p class="text-xs text-foreground/75 font-light leading-relaxed">Du weisst immer, mit wem du handelst. KYC-Verifizierung ist Pflicht.</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3 items-start">
+                                    <svg class="w-4 h-4 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    <div>
+                                        <strong class="text-sm text-foreground/80 block mb-0.5">KI-geschutzter Messenger</strong>
+                                        <p class="text-xs text-foreground/75 font-light leading-relaxed">Verdachtige Nachrichten werden in Echtzeit erkannt und gewarnt.</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3 items-start">
+                                    <svg class="w-4 h-4 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    <div>
+                                        <strong class="text-sm text-foreground/80 block mb-0.5">Streitschlichtung inklusive</strong>
+                                        <p class="text-xs text-foreground/75 font-light leading-relaxed">Unser Support-Team vermittelt bei Problemen. Fair und transparent.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TREUHAND -->
+        <section id="treuhand" class="py-20 border-t border-foreground/[.20]">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <p class="font-condensed text-[.7rem] font-medium tracking-[.2em] uppercase text-primary/70 mb-4">Finanzielle Sicherheit</p>
+                    <h2 class="font-headings font-light text-2xl md:text-3xl leading-tight mb-3 text-foreground">Das Ehren-Deal Treuhandkonto</h2>
+                    <p class="text-sm text-foreground/80 font-light max-w-2xl mx-auto leading-relaxed">
+                        Dein Geld ist nie in Gefahr. Das Treuhandkonto ist ein neutraler Zwischenspeicher, der beide Seiten schutzt.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div class="p-6 border border-foreground/[.12] bg-secondary/40 text-center">
+                        <div class="w-12 h-12 border border-primary/25 flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                        </div>
+                        <h3 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-foreground/80 mb-2">Kaufer zahlt</h3>
+                        <p class="text-xs text-foreground/70 font-light leading-relaxed">Der Kaufer uberweist den vereinbarten Betrag auf das Ehren-Deal Treuhandkonto. Stripe oder Bankuberweisung.</p>
+                    </div>
+                    <div class="p-6 border border-primary/20 bg-primary/[.03] text-center">
+                        <div class="w-12 h-12 border border-primary/25 flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </div>
+                        <h3 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-primary mb-2">Geld wird gehalten</h3>
+                        <p class="text-xs text-foreground/70 font-light leading-relaxed">Das Geld wird sicher verwahrt. Weder Kaufer noch Verkaufer haben Zugriff. Ehren-Deal garantiert die Verwaltung.</p>
+                    </div>
+                    <div class="p-6 border border-foreground/[.12] bg-secondary/40 text-center">
+                        <div class="w-12 h-12 border border-primary/25 flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        </div>
+                        <h3 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-foreground/80 mb-2">Freigabe nach Erhalt</h3>
+                        <p class="text-xs text-foreground/70 font-light leading-relaxed">Erst wenn der Kaufer den Erhalt bestatigt und die Ware gepruft hat, wird das Geld an den Verkaufer freigegeben.</p>
+                    </div>
+                </div>
+                <div class="border border-foreground/[.12] bg-secondary/40 p-6 max-w-3xl mx-auto">
+                    <h3 class="font-condensed font-semibold text-sm uppercase tracking-[.12em] text-primary mb-4 text-center">Was passiert im Streitfall?</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-foreground/80 font-light leading-relaxed">
+                        <div class="flex gap-3 items-start">
+                            <span class="text-primary font-condensed text-xs mt-0.5">01</span>
+                            <p>Kaufer meldet ein Problem innerhalb von 48 Stunden nach Erhalt.</p>
+                        </div>
+                        <div class="flex gap-3 items-start">
+                            <span class="text-primary font-condensed text-xs mt-0.5">02</span>
+                            <p>Ehren-Deal pausiert die Auszahlung und kontaktiert beide Parteien.</p>
+                        </div>
+                        <div class="flex gap-3 items-start">
+                            <span class="text-primary font-condensed text-xs mt-0.5">03</span>
+                            <p>Unser Mediation-Team pruft Beweise (Fotos, Chat-Verlauf, Tracking).</p>
+                        </div>
+                        <div class="flex gap-3 items-start">
+                            <span class="text-primary font-condensed text-xs mt-0.5">04</span>
+                            <p>Entscheidung innerhalb von 5 Werktagen. Ruckerstattung oder Freigabe.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- KÄUFERSCHUTZ -->
+        <section id="kaeuferschutz" class="py-20 border-t border-foreground/[.20]">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+                    <div>
+                        <p class="font-condensed text-[.7rem] font-medium tracking-[.2em] uppercase text-primary mb-4">Rundum geschutzt</p>
+                        <h2 class="font-headings font-light text-2xl md:text-3xl leading-tight mb-4 text-foreground">Der Ehren-Deal Kauferschutz</h2>
+                        <p class="text-sm text-foreground/80 font-light leading-relaxed mb-6">
+                            Unser Kauferschutz geht weit uber eine einfache Geld-zuruck-Garantie hinaus. Er ist ein umfassendes System, das dich vor, wahrend und nach dem Kauf schutzt.
+                        </p>
+                        <div class="space-y-4">
+                            <div class="flex gap-3 items-start">
+                                <svg class="w-4 h-4 text-primary flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                <div>
+                                    <strong class="text-sm text-foreground/80 block mb-0.5">Vor dem Kauf</strong>
+                                    <p class="text-xs text-foreground/70 font-light leading-relaxed">KI-Analyse pruft Anzeigen auf verdachtige Muster. Unrealistische Preise und bekannte Betrugsmaschen werden automatisch erkannt.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-3 items-start">
+                                <svg class="w-4 h-4 text-primary flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                <div>
+                                    <strong class="text-sm text-foreground/80 block mb-0.5">Wahrend des Kaufs</strong>
+                                    <p class="text-xs text-foreground/70 font-light leading-relaxed">Treuhandkonto sichert dein Geld. KI-geschutzter Messenger warnt bei verdachtigen Nachrichten des Verkaufers.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-3 items-start">
+                                <svg class="w-4 h-4 text-primary flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                <div>
+                                    <strong class="text-sm text-foreground/80 block mb-0.5">Nach dem Kauf</strong>
+                                    <p class="text-xs text-foreground/70 font-light leading-relaxed">48-Stunden Prufungszeitraum. Streitschlichtung durch das Ehren-Deal Mediation-Team. Volle Ruckerstattung bei berechtigten Beschwerden.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="border border-primary/20 bg-primary/[.03] p-5">
+                            <h4 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-primary mb-3">Abgedeckte Falle</h4>
+                            <ul class="space-y-2 text-xs text-foreground/75 font-light leading-relaxed">
+                                <li class="flex gap-2"><span class="text-primary">--</span> Ware nicht wie beschrieben (Zustand, Farbe, Grosse)</li>
+                                <li class="flex gap-2"><span class="text-primary">--</span> Ware nicht erhalten (Versand-Deals)</li>
+                                <li class="flex gap-2"><span class="text-primary">--</span> Falschung statt Original</li>
+                                <li class="flex gap-2"><span class="text-primary">--</span> Defekte oder beschadigte Ware</li>
+                                <li class="flex gap-2"><span class="text-primary">--</span> Fehlende Teile oder Zubehor (laut Beschreibung)</li>
+                                <li class="flex gap-2"><span class="text-primary">--</span> Verkaufer verweigert die Ubergabe nach Handschlag</li>
+                            </ul>
+                        </div>
+                        <div class="border border-foreground/[.12] bg-secondary/40 p-5">
+                            <h4 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-foreground/60 mb-3">Nicht abgedeckt</h4>
+                            <ul class="space-y-2 text-xs text-foreground/60 font-light leading-relaxed">
+                                <li class="flex gap-2"><span class="text-foreground/30">--</span> Kaufer andert seine Meinung nach bestatigtem Erhalt</li>
+                                <li class="flex gap-2"><span class="text-foreground/30">--</span> Normale Gebrauchsspuren (wenn als "Gebraucht" markiert)</li>
+                                <li class="flex gap-2"><span class="text-foreground/30">--</span> Preisschwankungen nach Kaufabschluss</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VERIFIZIERUNG -->
+        <section id="verifizierung" class="py-20 border-t border-foreground/[.20]">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <p class="font-condensed text-[.7rem] font-medium tracking-[.2em] uppercase text-primary/70 mb-4">Identitat & Vertrauen</p>
+                    <h2 class="font-headings font-light text-2xl md:text-3xl leading-tight mb-3 text-foreground">KYC-Verifizierung</h2>
+                    <p class="text-sm text-foreground/80 font-light max-w-2xl mx-auto leading-relaxed">
+                        Jeder Nutzer auf Ehren-Deal wird uber ein mehrstufiges KYC-Verfahren verifiziert. Anonyme Betruger haben bei uns keine Chance.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <div class="p-5 border border-foreground/[.12] bg-secondary/40 text-center">
+                        <div class="font-condensed text-2xl text-primary/40 font-light mb-3">01</div>
+                        <h3 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-foreground/80 mb-2">E-Mail bestatigen</h3>
+                        <p class="text-xs text-foreground/60 font-light leading-relaxed">Verifizierung der E-Mail-Adresse per Bestatigungslink.</p>
+                    </div>
+                    <div class="p-5 border border-foreground/[.12] bg-secondary/40 text-center">
+                        <div class="font-condensed text-2xl text-primary/40 font-light mb-3">02</div>
+                        <h3 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-foreground/80 mb-2">Telefonnummer</h3>
+                        <p class="text-xs text-foreground/60 font-light leading-relaxed">SMS-Code an deine Handynummer. Einmalig und sicher.</p>
+                    </div>
+                    <div class="p-5 border border-primary/20 bg-primary/[.03] text-center">
+                        <div class="font-condensed text-2xl text-primary font-light mb-3">03</div>
+                        <h3 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-primary mb-2">Ausweisdokument</h3>
+                        <p class="text-xs text-foreground/70 font-light leading-relaxed">Upload von Personalausweis oder Reisepass. Automatisierte Prufung.</p>
+                    </div>
+                    <div class="p-5 border border-foreground/[.12] bg-secondary/40 text-center">
+                        <div class="font-condensed text-2xl text-primary/40 font-light mb-3">04</div>
+                        <h3 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-foreground/80 mb-2">Selfie-Abgleich</h3>
+                        <p class="text-xs text-foreground/60 font-light leading-relaxed">Biometrischer Abgleich zwischen Selfie und Ausweisfoto.</p>
+                    </div>
+                </div>
+                <div class="mt-8 text-center">
+                    <p class="text-xs text-foreground/50 font-light leading-relaxed max-w-xl mx-auto">
+                        Deine Daten werden DSGVO-konform verarbeitet und nach der Verifizierung verschlusselt gespeichert. Ehren-Deal gibt keine personlichen Daten an Dritte weiter.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- KI-SCHUTZ -->
+        <section id="ki-schutz" class="py-20 border-t border-foreground/[.20]">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+                    <div>
+                        <p class="font-condensed text-[.7rem] font-medium tracking-[.2em] uppercase text-primary mb-4">Kunstliche Intelligenz</p>
+                        <h2 class="font-headings font-light text-2xl md:text-3xl leading-tight mb-4 text-foreground">KI-gestutzte Betrugserkennung</h2>
+                        <p class="text-sm text-foreground/80 font-light leading-relaxed mb-6">
+                            Unsere Algorithmen arbeiten rund um die Uhr im Hintergrund und analysieren jede Interaktion auf der Plattform. Drei Schutzebenen sichern dein Erlebnis.
+                        </p>
+                        <div class="space-y-5">
+                            <div class="flex gap-4 items-start">
+                                <div class="w-8 h-8 border border-primary/30 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                                </div>
+                                <div>
+                                    <strong class="text-sm text-foreground/80 block mb-1">Anzeigen-Scan</strong>
+                                    <p class="text-xs text-foreground/70 font-light leading-relaxed">Jede neue Anzeige wird auf verdachtige Muster gepruft: unrealistische Preise, bekannte Betrugsformulierungen, gestohlene Bilder. Verdachtige Anzeigen werden automatisch zur manuellen Prufung markiert.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="w-8 h-8 border border-primary/30 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                                </div>
+                                <div>
+                                    <strong class="text-sm text-foreground/80 block mb-1">Chat-Uberwachung</strong>
+                                    <p class="text-xs text-foreground/70 font-light leading-relaxed">Nachrichten werden in Echtzeit auf Betrugsversuche gepruft: Aufforderungen zu externen Zahlungen, Phishing-Links, Social-Engineering-Taktiken. Sofortige Warnung an den Kaufer.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="w-8 h-8 border border-primary/30 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                </div>
+                                <div>
+                                    <strong class="text-sm text-foreground/80 block mb-1">Preis-Anomalie-Erkennung</strong>
+                                    <p class="text-xs text-foreground/70 font-light leading-relaxed">Vergleich mit Marktdurchschnittspreisen fur ahnliche Artikel. Extrem niedrige Preise werden als potenzieller Betrug markiert und erfordern zusatzliche Verifizierung.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:sticky lg:top-[100px]">
+                        <div class="border border-primary/20 bg-primary/[.03] p-6">
+                            <h3 class="font-condensed font-semibold text-sm uppercase tracking-[.12em] text-primary mb-5 text-center">Live-Schutz im Messenger</h3>
+                            <div class="space-y-3">
+                                <div class="p-3 border border-foreground/[.08] bg-[#0a0a0b]">
+                                    <p class="text-xs text-foreground/70 font-light mb-1">Verkaufer schreibt:</p>
+                                    <p class="text-sm text-foreground/80 italic">"Zahle bitte per PayPal Freunde, dann spare ich die Gebuhren..."</p>
+                                </div>
+                                <div class="p-3 border border-[#c45c5c]/30 bg-[#c45c5c]/[.06]">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <svg class="w-3.5 h-3.5 text-[#c45c5c]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                        <span class="font-condensed text-[.65rem] uppercase tracking-[.1em] text-[#c45c5c] font-semibold">KI-Warnung</span>
+                                    </div>
+                                    <p class="text-xs text-[#c45c5c]/80 font-light leading-relaxed">Verdachtige Zahlungsaufforderung erkannt. "PayPal Freunde" bietet keinen Kauferschutz. Nutze ausschliesslich das Ehren-Deal Treuhandkonto.</p>
+                                </div>
+                            </div>
+                            <p class="text-[.6rem] text-foreground/40 font-light text-center mt-4">Echtzeit-Analyse mit 500ms Debounce</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GELD-ZURÜCK-GARANTIE -->
+        <section id="garantie" class="py-20 border-t border-foreground/[.20]">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="max-w-3xl mx-auto text-center">
+                    <p class="font-condensed text-[.7rem] font-medium tracking-[.2em] uppercase text-primary/70 mb-4">Dein Versprechen</p>
+                    <h2 class="font-headings font-light text-2xl md:text-3xl leading-tight mb-4 text-foreground">100% Geld-zuruck-Garantie</h2>
+                    <p class="text-sm text-foreground/80 font-light leading-relaxed mb-8">
+                        Wenn ein Kauf uber das Treuhandkonto nicht wie vereinbart ablauft, erstattet Ehren-Deal dir den vollen Betrag. Ohne Wenn und Aber.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                    <div class="p-6 border border-foreground/[.12] bg-secondary/40 text-center">
+                        <svg class="w-6 h-6 text-primary mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        <h3 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-foreground/80 mb-2">Voller Betrag</h3>
+                        <p class="text-xs text-foreground/60 font-light leading-relaxed">Keine anteilige Ruckerstattung. Du erhaltst 100% des gezahlten Betrags zuruck.</p>
+                    </div>
+                    <div class="p-6 border border-primary/20 bg-primary/[.03] text-center">
+                        <svg class="w-6 h-6 text-primary mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <h3 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-primary mb-2">Schnelle Bearbeitung</h3>
+                        <p class="text-xs text-foreground/70 font-light leading-relaxed">Ruckerstattung innerhalb von 5 Werktagen nach Entscheidung des Mediation-Teams.</p>
+                    </div>
+                    <div class="p-6 border border-foreground/[.12] bg-secondary/40 text-center">
+                        <svg class="w-6 h-6 text-primary mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        <h3 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-foreground/80 mb-2">Transparenter Prozess</h3>
+                        <p class="text-xs text-foreground/60 font-light leading-relaxed">Jeder Schritt wird dokumentiert. Du wirst uber den Status deiner Beschwerde informiert.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq" class="py-20 border-t border-foreground/[.20]">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <p class="font-condensed text-[.7rem] font-medium tracking-[.2em] uppercase text-primary/70 mb-4">Haufig gestellte Fragen</p>
+                    <h2 class="font-headings font-light text-2xl md:text-3xl leading-tight mb-3 text-foreground">FAQ zum sicheren Kauf</h2>
+                </div>
+                <div class="space-y-4">
+                    <details class="group border border-foreground/[.12] bg-secondary/40">
+                        <summary class="p-4 cursor-pointer flex justify-between items-center text-sm text-foreground/80 font-medium hover:text-primary transition-colors">
+                            Was kostet der Kauferschutz?
+                            <span class="text-primary/50 group-open:rotate-45 transition-transform text-lg">+</span>
+                        </summary>
+                        <div class="px-4 pb-4 text-xs text-foreground/70 font-light leading-relaxed border-t border-foreground/[.08] pt-3">
+                            Der Kauferschutz ist fur Kaufer kostenlos. Bei Versand-Deals fallt eine geringe Treuhand-Gebuhr von 2.5% auf den Verkaufer an. Bei lokalen Ehren-Deals ist alles komplett kostenfrei.
+                        </div>
+                    </details>
+                    <details class="group border border-foreground/[.12] bg-secondary/40">
+                        <summary class="p-4 cursor-pointer flex justify-between items-center text-sm text-foreground/80 font-medium hover:text-primary transition-colors">
+                            Wie lange habe ich Zeit, ein Problem zu melden?
+                            <span class="text-primary/50 group-open:rotate-45 transition-transform text-lg">+</span>
+                        </summary>
+                        <div class="px-4 pb-4 text-xs text-foreground/70 font-light leading-relaxed border-t border-foreground/[.08] pt-3">
+                            Du hast 48 Stunden nach bestatigtem Erhalt der Ware, um ein Problem zu melden. In Ausnahmefallen (z.B. versteckte Mangel) kann dieser Zeitraum auf Antrag verlangert werden.
+                        </div>
+                    </details>
+                    <details class="group border border-foreground/[.12] bg-secondary/40">
+                        <summary class="p-4 cursor-pointer flex justify-between items-center text-sm text-foreground/80 font-medium hover:text-primary transition-colors">
+                            Was ist der Ehren-Handschlag?
+                            <span class="text-primary/50 group-open:rotate-45 transition-transform text-lg">+</span>
+                        </summary>
+                        <div class="px-4 pb-4 text-xs text-foreground/70 font-light leading-relaxed border-t border-foreground/[.08] pt-3">
+                            Der Ehren-Handschlag ist eine digitale, verbindliche Vereinbarung zwischen Kaufer und Verkaufer. Beide Seiten bestatigen Preis, Zustand und Ubergabemethode. Er ist die Grundlage fur den Treuhand-Schutz und kann nicht einseitig widerrufen werden.
+                        </div>
+                    </details>
+                    <details class="group border border-foreground/[.12] bg-secondary/40">
+                        <summary class="p-4 cursor-pointer flex justify-between items-center text-sm text-foreground/80 font-medium hover:text-primary transition-colors">
+                            Muss ich mich verifizieren, um zu kaufen?
+                            <span class="text-primary/50 group-open:rotate-45 transition-transform text-lg">+</span>
+                        </summary>
+                        <div class="px-4 pb-4 text-xs text-foreground/70 font-light leading-relaxed border-t border-foreground/[.08] pt-3">
+                            Ja, eine Basis-Verifizierung (E-Mail + Telefonnummer) ist fur alle Nutzer Pflicht. Fur hoherwertige Kaufe und volle Kauferschutz-Leistungen empfehlen wir die vollstandige KYC-Verifizierung mit Ausweisdokument.
+                        </div>
+                    </details>
+                    <details class="group border border-foreground/[.12] bg-secondary/40">
+                        <summary class="p-4 cursor-pointer flex justify-between items-center text-sm text-foreground/80 font-medium hover:text-primary transition-colors">
+                            Wie funktioniert die KI-Betrugserkennung?
+                            <span class="text-primary/50 group-open:rotate-45 transition-transform text-lg">+</span>
+                        </summary>
+                        <div class="px-4 pb-4 text-xs text-foreground/70 font-light leading-relaxed border-t border-foreground/[.08] pt-3">
+                            Unsere KI analysiert drei Bereiche: Anzeigeninhalte (Preise, Texte, Bilder), Chatnachrichten (verdachtige Formulierungen, Phishing-Links) und Preisanomalien (Vergleich mit Marktdurchschnitt). Verdachtige Aktivitaten werden sofort gemeldet oder blockiert.
+                        </div>
+                    </details>
+                    <details class="group border border-foreground/[.12] bg-secondary/40">
+                        <summary class="p-4 cursor-pointer flex justify-between items-center text-sm text-foreground/80 font-medium hover:text-primary transition-colors">
+                            Was passiert bei einem lokalen Ehren-Deal?
+                            <span class="text-primary/50 group-open:rotate-45 transition-transform text-lg">+</span>
+                        </summary>
+                        <div class="px-4 pb-4 text-xs text-foreground/70 font-light leading-relaxed border-t border-foreground/[.08] pt-3">
+                            Bei lokalen Deals triffst du den Verkaufer personlich. Bezahlung erfolgt nach Prufung der Ware. Der Ehren-Handschlag dokumentiert die Vereinbarung. Beide Parteien bestatigen den erfolgreichen Abschluss auf der Plattform.
+                        </div>
+                    </details>
+                    <details class="group border border-foreground/[.12] bg-secondary/40">
+                        <summary class="p-4 cursor-pointer flex justify-between items-center text-sm text-foreground/80 font-medium hover:text-primary transition-colors">
+                            Sind meine personlichen Daten sicher?
+                            <span class="text-primary/50 group-open:rotate-45 transition-transform text-lg">+</span>
+                        </summary>
+                        <div class="px-4 pb-4 text-xs text-foreground/70 font-light leading-relaxed border-t border-foreground/[.08] pt-3">
+                            Alle Daten werden DSGVO-konform verarbeitet und verschlusselt gespeichert. KYC-Dokumente werden nach erfolgreicher Verifizierung sicher archiviert und niemals an Dritte weitergegeben.
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="py-20 border-t border-foreground/[.20]">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="font-headings font-light text-2xl md:text-3xl leading-tight mb-4 text-foreground">Bereit fur deinen sicheren Kauf?</h2>
+                <p class="text-sm text-foreground/80 font-light leading-relaxed mb-8">
+                    Durchstobere verifizierte Angebote und handle mit Vertrauen. Ehren-Deal schutzt jeden Schritt.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="/kategorien" class="btn-primary text-[.72rem] py-2.5 px-6">Angebote entdecken</a>
+                    <a href="/anmelden" class="btn-outline text-[.72rem] py-2.5 px-6">Jetzt registrieren</a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    <Footer />
+</BaseLayout>
+

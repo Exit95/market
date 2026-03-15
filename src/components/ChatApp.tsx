@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Info, ShieldAlert, Paperclip, Send, CheckCircle2, ShieldCheck } from 'lucide-react';
 import * as Ably from 'ably';
 
 type User = { id: string; firstName: string; lastName: string; idVerified?: boolean };
@@ -14,7 +13,9 @@ export default function ChatApp({ currentUserId }: { currentUserId: string }) {
     const [inputText, setInputText] = useState('');
     const [fraudWarning, setFraudWarning] = useState('');
     const [showBanner, setShowBanner] = useState(true);
-    
+    const [searchQuery, setSearchQuery] = useState('');
+    const [showSidebar, setShowSidebar] = useState(true);
+
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const channelRef = useRef<Ably.RealtimeChannel | null>(null);
     const ablyRef = useRef<Ably.Realtime | null>(null);
@@ -144,110 +145,185 @@ export default function ChatApp({ currentUserId }: { currentUserId: string }) {
         }
     };
 
+    // Filter conversations by search
+    const filteredConversations = conversations.filter(conv => {
+        if (!searchQuery.trim()) return true;
+        const partner = conv.buyerId === currentUserId ? conv.seller : conv.buyer;
+        const q = searchQuery.toLowerCase();
+        return (
+            partner?.firstName?.toLowerCase().includes(q) ||
+            partner?.lastName?.toLowerCase().includes(q) ||
+            conv.listing.title.toLowerCase().includes(q)
+        );
+    });
+
     return (
-        <div className="flex h-full w-full bg-white divide-x divide-slate-200">
-            {/* Sidebar */}
-            <aside className="w-80 flex flex-col flex-shrink-0 bg-slate-50 relative z-10 hidden md:flex">
-                <div className="p-5 border-b border-slate-200 bg-white">
-                    <h2 className="text-lg font-bold text-slate-800">Meine Chats</h2>
-                </div>
-                <div className="p-4 border-b border-slate-200">
-                    <div className="relative bg-white border border-slate-300 rounded-lg shadow-sm flex items-center px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-[var(--ehren-primary)] focus-within:border-[var(--ehren-primary)]">
-                        <Search className="w-4 h-4 text-slate-400 mr-2" />
-                        <input type="text" placeholder="Chats durchsuchen..." className="w-full bg-transparent outline-none" />
+        <div className="flex h-full w-full" style={{ background: '#0a0a0b' }}>
+            {/* ── Sidebar ── */}
+            <aside className={`w-full md:w-[340px] flex flex-col flex-shrink-0 border-r border-[#e8e4de]/[.12] ${activeConvId && !showSidebar ? 'hidden md:flex' : 'flex'}`}>
+                {/* Sidebar Header */}
+                <div className="p-5 border-b border-[#e8e4de]/[.12]">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 style={{ fontFamily: '"Cormorant Garamond", Georgia, serif', fontWeight: 300, fontSize: '1.5rem', color: '#e8e4de' }}>
+                            Nachrichten
+                        </h2>
+                        <span style={{ fontFamily: '"Barlow Condensed", sans-serif', fontSize: '.65rem', fontWeight: 500, letterSpacing: '.1em', textTransform: 'uppercase' as const, color: '#c8973a', padding: '2px 8px', border: '1px solid rgba(200,151,58,.25)' }}>
+                            {conversations.length} {conversations.length === 1 ? 'Chat' : 'Chats'}
+                        </span>
+                    </div>
+                    <div className="relative flex items-center" style={{ border: '1px solid rgba(232,228,222,.15)', background: 'rgba(232,228,222,.04)', padding: '8px 12px' }}>
+                        <svg className="w-4 h-4 mr-2" style={{ color: '#6b6b6b' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Chats durchsuchen..."
+                            style={{ background: 'transparent', outline: 'none', width: '100%', color: '#e8e4de', fontSize: '.85rem', fontFamily: 'Barlow, sans-serif' }}
+                        />
                     </div>
                 </div>
-                <div className="flex-1 overflow-y-auto w-full">
-                    {conversations.length === 0 ? (
-                        <div className="p-6 text-center text-sm text-slate-500">Keine aktiven Chats.</div>
+
+                {/* Conversations List */}
+                <div className="flex-1 overflow-y-auto">
+                    {filteredConversations.length === 0 ? (
+                        <div className="p-8 text-center" style={{ color: '#6b6b6b', fontSize: '.85rem', fontFamily: 'Barlow, sans-serif' }}>
+                            {searchQuery ? 'Keine Chats gefunden.' : 'Keine aktiven Unterhaltungen.'}
+                        </div>
                     ) : (
-                        conversations.map(conv => {
+                        filteredConversations.map(conv => {
                             const partner = conv.buyerId === currentUserId ? conv.seller : conv.buyer;
                             const isActive = conv.id === activeConvId;
-                            const lastMsg = conv.messages?.[0]; // ordered desc
+                            const lastMsg = conv.messages?.[0];
                             return (
-                                <div 
-                                    key={conv.id} 
-                                    onClick={() => setActiveConvId(conv.id)}
-                                    className={`flex items-start gap-3 p-4 border-b border-slate-100 cursor-pointer transition-colors ${isActive ? 'bg-[var(--ehren-blue)]/5 border-l-4 border-l-[var(--ehren-blue)]' : 'hover:bg-slate-100 border-l-4 border-l-transparent'}`}
+                                <div
+                                    key={conv.id}
+                                    onClick={() => { setActiveConvId(conv.id); setShowSidebar(false); }}
+                                    className="cursor-pointer transition-all duration-200"
+                                    style={{
+                                        display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '16px 20px',
+                                        borderBottom: '1px solid rgba(232,228,222,.08)',
+                                        borderLeft: isActive ? '3px solid #c8973a' : '3px solid transparent',
+                                        background: isActive ? 'rgba(200,151,58,.06)' : 'transparent',
+                                    }}
+                                    onMouseEnter={e => { if (!isActive) (e.currentTarget.style.background = 'rgba(232,228,222,.04)'); }}
+                                    onMouseLeave={e => { if (!isActive) (e.currentTarget.style.background = 'transparent'); }}
                                 >
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 text-slate-600 flex items-center justify-center font-bold uppercase shrink-0">
-                                        {partner?.firstName?.charAt(0) || 'U'}
+                                    <div style={{ width: 42, height: 42, borderRadius: '50%', background: 'linear-gradient(135deg, #c8973a, #a37a2e)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0a0a0b', fontWeight: 700, fontSize: '.85rem', flexShrink: 0, fontFamily: '"Barlow Condensed", sans-serif' }}>
+                                        {partner?.firstName?.charAt(0) || '?'}
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex justify-between items-center mb-0.5">
-                                            <span className="font-semibold text-sm truncate text-slate-800">{partner?.firstName} {partner?.lastName?.charAt(0)}.</span>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div className="flex justify-between items-center" style={{ marginBottom: 2 }}>
+                                            <span style={{ fontWeight: 500, fontSize: '.85rem', color: '#e8e4de', fontFamily: 'Barlow, sans-serif' }} className="truncate">
+                                                {partner?.firstName} {partner?.lastName?.charAt(0)}.
+                                                {partner?.idVerified && (
+                                                    <svg className="inline-block w-3.5 h-3.5 ml-1" style={{ color: '#52b788' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                                )}
+                                            </span>
                                         </div>
-                                        <div className="text-xs text-slate-500 truncate">{lastMsg?.body || 'Noch keine Nachrichten'}</div>
-                                        <div className="text-[10px] uppercase font-bold text-[var(--ehren-primary)] mt-1 truncate">{conv.listing.title}</div>
+                                        <div className="truncate" style={{ fontSize: '.75rem', color: '#6b6b6b', fontFamily: 'Barlow, sans-serif' }}>{lastMsg?.body || 'Noch keine Nachrichten'}</div>
+                                        <div className="truncate" style={{ fontSize: '.6rem', color: '#c8973a', fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase' as const, letterSpacing: '.06em', fontWeight: 500, marginTop: 4 }}>{conv.listing.title}</div>
                                     </div>
                                 </div>
                             );
                         })
                     )}
                 </div>
+
+                {/* Sidebar Footer */}
+                <div style={{ padding: '12px 20px', borderTop: '1px solid rgba(232,228,222,.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                    <svg className="w-3 h-3" style={{ color: '#c8973a', opacity: .5 }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span style={{ fontSize: '.6rem', color: '#6b6b6b', fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase' as const, letterSpacing: '.1em' }}>Ende-zu-Ende verschlusselt</span>
+                </div>
             </aside>
 
-            {/* Chat Area */}
+            {/* ── Chat Area ── */}
             {activeConvId && otherUser && activeConv ? (
-                <div className="flex-1 flex flex-col h-full overflow-hidden bg-white">
+                <div className={`flex-1 flex flex-col h-full overflow-hidden ${!showSidebar ? 'flex' : 'hidden md:flex'}`} style={{ background: '#0a0a0b' }}>
                     {/* Chat Header */}
-                    <div className="flex items-center justify-between p-4 border-b border-slate-200 shadow-sm z-10 bg-white">
+                    <div className="flex items-center justify-between shrink-0" style={{ padding: '12px 20px', borderBottom: '1px solid rgba(232,228,222,.12)', background: 'rgba(21,21,22,.8)', backdropFilter: 'blur(12px)' }}>
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--ehren-accent)] to-[var(--ehren-blue)] text-white flex items-center justify-center font-bold">
+                            {/* Mobile back button */}
+                            <button onClick={() => setShowSidebar(true)} className="md:hidden p-1" style={{ color: '#c8973a' }}>
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5"><path d="M15 19l-7-7 7-7"/></svg>
+                            </button>
+                            <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'linear-gradient(135deg, #c8973a, #a37a2e)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0a0a0b', fontWeight: 700, fontSize: '.85rem', fontFamily: '"Barlow Condensed", sans-serif' }}>
                                 {otherUser.firstName.charAt(0)}
                             </div>
                             <div>
-                                <div className="font-bold flex items-center gap-2">
+                                <div className="flex items-center gap-2" style={{ fontWeight: 500, color: '#e8e4de', fontSize: '.9rem', fontFamily: 'Barlow, sans-serif' }}>
                                     {otherUser.firstName} {otherUser.lastName?.charAt(0)}.
-                                    {(activeConv?.seller.idVerified || activeConv?.buyer.idVerified) && (
-                                        <ShieldCheck className="w-4 h-4 text-green-500" />
+                                    {(otherUser.idVerified) && (
+                                        <svg className="w-4 h-4" style={{ color: '#52b788' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                                     )}
                                 </div>
-                                <div className="text-xs text-slate-500 flex items-center gap-1">
-                                    <span className="w-2 h-2 bg-green-500 rounded-full"></span> Online
+                                <div className="flex items-center gap-1.5" style={{ fontSize: '.7rem', color: '#6b6b6b', fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase' as const, letterSpacing: '.06em' }}>
+                                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#52b788', display: 'inline-block' }}></span>
+                                    Online
                                 </div>
                             </div>
                         </div>
-                        <div className="hidden sm:flex items-center gap-3 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                        {/* Listing Preview */}
+                        <div className="hidden sm:flex items-center gap-3" style={{ padding: '8px 12px', border: '1px solid rgba(232,228,222,.1)', background: 'rgba(232,228,222,.03)' }}>
                             {activeConv.listing.images?.[0]?.url ? (
-                                <img src={activeConv.listing.images[0].url} alt="" className="w-10 h-10 object-cover rounded shadow-sm" />
+                                <img src={activeConv.listing.images[0].url} alt="" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 2 }} />
                             ) : (
-                                <div className="w-10 h-10 bg-slate-200 rounded flex items-center justify-center text-xs">📦</div>
+                                <div style={{ width: 40, height: 40, background: '#151516', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <svg className="w-5 h-5" style={{ color: '#6b6b6b' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                                </div>
                             )}
-                            <div className="flex flex-col">
-                                <span className="text-xs font-semibold max-w-[150px] truncate">{activeConv.listing.title}</span>
-                                <span className="text-sm font-black text-[var(--ehren-primary)]">{activeConv.listing.price.toLocaleString('de-DE')} €</span>
+                            <div>
+                                <div className="truncate" style={{ maxWidth: 150, fontSize: '.75rem', fontWeight: 500, color: '#e8e4de', fontFamily: 'Barlow, sans-serif' }}>{activeConv.listing.title}</div>
+                                <div style={{ fontSize: '.85rem', fontWeight: 700, color: '#c8973a', fontFamily: '"Cormorant Garamond", serif' }}>{activeConv.listing.price.toLocaleString('de-DE')} EUR</div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Fraud Banner */}
+                    {/* Security Banner */}
                     {showBanner && (
-                        <div className="bg-amber-50 border-b border-amber-200 p-3 flex gap-3 text-xs text-amber-800 relative shadow-sm">
-                            <ShieldAlert className="w-5 h-5 flex-shrink-0 text-amber-600" />
-                            <div className="flex-1 pr-6 leading-relaxed">
-                                <strong>Ehren-Deal Sicherheitscheck:</strong> Zahle niemals per "PayPal Freunde", Krypto oder auf ausländische Bankkonten. 
-                                Nutze für diesen Deal ausschließlich den integrierten Handschlag-Käuferschutz.
+                        <div className="relative shrink-0" style={{ background: 'rgba(200,151,58,.06)', borderBottom: '1px solid rgba(200,151,58,.15)', padding: '10px 20px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                            <svg className="w-4 h-4 shrink-0 mt-0.5" style={{ color: '#c8973a' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            <div style={{ flex: 1, paddingRight: 24, fontSize: '.75rem', color: '#e8e4de', opacity: .75, fontFamily: 'Barlow, sans-serif', lineHeight: 1.5 }}>
+                                <strong style={{ color: '#c8973a' }}>Sicherheitshinweis:</strong> Zahle niemals per "PayPal Freunde", Krypto oder auf auslandische Bankkonten. Nutze ausschliesslich den integrierten Handschlag-Kauferschutz.
                             </div>
-                            <button onClick={() => setShowBanner(false)} className="absolute top-3 right-3 text-amber-400 hover:text-amber-600">✕</button>
+                            <button onClick={() => setShowBanner(false)} style={{ position: 'absolute', top: 10, right: 12, color: 'rgba(200,151,58,.4)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '.85rem' }}>x</button>
                         </div>
                     )}
 
                     {/* Messages */}
-                    <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col gap-4 bg-[#f8fafc]">
+                    <div className="flex-1 overflow-y-auto flex flex-col gap-3" style={{ padding: '20px' }}>
+                        {messages.length === 0 && (
+                            <div className="flex flex-col items-center justify-center flex-1" style={{ color: '#6b6b6b' }}>
+                                <svg className="w-10 h-10 mb-3" style={{ opacity: .3 }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                                <span style={{ fontSize: '.8rem', fontFamily: 'Barlow, sans-serif' }}>Starte die Unterhaltung</span>
+                            </div>
+                        )}
                         {messages.map((msg, idx) => {
                             const isMe = msg.senderId === currentUserId;
                             const d = new Date(msg.createdAt);
                             const timeStr = isNaN(d.getTime()) ? '' : `${d.getHours()}:${d.getMinutes().toString().padStart(2, '0')}`;
                             return (
-                                <div key={msg.id || idx} className={`flex gap-3 max-w-[85%] sm:max-w-[75%] ${isMe ? 'self-end flex-row-reverse' : 'self-start'}`}>
-                                    <div className="w-8 h-8 rounded-full bg-slate-200 shrink-0 flex items-center justify-center font-bold text-xs">
+                                <div key={msg.id || idx} className={`flex gap-2.5 max-w-[85%] sm:max-w-[70%] ${isMe ? 'self-end flex-row-reverse' : 'self-start'}`}>
+                                    <div style={{ width: 30, height: 30, borderRadius: '50%', background: isMe ? 'rgba(200,151,58,.15)' : 'rgba(232,228,222,.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '.65rem', fontWeight: 600, color: isMe ? '#c8973a' : '#6b6b6b', flexShrink: 0, fontFamily: '"Barlow Condensed", sans-serif' }}>
                                         {isMe ? 'Du' : otherUser?.firstName?.charAt(0)}
                                     </div>
-                                    <div className={`p-3 rounded-2xl relative shadow-sm text-sm ${isMe ? 'bg-[var(--ehren-primary)] text-white rounded-tr-sm border-none' : 'bg-white border border-slate-200 text-slate-800 rounded-tl-sm'}`}>
-                                        <p className="whitespace-pre-wrap break-words">{msg.body}</p>
-                                        <span className={`block text-[10px] mt-1 text-right ${isMe ? 'text-white/70' : 'text-slate-400'}`}>{timeStr}</span>
+                                    <div style={{
+                                        padding: '10px 14px',
+                                        fontSize: '.85rem',
+                                        fontFamily: 'Barlow, sans-serif',
+                                        lineHeight: 1.5,
+                                        ...(isMe ? {
+                                            background: '#c8973a',
+                                            color: '#0a0a0b',
+                                            borderRadius: '4px 4px 0 4px',
+                                        } : {
+                                            background: '#151516',
+                                            color: '#e8e4de',
+                                            border: '1px solid rgba(232,228,222,.1)',
+                                            borderRadius: '4px 4px 4px 0',
+                                        })
+                                    }}>
+                                        <p style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0 }}>{msg.body}</p>
+                                        <span style={{ display: 'block', fontSize: '.6rem', marginTop: 4, textAlign: 'right', opacity: .6 }}>{timeStr}</span>
                                     </div>
                                 </div>
                             );
@@ -255,28 +331,28 @@ export default function ChatApp({ currentUserId }: { currentUserId: string }) {
                         <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Treuhand CTA */}
-                    <div className="bg-green-50 border-y border-green-200 p-3 flex items-center justify-between text-sm px-6">
-                        <div className="flex items-center gap-2 text-green-800 font-semibold">
-                            <CheckCircle2 className="w-5 h-5" />
-                            Der Verkäufer ist für lokale Ehren-Deals bereit.
+                    {/* Handschlag CTA */}
+                    <div className="shrink-0" style={{ borderTop: '1px solid rgba(82,183,136,.15)', borderBottom: '1px solid rgba(82,183,136,.15)', background: 'rgba(82,183,136,.04)', padding: '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div className="flex items-center gap-2" style={{ color: '#52b788', fontFamily: '"Barlow Condensed", sans-serif', fontSize: '.75rem', fontWeight: 500, textTransform: 'uppercase' as const, letterSpacing: '.06em' }}>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            Verkaufer ist fur lokale Ehren-Deals bereit
                         </div>
-                        <button className="bg-white border shadow-sm border-green-200 text-green-700 px-4 py-1.5 rounded-lg font-bold text-xs hover:bg-green-100 transition-colors">
+                        <button style={{ border: '1px solid rgba(82,183,136,.3)', background: 'transparent', color: '#52b788', padding: '5px 14px', fontSize: '.65rem', fontFamily: '"Barlow Condensed", sans-serif', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '.08em', cursor: 'pointer', transition: 'all .2s' }}>
                             Handschlag anbieten
                         </button>
                     </div>
 
                     {/* Input Area */}
-                    <div className="p-4 bg-white border-t border-slate-200 shrink-0">
+                    <div className="shrink-0" style={{ padding: '16px 20px', borderTop: '1px solid rgba(232,228,222,.1)' }}>
                         {fraudWarning && (
-                            <div className="text-xs text-red-600 font-medium mb-3 flex items-center gap-1.5 bg-red-50 p-2 rounded border border-red-100">
-                                <ShieldAlert className="w-4 h-4 shrink-0" />
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 12, padding: '8px 12px', background: 'rgba(196,92,92,.08)', border: '1px solid rgba(196,92,92,.2)', fontSize: '.75rem', color: '#c45c5c', fontFamily: 'Barlow, sans-serif' }}>
+                                <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                                 {fraudWarning}
                             </div>
                         )}
-                        <div className="flex items-end gap-3 max-w-4xl mx-auto">
-                            <button className="p-3 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors">
-                                <Paperclip className="w-5 h-5" />
+                        <div className="flex items-end gap-3">
+                            <button style={{ padding: 8, color: '#6b6b6b', background: 'none', border: 'none', cursor: 'pointer', transition: 'color .2s' }}>
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                             </button>
                             <textarea
                                 value={inputText}
@@ -284,28 +360,37 @@ export default function ChatApp({ currentUserId }: { currentUserId: string }) {
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
                                 }}
-                                placeholder="Schreibe eine sichere Nachricht..."
-                                className="flex-1 max-h-32 min-h-[44px] bg-slate-100 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--ehren-primary)] resize-none"
+                                placeholder="Nachricht schreiben..."
                                 rows={1}
+                                style={{
+                                    flex: 1, maxHeight: 120, minHeight: 42, resize: 'none',
+                                    background: 'rgba(232,228,222,.05)', border: '1px solid rgba(232,228,222,.12)',
+                                    color: '#e8e4de', padding: '10px 14px', fontSize: '.85rem', fontFamily: 'Barlow, sans-serif',
+                                    outline: 'none', borderRadius: 4,
+                                }}
                             />
-                            <button 
+                            <button
                                 onClick={sendMessage}
                                 disabled={!inputText.trim()}
-                                className="p-3 bg-[var(--ehren-primary)] text-white rounded-xl shadow-sm hover:shadow-md hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
+                                style={{
+                                    padding: '10px 14px', background: inputText.trim() ? '#c8973a' : 'rgba(200,151,58,.2)',
+                                    color: inputText.trim() ? '#0a0a0b' : '#6b6b6b', border: 'none', cursor: inputText.trim() ? 'pointer' : 'default',
+                                    transition: 'all .2s', borderRadius: 4,
+                                }}
                             >
-                                <Send className="w-5 h-5" />
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                             </button>
                         </div>
-                        <div className="text-[10px] text-center text-slate-400 mt-3 font-medium flex items-center justify-center gap-1">
-                            <ShieldCheck className="w-3 h-3" />
-                            <span>Deine Nachrichten werden durch den Ehren-Deal Betrugsfilter geschützt.</span>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 10 }}>
+                            <svg className="w-3 h-3" style={{ color: '#c8973a', opacity: .4 }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            <span style={{ fontSize: '.55rem', color: '#6b6b6b', fontFamily: '"Barlow Condensed", sans-serif', textTransform: 'uppercase' as const, letterSpacing: '.1em' }}>Geschutzt durch den Ehren-Deal Betrugsfilter</span>
                         </div>
                     </div>
                 </div>
             ) : (
-                <div className="flex-1 bg-[#f8fafc] flex flex-col items-center justify-center text-slate-400">
-                    <Info className="w-12 h-12 mb-4 opacity-50" />
-                    <p>Wähle einen Chat aus, um eine Nachricht zu senden.</p>
+                <div className={`flex-1 flex-col items-center justify-center ${!showSidebar ? 'flex' : 'hidden md:flex'}`} style={{ background: '#0a0a0b' }}>
+                    <svg className="w-14 h-14 mb-4" style={{ color: '#c8973a', opacity: .15 }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <p style={{ color: '#6b6b6b', fontSize: '.85rem', fontFamily: 'Barlow, sans-serif' }}>Wahle einen Chat aus, um eine Nachricht zu senden.</p>
                 </div>
             )}
         </div>
