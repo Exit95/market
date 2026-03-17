@@ -176,7 +176,13 @@ if (relatedListings.length < 3) {
             <!-- LEFT COLUMN -->
             <div class="space-y-6">
 
-                <!-- 2a. Image Gallery -->
+                <!-- 2a. Title (mobile: above gallery; desktop: shown here too) -->
+                <div class="lg:hidden">
+                    <h1 class="font-headings font-light text-2xl text-foreground leading-tight mb-1">{listing.title}</h1>
+                    <div class="text-2xl font-black tracking-tight text-primary">{listing.price.toLocaleString("de-DE")} €</div>
+                </div>
+
+                <!-- 2b. Image Gallery -->
                 <div>
                     <div class="relative rounded-default overflow-hidden bg-secondary aspect-[4/3]">
                         <img src={allImages[0]?.url || listing.image} alt={listing.title} class="w-full h-full object-cover" id="mainImg" />
@@ -258,6 +264,7 @@ if (relatedListings.length < 3) {
 
                 <!-- Kaufbox -->
                 <div class="bg-secondary/40 border border-foreground/[.15] rounded-default p-6 backdrop-blur-sm">
+                    <h1 class="hidden lg:block font-headings font-light text-xl text-foreground leading-tight mb-3">{listing.title}</h1>
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-3xl font-black tracking-tight text-foreground">{listing.price.toLocaleString("de-DE")} €</span>
                         {listing.treuhandAvailable && (

@@ -26,6 +26,9 @@ const currentPage = pagination.page ?? 1;
 const totalPages = pagination.totalPages ?? 1;
 const currentQuery = Astro.url.searchParams.get("query") ?? "";
 const currentCat = Astro.url.searchParams.get("category") ?? "";
+const currentSort = Astro.url.searchParams.get("sort") ?? "";
+const currentMinPrice = Astro.url.searchParams.get("minPrice") ?? "";
+const currentMaxPrice = Astro.url.searchParams.get("maxPrice") ?? "";
 ---
 
 <BaseLayout title="Ehren-Deal · Handeln mit Handschlag">
@@ -45,6 +48,7 @@ const currentCat = Astro.url.searchParams.get("category") ?? "";
                 <!-- Search bar -->
                 <div class="max-w-3xl mx-auto">
                     <form id="searchForm" method="GET" class="flex flex-col gap-2 p-2.5 bg-secondary/50 border border-foreground/[.20]">
+                        <!-- Row 1: Query + Category + Submit -->
                         <div class="flex flex-col sm:flex-row gap-2">
                             <input
                                 name="query"
@@ -52,26 +56,37 @@ const currentCat = Astro.url.searchParams.get("category") ?? "";
                                 placeholder="Was suchst du?"
                                 class="input-field flex-grow bg-transparent"
                             />
-                            <select name="category" class="input-field sm:w-48 bg-transparent">
+                            <select name="category" class="input-field sm:w-44 bg-transparent">
                                 <option value="">Alle Kategorien</option>
-                                {
-                                    categories.map((c) => (
-                                        <option
-                                            value={c.slug.toUpperCase()}
-                                            selected={currentCat === c.slug.toUpperCase()}
-                                        >
-                                            {c.label}
-                                        </option>
-                                    ))
-                                }
+                                {categories.map((c) => (
+                                    <option value={c.slug.toUpperCase()} selected={currentCat === c.slug.toUpperCase()}>
+                                        {c.label}
+                                    </option>
+                                ))}
                             </select>
-                            <button type="submit" class="btn-primary sm:w-32">
+                            <button type="submit" class="btn-primary sm:w-28">
                                 Suchen
                             </button>
                         </div>
-                        <!-- Umkreissuche -->
-                        <div class="flex flex-row gap-3 items-center">
-                            <select id="radiusSelect" name="radius" class="input-field sm:w-40 bg-transparent text-sm py-2">
+                        <!-- Row 2: Preis + Umkreis + Standort -->
+                        <div class="flex flex-wrap gap-2 items-center">
+                            <input
+                                name="minPrice"
+                                type="number"
+                                min="0"
+                                value={currentMinPrice}
+                                placeholder="€ von"
+                                class="input-field w-24 bg-transparent text-sm py-2"
+                            />
+                            <input
+                                name="maxPrice"
+                                type="number"
+                                min="0"
+                                value={currentMaxPrice}
+                                placeholder="€ bis"
+                                class="input-field w-24 bg-transparent text-sm py-2"
+                            />
+                            <select id="radiusSelect" name="radius" class="input-field sm:w-36 bg-transparent text-sm py-2">
                                 <option value="">Kein Umkreis</option>
                                 <option value="5">5 km</option>
                                 <option value="10">10 km</option>
@@ -81,7 +96,7 @@ const currentCat = Astro.url.searchParams.get("category") ?? "";
                                 <option value="200">200 km</option>
                             </select>
                             <button type="button" id="geoLocateBtn" class="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 font-condensed uppercase tracking-wider transition-colors whitespace-nowrap">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line></svg>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line></svg>
                                 <span id="geoLocateText">Standort</span>
                             </button>
                             <input type="hidden" name="lat" id="geoLat" />
@@ -109,28 +124,30 @@ const currentCat = Astro.url.searchParams.get("category") ?? "";
                 </div>
             </div>
 
-            <!-- Result summary -->
-            <div class="flex justify-between items-end mb-8 border-b border-foreground/[.20] pb-4">
-                <div>
-                    <h2 class="text-2xl font-headings font-light text-foreground">
-                        {currentQuery ? `Ergebnisse für „${currentQuery}"` : "Aktuelle Angebote"}
-                    </h2>
-                    <p class="text-foreground/80 text-xs mt-1.5 font-condensed font-light tracking-wider uppercase">
-                        {pagination.total} Anzeige{pagination.total !== 1 ? "n" : ""} gefunden
-                    </p>
-                </div>
-                <div class="hidden sm:flex items-center">
-                    <span class="trust-badge">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Sicher Handeln
-                    </span>
-                </div>
+            <!-- Result bar: count + sort -->
+            <div class="flex items-center justify-between mb-5 pb-4 border-b border-foreground/[.12]">
+                <p class="text-xs text-foreground/50 font-condensed uppercase tracking-wider">
+                    <span class="text-foreground/80 font-medium">{pagination.total}</span>
+                    {" "}Anzeige{pagination.total !== 1 ? "n" : ""}
+                    {currentQuery && <span> für <em class="not-italic text-primary">„{currentQuery}"</em></span>}
+                </p>
+                <form method="GET" id="sortForm" class="flex items-center gap-2">
+                    {currentQuery && <input type="hidden" name="query" value={currentQuery} />}
+                    {currentCat && <input type="hidden" name="category" value={currentCat} />}
+                    {currentMinPrice && <input type="hidden" name="minPrice" value={currentMinPrice} />}
+                    {currentMaxPrice && <input type="hidden" name="maxPrice" value={currentMaxPrice} />}
+                    <select name="sort" onchange="this.form.submit()" class="text-xs bg-secondary/50 border border-foreground/[.18] text-foreground/70 px-3 py-1.5 focus:outline-none focus:border-primary/50 font-condensed uppercase tracking-wider cursor-pointer">
+                        <option value="" selected={!currentSort}>Neueste zuerst</option>
+                        <option value="price_asc" selected={currentSort === "price_asc"}>Preis aufsteigend</option>
+                        <option value="price_desc" selected={currentSort === "price_desc"}>Preis absteigend</option>
+                    </select>
+                </form>
             </div>
 
             <!-- Listings Grid -->
             {
                 listings.length > 0 ? (
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                         {listings.map((l: any, i: number) => (
                             <a href={`/listing/${l.id}`} class="group block h-full">
                                 <article class="bg-secondary/40 border border-foreground/[.20] overflow-hidden hover:border-primary/30 transition-all duration-300 h-full flex flex-col relative">
@@ -168,20 +185,17 @@ const currentCat = Astro.url.searchParams.get("category") ?? "";
                                     </div>
 
                                     <!-- Content -->
-                                    <div class="p-4 flex flex-col flex-grow">
-                                        <div class="text-lg font-headings font-light text-primary mb-0.5">
+                                    <div class="p-2.5 sm:p-4 flex flex-col flex-grow">
+                                        <div class="text-base sm:text-lg font-headings font-light text-primary mb-0.5 leading-tight">
                                             {(l.price / 100).toLocaleString("de-DE", { style: "currency", currency: "EUR" })}
                                         </div>
-                                        <h3 class="font-light text-foreground/80 mb-2 line-clamp-2 leading-snug text-sm">
+                                        <h3 class="font-light text-foreground/80 mb-2 line-clamp-2 leading-snug text-xs sm:text-sm">
                                             {l.title}
                                         </h3>
-                                        <div class="mt-auto pt-3 flex items-center justify-between text-[.65rem] text-foreground/80 font-condensed tracking-wider uppercase">
-                                            <div class="flex items-center gap-1">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                                {l.city}
-                                            </div>
-                                            <div class="text-foreground/75">
-                                                {l.category}
+                                        <div class="mt-auto pt-2 flex items-center justify-between text-[.6rem] text-foreground/60 font-condensed tracking-wide uppercase">
+                                            <div class="flex items-center gap-1 truncate">
+                                                <svg class="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                                <span class="truncate">{l.city}</span>
                                             </div>
                                         </div>
                                     </div>

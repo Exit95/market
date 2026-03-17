@@ -11,70 +11,29 @@ import { categories } from "../data/listings";
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             <!-- Header -->
-            <div class="mb-12">
-                <h1 class="text-4xl md:text-5xl font-headings font-bold text-primary mb-3">Alle Kategorien</h1>
-                <p class="text-foreground/80 text-lg font-light max-w-2xl">
-                    Durchstöbere alle Kategorien auf Ehren-Deal und finde genau das, was du suchst.
+            <div class="mb-8">
+                <h1 class="text-3xl md:text-4xl font-headings font-light text-foreground mb-2">Alle Kategorien</h1>
+                <p class="text-foreground/50 text-sm font-light">
+                    {categories.reduce((s, c) => s + c.count, 0).toLocaleString('de-DE')} Anzeigen in {categories.length} Kategorien
                 </p>
             </div>
 
             <!-- Category Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-16">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
                 {categories.map((cat) => (
                     <a
                         href={`/?category=${cat.slug.toUpperCase()}`}
-                        class="group block bg-secondary/40 border border-foreground/[.20] p-6 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300"
+                        class="group flex flex-col gap-3 bg-secondary/40 border border-foreground/[.15] p-5 hover:border-primary/40 hover:bg-primary/5 transition-all duration-200"
                     >
-                        <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 flex items-center justify-center bg-foreground/[.10] border border-foreground/[.20] group-hover:border-primary/30 group-hover:bg-primary/10 transition-all duration-300 flex-shrink-0">
-                                <img src={cat.icon} alt={cat.label} class="w-7 h-7 opacity-80 group-hover:opacity-100 transition-opacity" loading="lazy" />
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <h2 class="font-condensed font-semibold text-base tracking-wide uppercase text-foreground group-hover:text-primary transition-colors">{cat.label}</h2>
-                                <p class="text-xs text-foreground/75 font-light mt-1">{cat.count.toLocaleString('de-DE')} Anzeigen</p>
-                            </div>
+                        <div class="w-10 h-10 flex items-center justify-center bg-foreground/[.07] border border-foreground/[.15] group-hover:border-primary/25 group-hover:bg-primary/8 transition-all duration-200 flex-shrink-0">
+                            <img src={cat.icon} alt={cat.label} class="w-6 h-6 opacity-70 group-hover:opacity-100 transition-opacity" loading="lazy" />
                         </div>
-                        <div class="mt-4 pt-3 border-t border-foreground/[.12] flex items-center justify-between">
-                            <span class="text-[10px] font-condensed uppercase tracking-[.12em] text-foreground/75">Jetzt entdecken</span>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-foreground/75 group-hover:text-primary group-hover:translate-x-1 transition-all">
-                                <path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path>
-                            </svg>
+                        <div>
+                            <h2 class="font-condensed font-medium text-sm uppercase tracking-wide text-foreground/80 group-hover:text-primary transition-colors leading-tight">{cat.label}</h2>
+                            <p class="text-[.65rem] text-foreground/40 font-light mt-0.5">{cat.count.toLocaleString('de-DE')} Anzeigen</p>
                         </div>
                     </a>
                 ))}
-            </div>
-
-            <!-- Info Section -->
-            <div class="border-t border-foreground/[.20] pt-12">
-                <div class="grid md:grid-cols-3 gap-8">
-                    <div class="bg-secondary/30 border border-foreground/[.20] p-6">
-                        <div class="flex items-center gap-3 mb-3">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-primary">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                            </svg>
-                            <h3 class="font-condensed font-semibold text-sm uppercase tracking-wider text-foreground">Verifizierte Verkäufer</h3>
-                        </div>
-                        <p class="text-sm text-foreground/80 font-light leading-relaxed">Alle Verkäufer durchlaufen eine Identitätsprüfung. Du handelst nur mit echten Personen.</p>
-                    </div>
-                    <div class="bg-secondary/30 border border-foreground/[.20] p-6">
-                        <div class="flex items-center gap-3 mb-3">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-primary">
-                                <rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 7V5a4 4 0 0 0-8 0v2"></path>
-                            </svg>
-                            <h3 class="font-condensed font-semibold text-sm uppercase tracking-wider text-foreground">Treuhand-Schutz</h3>
-                        </div>
-                        <p class="text-sm text-foreground/80 font-light leading-relaxed">Optionale Treuhand-Abwicklung bei Versand-Deals. Dein Geld ist bis zur Bestätigung sicher.</p>
-                    </div>
-                    <div class="bg-secondary/30 border border-foreground/[.20] p-6">
-                        <div class="flex items-center gap-3 mb-3">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-primary">
-                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                            </svg>
-                            <h3 class="font-condensed font-semibold text-sm uppercase tracking-wider text-foreground">Lokale Community</h3>
-                        </div>
-                        <p class="text-sm text-foreground/80 font-light leading-relaxed">Finde Angebote in deiner Nähe und triff dich persönlich – bestätigt mit dem Ehren-Handschlag.</p>
-                    </div>
-                </div>
             </div>
 
         </div>

@@ -26,30 +26,16 @@ const displayName = authUser?.firstName || authUser?.email?.split('@')[0] || 'Ko
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             <!-- Logo -->
-            <a href="/" class="flex items-center gap-3 flex-shrink-0 group">
-                <div class="medallion-wrap">
-                    <svg class="ring-svg" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <path id="rp" d="M70,70 m-52,0 a52,52 0 1,1 104,0 a52,52 0 1,1-104,0"/>
-                        </defs>
-                        <text font-family="Barlow Condensed, sans-serif" font-size="8.8" fill="#c8973a" letter-spacing="5.2" font-weight="400" opacity=".65">
-                            <textPath href="#rp">EHREN-DEAL  ·  HANDELN MIT HANDSCHLAG  ·  </textPath>
-                        </text>
-                        <circle cx="70" cy="70" r="61" stroke="#c8973a" stroke-width=".4" opacity=".15"/>
-                    </svg>
-                    <div class="medal-inner">
-                        <svg class="mark-svg" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M4 20 L13 14 L19 18 L21 18 L27 14 L36 20" stroke="#c8973a" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M13 14 L13 27" stroke="#c8973a" stroke-width="1.4" stroke-linecap="round" opacity=".4"/>
-                            <path d="M27 14 L27 27" stroke="#c8973a" stroke-width="1.4" stroke-linecap="round" opacity=".4"/>
-                            <path d="M19 18 L19 28" stroke="#c8973a" stroke-width="1.4" stroke-linecap="round" opacity=".6"/>
-                            <path d="M21 18 L21 28" stroke="#c8973a" stroke-width="1.4" stroke-linecap="round" opacity=".6"/>
-                            <line x1="13" y1="27" x2="27" y2="27" stroke="#c8973a" stroke-width="1.4" stroke-linecap="round" opacity=".3"/>
-                            <circle cx="20" cy="9" r="1.2" fill="#c8973a" opacity=".5"/>
-                        </svg>
-                    </div>
-                </div>
-                <span class="font-condensed font-medium text-lg tracking-[.12em] uppercase text-foreground">
+            <a href="/" class="flex items-center gap-2.5 flex-shrink-0">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:28px;height:28px;">
+                    <path d="M4 20 L13 14 L19 18 L21 18 L27 14 L36 20" stroke="#c8973a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M13 14 L13 27" stroke="#c8973a" stroke-width="1.5" stroke-linecap="round" opacity=".45"/>
+                    <path d="M27 14 L27 27" stroke="#c8973a" stroke-width="1.5" stroke-linecap="round" opacity=".45"/>
+                    <path d="M19 18 L19 28" stroke="#c8973a" stroke-width="1.5" stroke-linecap="round" opacity=".65"/>
+                    <path d="M21 18 L21 28" stroke="#c8973a" stroke-width="1.5" stroke-linecap="round" opacity=".65"/>
+                    <line x1="13" y1="27" x2="27" y2="27" stroke="#c8973a" stroke-width="1.5" stroke-linecap="round" opacity=".3"/>
+                </svg>
+                <span class="font-condensed font-medium text-base tracking-[.12em] uppercase text-foreground">
                     Ehren‑Deal
                 </span>
             </a>
@@ -196,28 +182,3 @@ const displayName = authUser?.firstName || authUser?.email?.split('@')[0] || 'Ko
 </script>
 
 
-<style>
-    .medallion-wrap {
-        position: relative;
-        width: 64px;
-        height: 64px;
-        flex-shrink: 0;
-    }
-    .ring-svg {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-    }
-    .medal-inner {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .mark-svg {
-        width: 30px;
-        height: 30px;
-    }
-</style>

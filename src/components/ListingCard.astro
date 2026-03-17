@@ -36,10 +36,10 @@ const stars =
     "☆".repeat(5 - Math.round(sellerRating));
 
 const conditionColors = {
-    "Neu": "bg-green-100 text-green-700 border-green-200",
-    "Sehr gut": "bg-blue-100 text-blue-700 border-blue-200",
-    "Gut": "bg-amber-100 text-amber-700 border-amber-200",
-    "Akzeptabel": "bg-slate-100 text-slate-700 border-slate-200",
+    "Neu": "bg-success/15 text-success border-success/30",
+    "Sehr gut": "bg-primary/15 text-primary border-primary/30",
+    "Gut": "bg-warning/15 text-warning border-warning/30",
+    "Akzeptabel": "bg-foreground/10 text-foreground/60 border-foreground/20",
 };
 const currentConditionColor = conditionColors[condition] || conditionColors["Gut"];
 ---
