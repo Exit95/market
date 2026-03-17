@@ -208,7 +208,6 @@ const displayName = authUser?.firstName || authUser?.email?.split('@')[0] || 'Ko
         inset: 0;
         width: 100%;
         height: 100%;
-        animation: spin-slow 25s linear infinite;
     }
     .medal-inner {
         position: absolute;
@@ -220,9 +219,5 @@ const displayName = authUser?.firstName || authUser?.email?.split('@')[0] || 'Ko
     .mark-svg {
         width: 30px;
         height: 30px;
-    }
-    @keyframes spin-slow {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
     }
 </style>

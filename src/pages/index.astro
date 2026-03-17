@@ -34,27 +34,25 @@ const currentCat = Astro.url.searchParams.get("category") ?? "";
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             <!-- Hero Section -->
-            <div class="mb-16 text-center pt-16 pb-4">
-                <p class="font-condensed text-[.7rem] font-medium tracking-[.2em] uppercase text-primary mb-5">Marktplatz</p>
-                <h1 class="font-headings font-light text-5xl md:text-6xl lg:text-7xl leading-[1.05] mb-4 text-foreground">
-                    Handeln<br/><em class="italic text-primary">mit Handschlag</em>
+            <div class="mb-6 text-center pt-6 pb-2">
+                <h1 class="font-headings font-light text-4xl md:text-5xl leading-[1.1] mb-2 text-foreground">
+                    Handeln <em class="italic text-primary">mit Handschlag</em>
                 </h1>
-                <hr class="gold-rule" />
-                <p class="text-sm text-foreground/75 font-light max-w-md mx-auto leading-relaxed">
-                    Verifizierte Identitäten · Treuhand-Schutz · Lokale Deals
+                <p class="text-xs text-foreground/60 font-condensed uppercase tracking-widest mb-5">
+                    Verifiziert · Treuhand-Schutz · Lokal
                 </p>
 
                 <!-- Search bar -->
-                <div class="pt-10 max-w-3xl mx-auto">
-                    <form id="searchForm" method="GET" class="flex flex-col gap-3 p-3 bg-secondary/50 border border-foreground/[.20]">
-                        <div class="flex flex-col sm:flex-row gap-3">
+                <div class="max-w-3xl mx-auto">
+                    <form id="searchForm" method="GET" class="flex flex-col gap-2 p-2.5 bg-secondary/50 border border-foreground/[.20]">
+                        <div class="flex flex-col sm:flex-row gap-2">
                             <input
                                 name="query"
                                 value={currentQuery}
                                 placeholder="Was suchst du?"
                                 class="input-field flex-grow bg-transparent"
                             />
-                            <select name="category" class="input-field sm:w-52 bg-transparent">
+                            <select name="category" class="input-field sm:w-48 bg-transparent">
                                 <option value="">Alle Kategorien</option>
                                 {
                                     categories.map((c) => (
@@ -67,24 +65,24 @@ const currentCat = Astro.url.searchParams.get("category") ?? "";
                                     ))
                                 }
                             </select>
-                            <button type="submit" class="btn-primary sm:w-36">
+                            <button type="submit" class="btn-primary sm:w-32">
                                 Suchen
                             </button>
                         </div>
                         <!-- Umkreissuche -->
-                        <div class="flex flex-col sm:flex-row gap-3 items-center">
-                            <select id="radiusSelect" name="radius" class="input-field sm:w-44 bg-transparent text-sm">
+                        <div class="flex flex-row gap-3 items-center">
+                            <select id="radiusSelect" name="radius" class="input-field sm:w-40 bg-transparent text-sm py-2">
                                 <option value="">Kein Umkreis</option>
-                                <option value="5">5 km Umkreis</option>
-                                <option value="10">10 km Umkreis</option>
-                                <option value="25">25 km Umkreis</option>
-                                <option value="50">50 km Umkreis</option>
-                                <option value="100">100 km Umkreis</option>
-                                <option value="200">200 km Umkreis</option>
+                                <option value="5">5 km</option>
+                                <option value="10">10 km</option>
+                                <option value="25">25 km</option>
+                                <option value="50">50 km</option>
+                                <option value="100">100 km</option>
+                                <option value="200">200 km</option>
                             </select>
-                            <button type="button" id="geoLocateBtn" class="flex items-center gap-2 text-sm text-primary hover:text-primary/80 font-condensed uppercase tracking-wider transition-colors whitespace-nowrap">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line></svg>
-                                <span id="geoLocateText">Standort nutzen</span>
+                            <button type="button" id="geoLocateBtn" class="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 font-condensed uppercase tracking-wider transition-colors whitespace-nowrap">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line></svg>
+                                <span id="geoLocateText">Standort</span>
                             </button>
                             <input type="hidden" name="lat" id="geoLat" />
                             <input type="hidden" name="lng" id="geoLng" />
@@ -92,30 +90,22 @@ const currentCat = Astro.url.searchParams.get("category") ?? "";
                         </div>
                     </form>
                 </div>
-            </div>
 
-            <!-- Pillars -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-2xl mx-auto mb-16 text-center">
-                <div>
-                    <div class="w-8 h-8 mx-auto mb-3 flex items-center justify-center text-primary/60">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M7 11v4a1 1 0 001 1h1m4-6v4a1 1 0 001 1h1m-8 0h8m-8 0H6m12 0h-2m-4-8l4-4m0 0l4 4m-4-4v12"/></svg>
+                <!-- Category pills -->
+                <div class="mt-3 max-w-3xl mx-auto">
+                    <div class="flex gap-2 overflow-x-auto pb-1" style="scrollbar-width:none;-ms-overflow-style:none;">
+                        <a href="/" class={`flex-shrink-0 px-3 py-1 text-[.7rem] font-condensed uppercase tracking-wider border transition-colors ${!currentCat ? 'border-primary text-primary bg-primary/10' : 'border-foreground/20 text-foreground/60 hover:border-foreground/40 hover:text-foreground/80'}`}>
+                            Alle
+                        </a>
+                        {categories.map((c) => (
+                            <a
+                                href={`/?category=${c.slug.toUpperCase()}`}
+                                class={`flex-shrink-0 px-3 py-1 text-[.7rem] font-condensed uppercase tracking-wider border transition-colors ${currentCat === c.slug.toUpperCase() ? 'border-primary text-primary bg-primary/10' : 'border-foreground/20 text-foreground/60 hover:border-foreground/40 hover:text-foreground/80'}`}
+                            >
+                                {c.label}
+                            </a>
+                        ))}
                     </div>
-                    <h3 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-foreground/80 mb-1">Handschlag</h3>
-                    <p class="text-xs text-foreground/80 font-light">Transparent & verbindlich</p>
-                </div>
-                <div>
-                    <div class="w-8 h-8 mx-auto mb-3 flex items-center justify-center text-primary/60">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                    </div>
-                    <h3 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-foreground/80 mb-1">Treuhand</h3>
-                    <p class="text-xs text-foreground/80 font-light">Dein Geld bleibt sicher</p>
-                </div>
-                <div>
-                    <div class="w-8 h-8 mx-auto mb-3 flex items-center justify-center text-primary/60">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    </div>
-                    <h3 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-foreground/80 mb-1">Identitäten</h3>
-                    <p class="text-xs text-foreground/80 font-light">Keine Fake-Profile</p>
                 </div>
             </div>
 
@@ -140,21 +130,21 @@ const currentCat = Astro.url.searchParams.get("category") ?? "";
             <!-- Listings Grid -->
             {
                 listings.length > 0 ? (
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {listings.map((l: any) => (
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        {listings.map((l: any, i: number) => (
                             <a href={`/listing/${l.id}`} class="group block h-full">
-                                <article class="bg-secondary/40 border border-foreground/[.20] overflow-hidden hover:border-primary/20 transition-all duration-500 h-full flex flex-col relative">
+                                <article class="bg-secondary/40 border border-foreground/[.20] overflow-hidden hover:border-primary/30 transition-all duration-300 h-full flex flex-col relative">
 
                                     <!-- Badges -->
-                                    <div class="absolute top-3 right-3 flex flex-col gap-2 z-10">
+                                    <div class="absolute top-2 right-2 flex flex-col gap-1.5 z-10">
                                         {l.treuhand && (
-                                            <span class="bg-primary/90 backdrop-blur-sm text-primary-foreground text-[.65rem] px-2 py-0.5 font-condensed font-medium uppercase tracking-wider">
+                                            <span class="bg-primary/90 backdrop-blur-sm text-primary-foreground text-[.6rem] px-1.5 py-0.5 font-condensed font-medium uppercase tracking-wider">
                                                 Treuhand
                                             </span>
                                         )}
                                         {l.seller?.trustScore?.level === 'VERIFIED' && (
-                                            <span class="bg-foreground/80 backdrop-blur-sm text-background text-[.65rem] px-2 py-0.5 font-condensed font-medium uppercase tracking-wider flex items-center gap-1">
-                                                <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                            <span class="bg-foreground/80 backdrop-blur-sm text-background text-[.6rem] px-1.5 py-0.5 font-condensed font-medium uppercase tracking-wider flex items-center gap-1">
+                                                <svg class="w-2 h-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
                                                 Verifiziert
                                             </span>
                                         )}
@@ -166,8 +156,9 @@ const currentCat = Astro.url.searchParams.get("category") ?? "";
                                             <img
                                                 src={l.images[0].url}
                                                 alt={l.title}
-                                                class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out"
-                                                loading="lazy"
+                                                class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out"
+                                                loading={i < 4 ? "eager" : "lazy"}
+                                                fetchpriority={i === 0 ? "high" : "auto"}
                                             />
                                         ) : (
                                             <div class="w-full h-full flex items-center justify-center text-foreground/75">
