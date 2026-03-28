@@ -713,7 +713,7 @@ if (!sessionUser) return Astro.redirect("/anmelden?redirect=/inserat-erstellen")
 
     function showGeoStatus(msg: string, isError = false) {
         geoStatus.textContent = msg;
-        geoStatus.style.color = isError ? '#e53e3e' : 'var(--ehren-accent,#c8973a)';
+        geoStatus.style.color = isError ? '#DC2626' : 'var(--ehren-accent,#1B65A6)';
         geoStatus.classList.remove('hidden');
         if (!isError) setTimeout(() => geoStatus.classList.add('hidden'), 4000);
     }
