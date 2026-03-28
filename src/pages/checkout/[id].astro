@@ -3,7 +3,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import { requireAuth, isAuthContext } from "../../lib/auth-middleware";
-import { FEE_RATE } from "../../lib/stripe";
+import { BUYER_FEE_CENTS, SELLER_COMMISSION_RATE, calcBuyerFee, calcSellerCommission, calcSellerPayout } from "../../lib/stripe";
 
 // 1. Auth – nur eingeloggte Nutzer
 const auth = await requireAuth(Astro.request, Astro.cookies);
@@ -25,16 +25,20 @@ if (listing.status !== "ACTIVE" && listing.status !== "RESERVED") return Astro.r
 
 // 5. Preisberechnung
 const priceCents = listing.price;
-const feeCents = Math.round(priceCents * FEE_RATE);
-const totalCents = priceCents + feeCents;
+const buyerFeeCents = calcBuyerFee();                          // 0,50 € Servicegebühr
+const sellerCommCents = calcSellerCommission(priceCents);      // 5 % Provision
+const sellerPayoutCents = calcSellerPayout(priceCents);        // Netto-Auszahlung Verkäufer
+const totalCents = priceCents + buyerFeeCents;                 // Käufer zahlt: Preis + 0,50 €
 
 const fmt = (cents: number) =>
     (cents / 100).toLocaleString("de-DE", { style: "currency", currency: "EUR" });
 
 const priceFormatted = fmt(priceCents);
-const feeFormatted = fmt(feeCents);
+const buyerFeeFormatted = fmt(buyerFeeCents);
 const totalFormatted = fmt(totalCents);
-const feePercent = (FEE_RATE * 100).toFixed(1);
+const sellerCommFormatted = fmt(sellerCommCents);
+const sellerPayoutFormatted = fmt(sellerPayoutCents);
+const sellerCommPercent = (SELLER_COMMISSION_RATE * 100).toFixed(0);
 
 const seller = listing.seller ?? {};
 const location = [listing.city, listing.postalCode].filter(Boolean).join(", ");
@@ -235,8 +239,8 @@ const imageUrl = listing.images?.[0]?.url ?? null;
                                 <span class="text-foreground font-light">{priceFormatted}</span>
                             </div>
                             <div class="flex justify-between text-sm">
-                                <span class="text-foreground/70 font-light">Treuhand-Gebühr ({feePercent}%)</span>
-                                <span class="text-foreground font-light">{feeFormatted}</span>
+                                <span class="text-foreground/70 font-light">Servicegebühr (Käuferschutz)</span>
+                                <span class="text-foreground font-light">{buyerFeeFormatted}</span>
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-foreground/70 font-light">Versand</span>
@@ -248,6 +252,19 @@ const imageUrl = listing.images?.[0]?.url ?? null;
                                 <span class="font-headings text-xl text-primary">{totalFormatted}</span>
                             </div>
                             <p class="text-[.6rem] text-foreground/40 font-light">Alle Preise inkl. MwSt. (Privatverkauf, keine MwSt. ausweisbar)</p>
+
+                            <!-- Verkäufer-Info -->
+                            <div class="mt-3 pt-3 border-t border-foreground/[.08]">
+                                <p class="text-[.65rem] text-foreground/50 font-light font-condensed uppercase tracking-wider mb-2">Info für Verkäufer</p>
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-foreground/50 font-light">Verkaufsprovision ({sellerCommPercent}%)</span>
+                                    <span class="text-foreground/50 font-light">−{sellerCommFormatted}</span>
+                                </div>
+                                <div class="flex justify-between text-xs mt-1">
+                                    <span class="text-foreground/70 font-light">Auszahlung an Verkäufer</span>
+                                    <span class="text-foreground/70 font-light">{sellerPayoutFormatted}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -360,7 +377,7 @@ const imageUrl = listing.images?.[0]?.url ?? null;
     <Footer />
 </BaseLayout>
 
-<script define:vars={{ listingId: id, totalCents, priceCents, feeCents }}>
+<script define:vars={{ listingId: id, totalCents, priceCents, buyerFeeCents }}>
     // ── Checkbox validation ──
     const chkAgb = document.getElementById('chk-agb');
     const chkTreuhand = document.getElementById('chk-treuhand');

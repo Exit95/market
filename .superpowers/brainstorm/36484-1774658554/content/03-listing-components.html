@@ -1,0 +1,171 @@
+<h2>Listing-Detailseite & Kern-Komponenten</h2>
+<p class="subtitle">Die wichtigste Conversion-Seite. Hier entscheidet sich ob jemand kauft oder geht.</p>
+
+<div class="section">
+  <span class="label">Regel: Wenige Icons, Typografie tragt die Kommunikation</span>
+  <p style="opacity:0.7;font-size:14px">Icons nur bei: Treuhand-Badge, Verifiziert-Status, Zustandsanzeige. Sonst Text, Farbe und Whitespace.</p>
+</div>
+
+<div class="mockup">
+  <div class="mockup-header">Listing-Detailseite: /listing/[id]</div>
+  <div class="mockup-body" style="padding:0;background:#F8FAFB">
+
+    <!-- Breadcrumb -->
+    <div style="padding:16px 32px;font-size:13px;color:#64748B;border-bottom:1px solid #E5E7EB;background:white">
+      Startseite &rarr; Elektronik &rarr; <span style="color:#1A2332">iPhone 15 Pro Max</span>
+    </div>
+
+    <!-- Main Content -->
+    <div style="padding:32px;display:grid;grid-template-columns:1.2fr 1fr;gap:32px">
+
+      <!-- Left: Images -->
+      <div>
+        <div style="background:#E8EDF2;border-radius:12px;height:320px;display:flex;align-items:center;justify-content:center;color:#94A3B8;font-size:16px">
+          Produktbild — gross, klar, vertrauensbildend
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <div style="width:72px;height:72px;background:#E8EDF2;border-radius:8px;border:2px solid #1B65A6"></div>
+          <div style="width:72px;height:72px;background:#E8EDF2;border-radius:8px;border:2px solid transparent"></div>
+          <div style="width:72px;height:72px;background:#E8EDF2;border-radius:8px;border:2px solid transparent"></div>
+          <div style="width:72px;height:72px;background:#E8EDF2;border-radius:8px;border:2px solid transparent"></div>
+        </div>
+      </div>
+
+      <!-- Right: Details -->
+      <div>
+        <!-- Badges -->
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <span style="background:#E8F5E9;color:#22A06B;font-size:12px;padding:4px 12px;border-radius:6px;font-weight:600">Treuhand-Schutz</span>
+          <span style="background:#E3F2FD;color:#1B65A6;font-size:12px;padding:4px 12px;border-radius:6px;font-weight:600">Verifizierter Verkaufer</span>
+        </div>
+
+        <div style="font-size:28px;font-weight:700;color:#1A2332;margin-bottom:4px">iPhone 15 Pro Max</div>
+        <div style="font-size:14px;color:#64748B;margin-bottom:20px">256 GB, Titanium Schwarz, mit OVP</div>
+
+        <!-- Preis -->
+        <div style="font-size:32px;font-weight:700;color:#1B65A6;margin-bottom:4px">899 &euro;</div>
+        <div style="font-size:13px;color:#64748B;margin-bottom:24px">inkl. Treuhand-Gebuhr &middot; Versand: 6,99 &euro;</div>
+
+        <!-- CTA -->
+        <div style="background:#1B65A6;color:white;padding:16px;border-radius:10px;text-align:center;font-weight:600;font-size:16px;cursor:pointer;margin-bottom:12px">
+          Jetzt sicher kaufen
+        </div>
+        <div style="background:white;color:#1A2332;padding:14px;border-radius:10px;text-align:center;font-weight:600;font-size:14px;cursor:pointer;border:1px solid #E5E7EB;margin-bottom:24px">
+          Nachricht schreiben
+        </div>
+
+        <!-- Risk Reversal - direkt am CTA -->
+        <div style="background:#F0F7FF;padding:16px;border-radius:10px;margin-bottom:24px;font-size:13px;color:#1A2332">
+          <div style="font-weight:600;margin-bottom:8px">Dein Kauf ist geschutzt</div>
+          <div style="margin-bottom:6px;color:#475569">Zahlung wird erst freigegeben, wenn du den Erhalt bestatigst. Bei Problemen: volle Erstattung.</div>
+          <a style="color:#1B65A6;text-decoration:none;font-weight:500" href="#">Mehr zum Kauferschutz &rarr;</a>
+        </div>
+
+        <!-- Details Grid -->
+        <div style="border-top:1px solid #E5E7EB;padding-top:20px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:14px">
+            <div>
+              <div style="color:#64748B;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px">Zustand</div>
+              <div style="color:#1A2332;font-weight:500">Sehr gut</div>
+            </div>
+            <div>
+              <div style="color:#64748B;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px">Kategorie</div>
+              <div style="color:#1A2332;font-weight:500">Elektronik</div>
+            </div>
+            <div>
+              <div style="color:#64748B;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px">Standort</div>
+              <div style="color:#1A2332;font-weight:500">Berlin</div>
+            </div>
+            <div>
+              <div style="color:#64748B;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px">Eingestellt</div>
+              <div style="color:#1A2332;font-weight:500">Vor 2 Stunden</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seller Card -->
+        <div style="border-top:1px solid #E5E7EB;padding-top:20px;margin-top:20px">
+          <div style="display:flex;align-items:center;gap:14px">
+            <div style="width:48px;height:48px;background:#E3F2FD;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#1B65A6;font-weight:700;font-size:18px">MK</div>
+            <div style="flex:1">
+              <div style="font-weight:600;color:#1A2332">Max K.</div>
+              <div style="font-size:13px;color:#64748B">Mitglied seit 2025 &middot; 12 Deals</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:14px;font-weight:600;color:#22A06B">Trust-Score: 94</div>
+              <div style="font-size:12px;color:#64748B">Verifiziert</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Beschreibung -->
+    <div style="padding:0 32px 32px;max-width:680px">
+      <div style="font-size:18px;font-weight:600;color:#1A2332;margin-bottom:12px">Beschreibung</div>
+      <div style="font-size:15px;color:#475569;line-height:1.7">
+        Verkaufe mein iPhone 15 Pro Max in sehr gutem Zustand. Keine Kratzer, keine Dellen. Immer mit Hulle und Schutzfolie genutzt. Akku-Kapazitat bei 96%. OVP, Kabel und Ladegerat dabei. Kaufbeleg vorhanden.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section" style="margin-top:32px">
+  <span class="label">Design-Entscheidungen & Vault-Begrundungen</span>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;font-size:13px">
+    <div style="background:rgba(255,255,255,0.05);padding:16px;border-radius:8px">
+      <strong>Risk Reversal direkt am CTA</strong>
+      <p style="margin:8px 0 0;opacity:0.8">Vault Trust 8.3: "Je radikaler die Garantie, desto starker der Effekt." Die blaue Info-Box direkt unter dem Kaufen-Button eliminiert die letzte Kaufangst im entscheidenden Moment.</p>
+    </div>
+    <div style="background:rgba(255,255,255,0.05);padding:16px;border-radius:8px">
+      <strong>Trust-Score beim Verkaufer</strong>
+      <p style="margin:8px 0 0;opacity:0.8">Vault Social Proof 3.1 + 3.3: "Spezifische Zahlen statt runder: 94 statt 'gut'." Foto + Name + Score = hochste Glaubwurdigkeit. Vault: "Testimonials mit Foto erhohen Glaubwurdigkeit um 35%"</p>
+    </div>
+    <div style="background:rgba(255,255,255,0.05);padding:16px;border-radius:8px">
+      <strong>Preis transparent, keine versteckten Kosten</strong>
+      <p style="margin:8px 0 0;opacity:0.8">Vault CRO-Killer #7 (Friction): "Versteckte Kosten erst im Checkout = Conversion-Killer." Treuhand-Gebuhr und Versand direkt sichtbar. Transparenz = Vertrauen.</p>
+    </div>
+    <div style="background:rgba(255,255,255,0.05);padding:16px;border-radius:8px">
+      <strong>Breadcrumb + klare Hierarchie</strong>
+      <p style="margin:8px 0 0;opacity:0.8">Vault CRO UX: "Findet der Nutzer in 3 Sek was er sucht?" Breadcrumbs + Structured Data (SEO 2026: BreadcrumbList Schema). Doppelter Nutzen: UX + SEO.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:24px">
+  <span class="label">Kern-Komponenten fur alle Seiten</span>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px">
+
+    <div style="background:rgba(255,255,255,0.05);padding:20px;border-radius:10px">
+      <div style="font-weight:600;margin-bottom:8px">Listing Card</div>
+      <div style="font-size:13px;opacity:0.8">Bild + Badges + Titel + Ort/Zeit + Preis. Weisser Hintergrund, subtiler Border, 12px Radius. Treuhand/Verifiziert-Badges nur als farbige Text-Labels, keine Icons.</div>
+    </div>
+
+    <div style="background:rgba(255,255,255,0.05);padding:20px;border-radius:10px">
+      <div style="font-weight:600;margin-bottom:8px">Trust-Badge</div>
+      <div style="font-size:13px;opacity:0.8">Grun (#E8F5E9 bg, #22A06B text) fur Treuhand. Blau (#E3F2FD bg, #1B65A6 text) fur Verifiziert. Kein Icon, nur farbiger Text-Chip. Dezent aber klar.</div>
+    </div>
+
+    <div style="background:rgba(255,255,255,0.05);padding:20px;border-radius:10px">
+      <div style="font-weight:600;margin-bottom:8px">Seller Card</div>
+      <div style="font-size:13px;opacity:0.8">Avatar (Initialen) + Name + Mitglied-seit + Deal-Count + Trust-Score. Kompakt, glaubwurdig. Vault: "Foto + Name + Beruf = hochste Glaubwurdigkeit."</div>
+    </div>
+
+    <div style="background:rgba(255,255,255,0.05);padding:20px;border-radius:10px">
+      <div style="font-weight:600;margin-bottom:8px">CTA Buttons</div>
+      <div style="font-size:13px;opacity:0.8">Primary: Trust Blue, 16px font, 10px radius, grosszugiges Padding. Secondary: Weiss mit Border. Vault: "Abgerundete Ecken wirken freundlicher und klickbarer."</div>
+    </div>
+
+    <div style="background:rgba(255,255,255,0.05);padding:20px;border-radius:10px">
+      <div style="font-weight:600;margin-bottom:8px">Info Box</div>
+      <div style="font-size:13px;opacity:0.8">Hellblauer Hintergrund (#F0F7FF), kein Border, 10px Radius. Fur Risk-Reversal-Texte, Hinweise, Erklarungen. Ruhig, nicht alarmierend.</div>
+    </div>
+
+    <div style="background:rgba(255,255,255,0.05);padding:20px;border-radius:10px">
+      <div style="font-weight:600;margin-bottom:8px">Form Fields</div>
+      <div style="font-size:13px;opacity:0.8">Weisser Hintergrund, 1px #E5E7EB Border, 8px Radius, 16px Font. Focus: Blue Border + leichter Blue Shadow. Vault CRO: "Klare, hilfreiche Fehlermeldungen."</div>
+    </div>
+
+  </div>
+</div>

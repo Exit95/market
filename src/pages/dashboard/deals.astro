@@ -39,18 +39,29 @@ const fmt = (cents: number) => (cents / 100).toLocaleString("de-DE", { style: "c
 <BaseLayout title="Meine Deals – Ehren-Deal">
     <Header />
     <main class="container dash-wrap">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="/">Startseite</a>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current">Meine Deals</span>
+        </nav>
+
         <div class="dash-header">
             <h1>Meine Deals</h1>
             <div class="flex gap-3">
-                <a href="/dashboard/listings" class="btn btn-ghost">Meine Anzeigen</a>
-                <a href="/nachrichten" class="btn btn-ghost">Nachrichten</a>
+                <a href="/dashboard/listings" class="btn-ghost">Meine Anzeigen</a>
+                <a href="/nachrichten" class="btn-ghost">Nachrichten</a>
             </div>
         </div>
 
         {deals.length === 0 && (
             <div class="empty-state">
-                <p>Du hast noch keine Deals.</p>
-                <a href="/" class="btn btn-primary" style="margin-top:1rem;">Marktplatz durchsuchen</a>
+                <svg class="empty-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                </svg>
+                <p class="empty-title">Noch keine Deals vorhanden</p>
+                <p class="empty-desc">Sobald du etwas kaufst oder verkaufst, erscheinen deine Deals hier.</p>
+                <a href="/" class="btn-primary" style="margin-top:1rem;">Marktplatz durchsuchen</a>
             </div>
         )}
 
@@ -75,6 +86,15 @@ const fmt = (cents: number) => (cents / 100).toLocaleString("de-DE", { style: "c
                                     <span class="deal-role">{roleLabel}</span>
                                 </div>
                                 <div class="deal-price">{fmt(d.totalAmount)}</div>
+                                {isBuyer ? (
+                                    <div class="text-[.6rem] text-foreground/40 font-light">
+                                        Gezahlt: {fmt(d.totalAmount + 50)} (inkl. 0,50 € Servicegebühr)
+                                    </div>
+                                ) : (
+                                    <div class="text-[.6rem] text-foreground/40 font-light">
+                                        Auszahlung: {fmt(Math.round(d.totalAmount * 0.95))} (abzgl. 5 % Provision)
+                                    </div>
+                                )}
                                 <div class="deal-partner">
                                     {isBuyer ? "Verkäufer" : "Käufer"}: {otherUser?.firstName ?? "?"} {otherUser?.lastName?.[0] ?? ""}.
                                 </div>
@@ -90,13 +110,26 @@ const fmt = (cents: number) => (cents / 100).toLocaleString("de-DE", { style: "c
 
 <style>
     .dash-wrap { @apply py-10 pb-16 bg-background min-h-screen text-foreground font-body max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
+
+    /* Breadcrumb */
+    .breadcrumb { @apply flex items-center gap-2 text-xs font-condensed uppercase tracking-wider text-foreground/50 mb-6; }
+    .breadcrumb a { @apply text-foreground/50 hover:text-primary transition-colors no-underline; }
+    .breadcrumb-sep { @apply text-foreground/30; }
+    .breadcrumb-current { @apply text-foreground/80; }
+
     .dash-header { @apply flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-6 border-b border-secondary gap-4; }
     .dash-header h1 { @apply text-2xl font-headings font-light text-foreground tracking-wide m-0; }
-    .empty-state { @apply text-center py-16 px-4 bg-secondary/40 border border-dashed border-foreground/[.22] text-foreground/75 font-light; }
 
+    /* Empty state */
+    .empty-state { @apply text-center py-16 px-4 bg-secondary/40 border border-dashed border-foreground/[.15] text-foreground/75 font-light rounded; }
+    .empty-icon { @apply w-12 h-12 mx-auto mb-4 text-foreground/30; }
+    .empty-title { @apply text-lg font-headings font-light text-foreground/80 mb-2; }
+    .empty-desc { @apply text-sm text-foreground/50 max-w-md mx-auto; }
+
+    /* Deal grid & cards */
     .deal-grid { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4; }
-    .deal-card { @apply flex gap-4 p-4 bg-secondary/30 border border-foreground/10 rounded-lg hover:border-foreground/25 transition-all no-underline text-foreground; }
-    .deal-img { @apply w-20 h-20 shrink-0 rounded-md overflow-hidden bg-secondary; }
+    .deal-card { @apply flex gap-4 p-4 bg-secondary/40 border border-foreground/[.15] rounded hover:border-foreground/25 transition-all no-underline text-foreground; }
+    .deal-img { @apply w-20 h-20 shrink-0 rounded overflow-hidden bg-secondary; }
     .deal-img img { @apply w-full h-full object-cover; }
     .deal-img-placeholder { @apply w-full h-full bg-secondary; }
     .deal-info { @apply flex flex-col gap-1 min-w-0; }
@@ -107,4 +140,3 @@ const fmt = (cents: number) => (cents / 100).toLocaleString("de-DE", { style: "c
     .deal-price { @apply text-sm font-bold text-[var(--ehren-primary)]; }
     .deal-partner { @apply text-xs text-foreground/50; }
 </style>
-

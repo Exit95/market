@@ -1,0 +1,219 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { lucia, prisma } from "../lib/auth";
+
+// Check auth via lucia session cookie (same pattern as Header.astro)
+let userId: string | null = null;
+const sessionId = Astro.cookies.get(lucia.sessionCookieName)?.value;
+if (sessionId) {
+    try {
+        const { user } = await lucia.validateSession(sessionId);
+        if (user) userId = user.id;
+    } catch { /* session invalid */ }
+}
+
+if (!userId) return Astro.redirect('/anmelden');
+
+// Query saved listings
+let savedListings: {
+    id: string;
+    title: string;
+    price: number;
+    city: string | null;
+    image: string | null;
+    treuhand: boolean;
+    savedAt: Date;
+}[] = [];
+
+try {
+    const results = await prisma.savedListing.findMany({
+        where: { userId },
+        include: {
+            listing: {
+                include: {
+                    images: { take: 1, orderBy: { position: 'asc' } },
+                },
+            },
+        },
+        orderBy: { createdAt: 'desc' },
+    });
+
+    savedListings = results.map((s: any) => ({
+        id: s.listing.id,
+        title: s.listing.title,
+        price: s.listing.price / 100,
+        city: s.listing.city,
+        image: s.listing.images[0]?.url || null,
+        treuhand: s.listing.treuhand,
+        savedAt: s.createdAt,
+    }));
+} catch { /* DB not available — show empty state */ }
+---
+
+<BaseLayout title="Meine Merkliste – Ehren-Deal">
+    <Header />
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-20">
+
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-2 text-foreground/50 mb-6 font-condensed tracking-wide uppercase text-xs">
+            <a href="/" class="hover:text-primary transition-colors">Startseite</a>
+            <span class="text-foreground/25">&rsaquo;</span>
+            <span class="text-foreground/70">Merkliste</span>
+        </nav>
+
+        <!-- Page Title -->
+        <h1 class="font-headings text-2xl sm:text-3xl font-light mb-8">
+            Meine Merkliste
+            <span class="text-foreground/40 text-xl ml-2">({savedListings.length})</span>
+        </h1>
+
+        {savedListings.length > 0 ? (
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4" id="merkliste-grid">
+                {savedListings.map((l) => (
+                    <div class="merkliste-card group relative bg-secondary/40 border border-foreground/[.15] rounded overflow-hidden transition-all duration-300" data-listing-id={l.id}>
+                        <a href={`/inserat/${l.id}`} class="block">
+                            <div class="aspect-[4/3] bg-secondary relative overflow-hidden">
+                                {l.image
+                                    ? <img src={l.image} alt={l.title} class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500" loading="lazy" />
+                                    : <div class="w-full h-full flex items-center justify-center text-foreground/30">
+                                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                      </div>
+                                }
+                                {l.treuhand && (
+                                    <span class="absolute top-2 right-2 bg-primary/90 text-primary-foreground text-[.6rem] px-1.5 py-0.5 font-condensed uppercase tracking-wider">Treuhand</span>
+                                )}
+                            </div>
+                            <div class="p-3 sm:p-4">
+                                <div class="text-base font-headings font-light text-primary mb-0.5">
+                                    {l.price.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
+                                </div>
+                                <p class="text-sm text-foreground/70 line-clamp-2 leading-snug">{l.title}</p>
+                                {l.city && (
+                                    <p class="text-[.65rem] text-foreground/40 mt-2 font-condensed uppercase tracking-wide">{l.city}</p>
+                                )}
+                            </div>
+                        </a>
+                        <!-- Remove button -->
+                        <button
+                            class="remove-btn absolute top-2 left-2 w-7 h-7 flex items-center justify-center bg-background/80 backdrop-blur-sm border border-foreground/[.15] rounded-full text-foreground/50 hover:text-red-500 hover:border-red-500/30 transition-all duration-200 opacity-0 group-hover:opacity-100"
+                            data-listing-id={l.id}
+                            title="Von Merkliste entfernen"
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                        </button>
+                    </div>
+                ))}
+            </div>
+        ) : (
+            <div class="text-center py-16 border border-dashed border-foreground/20 rounded" id="empty-state">
+                <svg class="w-10 h-10 mx-auto mb-3 text-foreground/30" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                </svg>
+                <p class="text-foreground/50 text-sm mb-4">Du hast noch keine Inserate gemerkt.</p>
+                <a href="/" class="btn-primary text-sm py-2.5 px-6 inline-flex items-center gap-2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    Anzeigen durchsuchen
+                </a>
+            </div>
+        )}
+
+    </main>
+    <Footer />
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-secondary border border-foreground/[.15] rounded px-5 py-3 text-sm font-condensed tracking-wide shadow-xl z-50 opacity-0 translate-y-4 pointer-events-none transition-all duration-300">
+        Inserat entfernt
+    </div>
+</BaseLayout>
+
+<style>
+    .merkliste-card.removing {
+        opacity: 0;
+        transform: scale(0.95);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+</style>
+
+<script>
+    function showToast(message: string) {
+        const toast = document.getElementById('toast');
+        if (!toast) return;
+        toast.textContent = message;
+        toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+        toast.classList.add('opacity-100', 'translate-y-0');
+        setTimeout(() => {
+            toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+            toast.classList.remove('opacity-100', 'translate-y-0');
+        }, 2500);
+    }
+
+    function updateCount() {
+        const grid = document.getElementById('merkliste-grid');
+        const remaining = grid?.querySelectorAll('.merkliste-card:not(.removing)').length ?? 0;
+        const countEl = document.querySelector('h1 span');
+        if (countEl) countEl.textContent = `(${remaining})`;
+    }
+
+    function showEmptyState() {
+        const grid = document.getElementById('merkliste-grid');
+        if (grid) grid.remove();
+
+        const main = document.querySelector('main');
+        if (!main) return;
+
+        const empty = document.createElement('div');
+        empty.className = 'text-center py-16 border border-dashed border-foreground/20 rounded';
+        empty.innerHTML = `
+            <svg class="w-10 h-10 mx-auto mb-3 text-foreground/30" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+            </svg>
+            <p class="text-foreground/50 text-sm mb-4">Du hast noch keine Inserate gemerkt.</p>
+            <a href="/" class="btn-primary text-sm py-2.5 px-6 inline-flex items-center gap-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                Anzeigen durchsuchen
+            </a>
+        `;
+        main.appendChild(empty);
+    }
+
+    document.querySelectorAll('.remove-btn').forEach((btn) => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const listingId = (btn as HTMLElement).dataset.listingId;
+            if (!listingId) return;
+
+            const card = (btn as HTMLElement).closest('.merkliste-card') as HTMLElement;
+            if (!card) return;
+
+            try {
+                const res = await fetch(`/api/listings/${listingId}/save`, { method: 'POST' });
+                const data = await res.json();
+
+                if (res.ok && data.saved === false) {
+                    card.classList.add('removing');
+                    updateCount();
+
+                    setTimeout(() => {
+                        card.remove();
+                        showToast('Inserat entfernt');
+
+                        const grid = document.getElementById('merkliste-grid');
+                        if (grid && grid.children.length === 0) {
+                            showEmptyState();
+                        }
+                    }, 300);
+                } else {
+                    showToast('Fehler beim Entfernen');
+                }
+            } catch {
+                showToast('Fehler beim Entfernen');
+            }
+        });
+    });
+</script>

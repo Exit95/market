@@ -124,3 +124,58 @@ import Footer from "../components/Footer.astro";
     <Footer />
 </BaseLayout>
 
+<script>
+    const form = document.getElementById('contactForm') as HTMLFormElement | null;
+    if (form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Wird gesendet …';
+
+            try {
+                const data = Object.fromEntries(new FormData(form));
+                const res = await fetch('/api/kontakt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+                const json = await res.json();
+
+                if (res.ok && json.ok) {
+                    form.innerHTML = `
+                        <div class="flex flex-col items-center gap-3 py-8 text-center">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-primary">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <p class="text-lg font-medium text-foreground">Nachricht gesendet!</p>
+                            <p class="text-sm text-foreground/70">Wir melden uns so schnell wie möglich bei dir.</p>
+                        </div>`;
+                } else {
+                    showError(json.error || 'Ein Fehler ist aufgetreten.');
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            } catch {
+                showError('Verbindung fehlgeschlagen. Bitte versuche es erneut.');
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        });
+    }
+
+    function showError(msg: string) {
+        let errEl = document.getElementById('contact-error');
+        if (!errEl) {
+            errEl = document.createElement('div');
+            errEl.id = 'contact-error';
+            errEl.className = 'bg-red-500/10 border border-red-500/30 text-red-400 text-sm p-3 mt-2';
+            form?.appendChild(errEl);
+        }
+        errEl.textContent = msg;
+        setTimeout(() => errEl?.remove(), 6000);
+    }
+</script>
+

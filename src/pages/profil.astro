@@ -8,23 +8,30 @@ import { lucia, prisma } from "../lib/auth";
 const sessionId = Astro.cookies.get(lucia.sessionCookieName)?.value;
 if (!sessionId) return Astro.redirect("/anmelden?redirect=/profil");
 
-const { user: sessionUser } = await lucia.validateSession(sessionId);
+let sessionUser: { id: string } | null = null;
+try {
+    const result = await lucia.validateSession(sessionId);
+    sessionUser = result.user;
+} catch { /* DB not available */ }
 if (!sessionUser) return Astro.redirect("/anmelden?redirect=/profil");
 
 // Fetch full user from DB with relations
-const dbUser = await prisma.user.findUnique({
-    where: { id: sessionUser.id },
-    include: {
-        trustScore: true,
-        listings: {
-            where: { status: { in: ['ACTIVE', 'RESERVED', 'SOLD'] } },
-            orderBy: { createdAt: 'desc' },
-            take: 5,
-            include: { images: true },
+let dbUser: any = null;
+try {
+    dbUser = await prisma.user.findUnique({
+        where: { id: sessionUser.id },
+        include: {
+            trustScore: true,
+            listings: {
+                where: { status: { in: ['ACTIVE', 'RESERVED', 'SOLD'] } },
+                orderBy: { createdAt: 'desc' },
+                take: 5,
+                include: { images: true },
+            },
+            sellerDeals: { where: { status: 'COMPLETED' } },
         },
-        sellerDeals: { where: { status: 'COMPLETED' } },
-    },
-});
+    });
+} catch { /* DB not available */ }
 if (!dbUser) return Astro.redirect("/anmelden?redirect=/profil");
 
 // Computed values
@@ -294,13 +301,12 @@ function maskPhone(phone: string | null): string {
     .banner-bg { @apply absolute inset-0 bg-secondary/40 opacity-50; }
 
     .profile-info { @apply relative flex flex-wrap items-center gap-6 py-10 px-6 sm:px-12 max-w-7xl mx-auto z-10; }
-    .profile-avatar { @apply w-24 h-24 bg-secondary border border-foreground/[.22] flex items-center justify-center text-3xl font-headings font-light text-primary flex-shrink-0; }
+    .profile-avatar { @apply w-24 h-24 bg-secondary border border-foreground/[.22] rounded-full flex items-center justify-center text-3xl font-headings font-light text-primary flex-shrink-0; }
 
     .profile-details { @apply flex-1; }
     .profile-name-row { @apply flex flex-wrap items-center gap-3 mb-2; }
     .profile-name { @apply text-2xl font-headings font-light tracking-wide text-foreground m-0; }
 
-    .trust-badge { @apply text-[10px] font-condensed font-medium px-2.5 py-1 inline-flex items-center gap-1 uppercase tracking-[.1em] border; }
     .trust-kyc { @apply bg-foreground/[.12] text-foreground/75 border-foreground/[.20]; }
     .trust-verified { @apply bg-primary/[.04] text-primary/70 border-primary/10; }
 
@@ -316,16 +322,16 @@ function maskPhone(phone: string | null): string {
     /* Profile Grid */
     .profile-grid { @apply grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8 mt-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
 
-    .card { @apply bg-secondary/40 border border-foreground/[.20] p-6; }
+    .card { @apply bg-secondary/40 border border-foreground/[.15] rounded p-6; }
     .card-section-title { @apply text-[10px] font-condensed uppercase tracking-[.15em] text-foreground/80 mb-5 m-0; }
 
     /* Verification */
     .verif-list { @apply flex flex-col gap-3; }
-    .verif-item { @apply flex items-center gap-4 p-4 bg-foreground/[.12] border border-foreground/[.22] transition-colors; }
+    .verif-item { @apply flex items-center gap-4 p-4 bg-foreground/[.12] border border-foreground/[.22] rounded transition-colors; }
     .verif-item.done { @apply bg-success/[.03] border-success/10; }
     .verif-item.pending { @apply bg-warning/[.03] border-warning/10; }
 
-    .verif-icon { @apply w-9 h-9 flex items-center justify-center flex-shrink-0; }
+    .verif-icon { @apply w-9 h-9 flex items-center justify-center rounded flex-shrink-0; }
     .verif-icon.success { @apply bg-success/[.08] text-success; }
     .verif-icon.warning { @apply bg-warning/[.08] text-warning; }
 
@@ -344,8 +350,8 @@ function maskPhone(phone: string | null): string {
 
     /* My Listings */
     .my-listings-list { @apply flex flex-col gap-4; }
-    .my-listing-item { @apply flex items-center gap-4 p-3 border border-foreground/[.22] transition-all hover:border-primary/30 hover:bg-foreground/[.12]; }
-    .my-listing-img { @apply w-20 h-16 object-cover flex-shrink-0 bg-secondary; }
+    .my-listing-item { @apply flex items-center gap-4 p-3 border border-foreground/[.22] rounded transition-all hover:border-primary/30 hover:bg-foreground/[.12]; }
+    .my-listing-img { @apply w-20 h-16 object-cover flex-shrink-0 bg-secondary rounded; }
     .my-listing-info { @apply flex-1 min-w-0; }
     .my-listing-title { @apply text-sm font-medium text-foreground/80 truncate mb-1; }
     .my-listing-price { @apply text-base font-headings font-light text-primary; }
@@ -356,9 +362,9 @@ function maskPhone(phone: string | null): string {
     .review-summary { @apply flex items-center gap-2; }
     .stars { color: var(--gold); }
     .reviews-list { @apply flex flex-col gap-5; }
-    .review-item { @apply p-5 bg-foreground/[.12] border border-foreground/[.22]; }
+    .review-item { @apply p-5 bg-foreground/[.12] border border-foreground/[.22] rounded; }
     .review-header { @apply flex items-center gap-3 mb-4; }
-    .reviewer-avatar { @apply w-9 h-9 bg-secondary border border-foreground/[.22] flex items-center justify-center text-xs font-condensed text-foreground/75 flex-shrink-0; }
+    .reviewer-avatar { @apply w-9 h-9 bg-secondary border border-foreground/[.22] rounded-full flex items-center justify-center text-xs font-condensed text-foreground/75 flex-shrink-0; }
     .reviewer-name { @apply text-sm font-medium text-foreground/75 mb-0.5; }
     .review-date { @apply ml-auto text-[10px] text-foreground/80 font-condensed tracking-wider; }
     .review-text { @apply text-sm text-foreground/80 font-light leading-relaxed mb-3; }
@@ -376,7 +382,7 @@ function maskPhone(phone: string | null): string {
     /* Modal */
     .modal-overlay { @apply fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4; display:none; }
     .modal-overlay.open { display:flex; }
-    .modal-box { @apply bg-background border border-foreground/20 p-8 max-w-md w-full; }
+    .modal-box { @apply bg-background border border-foreground/20 rounded p-8 max-w-md w-full; }
     .modal-title { @apply text-lg font-headings font-light text-foreground mb-4; }
     .modal-input { @apply w-full p-3 bg-secondary/40 border border-foreground/20 text-foreground text-sm mb-4 outline-none; }
     .modal-input:focus { @apply border-primary/50; }

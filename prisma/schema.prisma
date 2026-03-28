@@ -154,6 +154,8 @@ model User {
   auditLogs        AuditLog[]
   adminActionsAsAdmin  AdminAction[] @relation("AdminActionsAsAdmin")
   adminActionsAsTarget AdminAction[] @relation("AdminActionsAsTarget")
+  savedListings    SavedListing[]
+  listingReports   ListingReport[]
 
   @@index([email])
   @@index([role])
@@ -204,6 +206,8 @@ model Listing {
   images       ListingImage[]
   conversations Conversation[]
   deals        Deal[]
+  savedBy      SavedListing[]
+  reports      ListingReport[]
 
   @@index([sellerId])
   @@index([category])
@@ -435,4 +439,58 @@ model AdminAction {
   @@index([targetUserId])
   @@index([actionType])
   @@map("admin_actions")
+}
+
+// ─── SavedListing ──────────────────────────────────────────────────────────────
+
+model SavedListing {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, listingId])
+  @@index([userId])
+  @@index([listingId])
+  @@map("saved_listings")
+}
+
+// ─── ListingReport ─────────────────────────────────────────────────────────────
+
+model ListingReport {
+  id        String             @id @default(cuid())
+  listingId String
+  listing   Listing            @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  reporterId String
+  reporter  User               @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  reason    ListingReportReason
+  details   String?
+  status    ReportStatus       @default(OPEN)
+  createdAt DateTime           @default(now())
+  resolvedAt DateTime?
+
+  @@unique([listingId, reporterId])
+  @@index([listingId])
+  @@index([reporterId])
+  @@index([status])
+  @@map("listing_reports")
+}
+
+enum ListingReportReason {
+  SPAM
+  FRAUD
+  WRONG_CATEGORY
+  PROHIBITED_ITEM
+  ALREADY_SOLD
+  DUPLICATE
+  OTHER
+}
+
+enum ReportStatus {
+  OPEN
+  REVIEWED
+  RESOLVED
+  DISMISSED
 }

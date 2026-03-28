@@ -1,0 +1,225 @@
+<h2>Features, Roadmap & Obsidian-Hub</h2>
+<p class="subtitle">Was gebaut wird, in welcher Reihenfolge, und wie das Obsidian-Vault alles zusammenhalt.</p>
+
+<div class="section">
+  <span class="label">Phase 1 — Design-System & Homepage (Fundament)</span>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+    <div style="background:rgba(34,160,107,0.1);border:1px solid rgba(34,160,107,0.2);padding:16px;border-radius:10px">
+      <div style="font-weight:600;color:#22A06B;margin-bottom:8px">Design-System</div>
+      <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.8">
+        <li>Neue Farbpalette (Trust Blue, Safe Green, Navy)</li>
+        <li>Typografie: Inter/System Stack, kein Serif</li>
+        <li>Tailwind Config komplett neu</li>
+        <li>Kern-Komponenten: Buttons, Cards, Badges, Forms</li>
+        <li>global.css entrumpeln: Grain, Glass weg</li>
+      </ul>
+    </div>
+    <div style="background:rgba(34,160,107,0.1);border:1px solid rgba(34,160,107,0.2);padding:16px;border-radius:10px">
+      <div style="font-weight:600;color:#22A06B;margin-bottom:8px">Homepage</div>
+      <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.8">
+        <li>Hero: Trust-First Messaging, Suchleiste</li>
+        <li>Trust Bar: 3 Saulen</li>
+        <li>Kategorie-Pills (clean, wenig Icons)</li>
+        <li>Listing-Grid mit neuen Cards</li>
+        <li>"So funktioniert's" 3-Schritte</li>
+        <li>Risk-Reversal Block + finaler CTA</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <span class="label">Phase 2 — Kern-Seiten Redesign</span>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px">
+    <div style="background:rgba(27,101,166,0.1);border:1px solid rgba(27,101,166,0.2);padding:16px;border-radius:10px">
+      <div style="font-weight:600;color:#1B65A6;margin-bottom:8px">Listing-Seite</div>
+      <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.8">
+        <li>Bildergalerie gross + Thumbnails</li>
+        <li>Risk-Reversal Box am CTA</li>
+        <li>Seller-Card mit Trust-Score</li>
+        <li>Transparente Preise/Gebuhren</li>
+        <li>Breadcrumbs + Structured Data</li>
+      </ul>
+    </div>
+    <div style="background:rgba(27,101,166,0.1);border:1px solid rgba(27,101,166,0.2);padding:16px;border-radius:10px">
+      <div style="font-weight:600;color:#1B65A6;margin-bottom:8px">Auth & Profil</div>
+      <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.8">
+        <li>Login/Register: Light-Theme</li>
+        <li>Multi-Step Register (Micro-Commitment)</li>
+        <li>Profil: Trust-Score prominent</li>
+        <li>Verifizierungs-Fortschritt sichtbar</li>
+        <li>Offentliches Profil mit Deal-History</li>
+      </ul>
+    </div>
+    <div style="background:rgba(27,101,166,0.1);border:1px solid rgba(27,101,166,0.2);padding:16px;border-radius:10px">
+      <div style="font-weight:600;color:#1B65A6;margin-bottom:8px">Inserat erstellen</div>
+      <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.8">
+        <li>4-Step Wizard beibehalten</li>
+        <li>Fortschrittsbalken (Zeigarnik)</li>
+        <li>Drag & Drop Bildupload</li>
+        <li>Bessere Formular-Validierung</li>
+        <li>Vorschau vor Veroffentlichung</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <span class="label">Phase 3 — Deal-Flow & Checkout</span>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+    <div style="background:rgba(217,119,6,0.1);border:1px solid rgba(217,119,6,0.2);padding:16px;border-radius:10px">
+      <div style="font-weight:600;color:#D97706;margin-bottom:8px">Checkout & Payment</div>
+      <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.8">
+        <li>Checkout-Seite: clean, Stripe-Einbettung</li>
+        <li>Treuhand-Erklarung im Checkout</li>
+        <li>Fortschrittsanzeige: Bezahlen → Versand → Bestatigung</li>
+        <li>Bestatigungsseite mit nachsten Schritten</li>
+      </ul>
+    </div>
+    <div style="background:rgba(217,119,6,0.1);border:1px solid rgba(217,119,6,0.2);padding:16px;border-radius:10px">
+      <div style="font-weight:600;color:#D97706;margin-bottom:8px">Deal-Management</div>
+      <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.8">
+        <li>Deal-Detail: Status-Timeline statt Textliste</li>
+        <li>Dashboard: Ubersichtliche Tabelle/Cards</li>
+        <li>Versand-Tracking Integration</li>
+        <li>Streitfall-Flow mit klaren Schritten</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <span class="label">Phase 4 — Neue Features (was Kleinanzeigen nicht hat)</span>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px">
+    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:16px;border-radius:10px">
+      <div style="font-weight:600;margin-bottom:8px">Bewertungssystem</div>
+      <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.8">
+        <li>Bewertung nach abgeschlossenem Deal</li>
+        <li>Sterne + Freitext</li>
+        <li>Bewertungen offentlich auf Profil</li>
+        <li>Vault: "4.7/5 glaubwurdiger als 5.0"</li>
+      </ul>
+    </div>
+    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:16px;border-radius:10px">
+      <div style="font-weight:600;margin-bottom:8px">Gamification (leicht)</div>
+      <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.8">
+        <li>Trust-Level: Neu → Verifiziert → Trusted → Elite</li>
+        <li>Fortschrittsbalken: "Noch 2 Deals bis Trusted"</li>
+        <li>Profil-Vollstandigkeit anzeigen</li>
+        <li>Vault: Hook-Modell, Zeigarnik-Effekt</li>
+      </ul>
+    </div>
+    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:16px;border-radius:10px">
+      <div style="font-weight:600;margin-bottom:8px">Suche & Entdecken</div>
+      <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.8">
+        <li>Filter: Preis, Zustand, Entfernung, Treuhand</li>
+        <li>Sortierung: Relevanz, Preis, Neueste</li>
+        <li>Algolia Full-Text-Suche aktivieren</li>
+        <li>Gespeicherte Suchen / Benachrichtigungen</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <span class="label">Phase 5 — Performance, SEO & Wachstum</span>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:16px;border-radius:10px">
+      <div style="font-weight:600;margin-bottom:8px">Performance</div>
+      <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.8">
+        <li>LCP < 2.5s (AVIF + WebP Bilder)</li>
+        <li>INP < 200ms (lazy JS, defer non-critical)</li>
+        <li>CLS < 0.1 (explicit image dimensions)</li>
+        <li>Fonts: self-hosted, font-display: optional</li>
+        <li>Vault: "Jede 100ms = +1% Conversions"</li>
+      </ul>
+    </div>
+    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:16px;border-radius:10px">
+      <div style="font-weight:600;margin-bottom:8px">SEO & Structured Data</div>
+      <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.8">
+        <li>Schema: Product, BreadcrumbList, WebSite</li>
+        <li>Open Graph Tags fur Social Sharing</li>
+        <li>Sitemap + robots.txt optimiert</li>
+        <li>WCAG 2.2 AA Konformitat</li>
+        <li>Vault: "Schema erhoht Rich-Snippet-Chancen 40-60%"</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:32px 0">
+
+<div class="section">
+  <span class="label">Obsidian-Vault: Ehren-Deal Hub-Struktur</span>
+  <p style="opacity:0.7;font-size:14px;margin-bottom:16px">Neuer Ordner <code>Projekte/Ehren-Deal/</code> mit Unterseiten, verknupft mit deinem bestehenden Wissen.</p>
+
+  <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:24px;font-family:monospace;font-size:13px;line-height:2">
+    <div style="color:#22A06B">Projekte/Ehren-Deal/</div>
+    <div style="padding-left:20px">
+      <div>Ehren-Deal.md <span style="opacity:0.5">— Hub-Seite, Ubersicht, Links zu allem</span></div>
+      <div style="color:#1B65A6;margin-top:8px">Design/</div>
+      <div style="padding-left:20px">
+        <div>Markenidentitat.md <span style="opacity:0.5">— Archetyp, Tonalitat, Farben, Typografie</span></div>
+        <div>Farbpalette.md <span style="opacity:0.5">— Alle Farben mit Vault-Begrundungen</span></div>
+        <div>Komponenten.md <span style="opacity:0.5">— Cards, Badges, Buttons, Forms</span></div>
+        <div>Seitenarchitektur.md <span style="opacity:0.5">— Jede Seite: Aufbau, CRO-Prinzipien</span></div>
+      </div>
+      <div style="color:#1B65A6;margin-top:8px">Psychologie/</div>
+      <div style="padding-left:20px">
+        <div>Trust-Strategie.md <span style="opacity:0.5">— Wie Trust Engineering auf ED angewandt wird</span></div>
+        <div>Customer-Journey.md <span style="opacity:0.5">— Kaufer + Verkaufer Journey auf ED</span></div>
+        <div>Conversion-Map.md <span style="opacity:0.5">— Welches Vault-Prinzip wo auf der Seite wirkt</span></div>
+        <div>Gamification-Plan.md <span style="opacity:0.5">— Trust-Levels, Fortschritt, Hooks</span></div>
+      </div>
+      <div style="color:#1B65A6;margin-top:8px">Technik/</div>
+      <div style="padding-left:20px">
+        <div>Architektur.md <span style="opacity:0.5">— Astro, Prisma, APIs, Integrationen</span></div>
+        <div>Performance.md <span style="opacity:0.5">— Core Web Vitals, Bildoptimierung, Fonts</span></div>
+        <div>SEO.md <span style="opacity:0.5">— Structured Data, Sitemap, OG Tags</span></div>
+      </div>
+      <div style="color:#1B65A6;margin-top:8px">Roadmap/</div>
+      <div style="padding-left:20px">
+        <div>Phasen-Ubersicht.md <span style="opacity:0.5">— Die 5 Phasen mit Status-Tracking</span></div>
+        <div>Wettbewerb.md <span style="opacity:0.5">— Kleinanzeigen vs. Ehren-Deal Vergleich</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:24px">
+  <span class="label">Vault-Vernetzung: Bestehende Notizen → Ehren-Deal</span>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;font-size:13px">
+    <div style="background:rgba(255,255,255,0.05);padding:16px;border-radius:8px">
+      <strong>Trust-Strategie.md verlinkt zu:</strong>
+      <ul style="margin:8px 0 0;padding-left:16px;opacity:0.8">
+        <li>[[08 - Trust Engineering]] — Theorie</li>
+        <li>[[03 - Social Proof Manipulation]] — Bewertungen</li>
+        <li>[[15 - Ethik, Recht & Grenzen]] — keine Fake-Reviews</li>
+      </ul>
+    </div>
+    <div style="background:rgba(255,255,255,0.05);padding:16px;border-radius:8px">
+      <strong>Customer-Journey.md verlinkt zu:</strong>
+      <ul style="margin:8px 0 0;padding-left:16px;opacity:0.8">
+        <li>[[Marketing/Customer Journey Mapping]] — Framework</li>
+        <li>[[07 - Micro-Commitments]] — Stufenmodell</li>
+        <li>[[09 - Gamification]] — Hook-Modell</li>
+      </ul>
+    </div>
+    <div style="background:rgba(255,255,255,0.05);padding:16px;border-radius:8px">
+      <strong>Conversion-Map.md verlinkt zu:</strong>
+      <ul style="margin:8px 0 0;padding-left:16px;opacity:0.8">
+        <li>[[Marketing/CRO]] — Pyramide + Checkliste</li>
+        <li>[[01 - Kognitive Verzerrungen]] — Biases</li>
+        <li>[[14 - Farb- und Formpsychologie]] — Design</li>
+      </ul>
+    </div>
+    <div style="background:rgba(255,255,255,0.05);padding:16px;border-radius:8px">
+      <strong>Markenidentitat.md verlinkt zu:</strong>
+      <ul style="margin:8px 0 0;padding-left:16px;opacity:0.8">
+        <li>[[Marketing/Brand Archetypes]] — Beschutzer</li>
+        <li>[[Farbwirkung-Tabelle]] — Referenz</li>
+        <li>[[13 - Copywriting-Formeln]] — Tonalitat</li>
+      </ul>
+    </div>
+  </div>
+</div>

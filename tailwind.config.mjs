@@ -60,6 +60,9 @@ export default {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
         body: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
         headings: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        // Legacy aliases (used by pages not yet migrated to Phase 2)
+        condensed: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        serif: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
       },
       borderRadius: {
         DEFAULT: '10px',
