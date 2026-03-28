@@ -9,7 +9,7 @@ url.searchParams.set("pageSize", "20");
 url.searchParams.set("page", "1");
 
 for (const [k, v] of Astro.url.searchParams) {
-    if (["query", "category", "minPrice", "maxPrice", "city", "lat", "lng", "radius", "page", "pageSize", "sort"].includes(k)) {
+    if (["query", "category", "minPrice", "maxPrice", "city", "lat", "lng", "radius", "page", "pageSize", "sort", "treuhand"].includes(k)) {
         url.searchParams.set(k, v);
     }
 }
@@ -27,6 +27,7 @@ const currentCat = Astro.url.searchParams.get("category") ?? "";
 const currentSort = Astro.url.searchParams.get("sort") ?? "";
 const currentMinPrice = Astro.url.searchParams.get("minPrice") ?? "";
 const currentMaxPrice = Astro.url.searchParams.get("maxPrice") ?? "";
+const currentTreuhand = Astro.url.searchParams.get("treuhand") === "true";
 ---
 
 <BaseLayout title="Ehren-Deal – Sicher kaufen und verkaufen">
@@ -129,6 +130,10 @@ const currentMaxPrice = Astro.url.searchParams.get("maxPrice") ?? "";
                             <input id="minPrice" name="minPrice" type="number" min="0" value={currentMinPrice} placeholder="€ von" class="input-field w-24 text-sm py-2" />
                             <label class="sr-only" for="maxPrice">Maximalpreis</label>
                             <input id="maxPrice" name="maxPrice" type="number" min="0" value={currentMaxPrice} placeholder="€ bis" class="input-field w-24 text-sm py-2" />
+                            <label class="flex items-center gap-1.5 text-sm text-text-secondary cursor-pointer select-none whitespace-nowrap">
+                                <input type="checkbox" name="treuhand" value="true" checked={currentTreuhand} class="accent-primary w-4 h-4" />
+                                Nur Treuhand-Schutz
+                            </label>
                             <button type="submit" class="btn-ghost text-sm py-2">Filtern</button>
                         </form>
                         <form method="GET" id="sortForm">
@@ -136,6 +141,7 @@ const currentMaxPrice = Astro.url.searchParams.get("maxPrice") ?? "";
                             {currentCat && <input type="hidden" name="category" value={currentCat} />}
                             {currentMinPrice && <input type="hidden" name="minPrice" value={currentMinPrice} />}
                             {currentMaxPrice && <input type="hidden" name="maxPrice" value={currentMaxPrice} />}
+                            {currentTreuhand && <input type="hidden" name="treuhand" value="true" />}
                             <select name="sort" onchange="this.form.submit()" class="select-field w-auto py-2 px-3 text-sm cursor-pointer">
                                 <option value="" selected={!currentSort}>Neueste zuerst</option>
                                 <option value="price_asc" selected={currentSort === "price_asc"}>Preis aufsteigend</option>
@@ -402,6 +408,47 @@ const currentMaxPrice = Astro.url.searchParams.get("maxPrice") ?? "";
 
     </main>
     <Footer />
+
+    <script is:inline type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Was ist der Treuhand-Schutz?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Beim Treuhand-Schutz wird dein Geld sicher auf einem Treuhandkonto verwahrt. Erst wenn du den Erhalt der Ware bestätigst, wird der Betrag an den Verkäufer freigegeben."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Was kostet Ehren-Deal?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Das Erstellen von Inseraten ist kostenlos. Bei einem erfolgreichen Verkauf fällt für den Käufer eine Servicegebühr von 0,50 € und für den Verkäufer eine Provision von 5% an."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Wie funktioniert die Verifizierung?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Du kannst dich per E-Mail, Telefonnummer und Identitätsprüfung (KYC) verifizieren. Je mehr Verifizierungen, desto höher dein Trust-Score."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Was passiert bei Problemen mit einem Kauf?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Unser Support-Team hilft dir weiter. Bei Treuhand-Käufen ist dein Geld geschützt, bis die Situation geklärt ist."
+          }
+        }
+      ]
+    }
+    </script>
 </BaseLayout>
 
 <script>
