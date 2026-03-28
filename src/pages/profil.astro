@@ -44,6 +44,26 @@ const completedDeals = dbUser.sellerDeals.length;
 const memberSince = dbUser.createdAt.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
 const cityDisplay = dbUser.city || '';
 
+// Trust-Level Gamification
+const trustLevels = [
+    { name: 'NEW', label: 'Neu', threshold: 0 },
+    { name: 'BASIC', label: 'Basis', threshold: 20 },
+    { name: 'VERIFIED', label: 'Verifiziert', threshold: 40 },
+    { name: 'TRUSTED', label: 'Vertraut', threshold: 70 },
+    { name: 'ELITE', label: 'Elite', threshold: 90 },
+];
+const currentLevelIdx = trustLevels.findIndex(l => l.name === trustLevel);
+const currentLevelInfo = trustLevels[currentLevelIdx] ?? trustLevels[0];
+const nextLevelInfo = currentLevelIdx < trustLevels.length - 1 ? trustLevels[currentLevelIdx + 1] : null;
+const pointsToNext = nextLevelInfo ? nextLevelInfo.threshold - trustScore : 0;
+const progressPercent = nextLevelInfo
+    ? Math.min(100, Math.round(((trustScore - currentLevelInfo.threshold) / (nextLevelInfo.threshold - currentLevelInfo.threshold)) * 100))
+    : 100;
+
+// Profile completeness
+const verifiedFields = [dbUser.emailVerified, dbUser.phoneVerified, dbUser.idVerified].filter(Boolean).length;
+const profileCompleteness = Math.round((verifiedFields / 3) * 100);
+
 // Mask phone for display
 function maskPhone(phone: string | null): string {
     if (!phone) return '';
@@ -179,6 +199,43 @@ function maskPhone(phone: string | null): string {
                                 <span>0</span>
                                 <span class="font-bold text-success">{trustScore} / 100</span>
                                 <span>100</span>
+                            </div>
+
+                            <!-- Trust Level Progress -->
+                            <div class="mt-4 p-3 bg-background rounded-lg">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-label font-semibold text-text">Level: {currentLevelInfo.label}</span>
+                                    {nextLevelInfo ? (
+                                        <span class="text-caption text-primary font-medium">Nächstes: {nextLevelInfo.label}</span>
+                                    ) : (
+                                        <span class="text-caption text-success font-medium">Max. Level erreicht!</span>
+                                    )}
+                                </div>
+                                {nextLevelInfo && (
+                                    <div>
+                                        <div class="bg-border h-1.5 rounded-full overflow-hidden mb-2">
+                                            <div class="h-full bg-primary rounded-full transition-all duration-500" style={`width:${progressPercent}%`}></div>
+                                        </div>
+                                        <p class="text-caption text-text-muted">
+                                            Noch <strong class="text-primary">{pointsToNext} Punkte</strong> bis <strong>{nextLevelInfo.label}</strong>
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+
+                            <!-- Profile Completeness -->
+                            <div class="mt-3 p-3 bg-background rounded-lg">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-label font-semibold text-text">Profil-Vollständigkeit</span>
+                                    <span class={`text-caption font-bold ${profileCompleteness === 100 ? 'text-success' : 'text-accent'}`}>{profileCompleteness}%</span>
+                                </div>
+                                <div class="bg-border h-1.5 rounded-full overflow-hidden mb-2">
+                                    <div class={`h-full rounded-full transition-all duration-500 ${profileCompleteness === 100 ? 'bg-success' : 'bg-accent'}`} style={`width:${profileCompleteness}%`}></div>
+                                </div>
+                                <p class="text-caption text-text-muted">
+                                    {verifiedFields} von 3 Verifizierungen abgeschlossen
+                                    {profileCompleteness < 100 && <span> (E-Mail, Telefon, KYC)</span>}
+                                </p>
                             </div>
                         </div>
                     </div>
