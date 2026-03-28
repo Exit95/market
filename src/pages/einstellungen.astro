@@ -70,7 +70,7 @@ if (!dbUser) return Astro.redirect("/anmelden?redirect=/einstellungen");
                     </div>
                 </div>
 
-                <hr class="border-foreground/10 my-6" />
+                <hr class="border-border my-6" />
 
                 <h2 class="panel-title">Persönliche Daten</h2>
                 <p class="panel-desc">Bearbeite deine Profildaten. Diese werden bei Deals und auf deinem Profil angezeigt.</p>
@@ -193,59 +193,59 @@ if (!dbUser) return Astro.redirect("/anmelden?redirect=/einstellungen");
 </BaseLayout>
 
 <style>
-    .settings-main { @apply pb-16 min-h-screen text-foreground font-body; }
+    .settings-main { @apply pb-16 min-h-screen text-text font-body bg-background; }
     .settings-container { @apply max-w-2xl mx-auto px-4 sm:px-6 py-10; }
 
-    .back-link { @apply inline-flex items-center gap-2 text-xs font-condensed tracking-wider uppercase text-foreground/50 hover:text-primary transition-colors mb-6; }
-    .settings-title { @apply text-2xl font-headings font-light tracking-wide text-foreground mb-6; }
+    .back-link { @apply inline-flex items-center gap-2 text-xs text-text-muted hover:text-primary transition-colors mb-6; }
+    .settings-title { @apply text-2xl font-bold text-text mb-6; }
 
-    .settings-tabs { @apply flex gap-1 border-b border-foreground/20 mb-8; }
-    .settings-tab { @apply px-4 py-3 text-xs font-condensed uppercase tracking-[.1em] text-foreground/50 hover:text-foreground transition-colors border-b-2 border-transparent cursor-pointer bg-transparent; }
+    .settings-tabs { @apply flex gap-1 border-b border-border mb-8; }
+    .settings-tab { @apply px-4 py-3 text-xs font-semibold text-text-muted hover:text-text transition-colors border-b-2 border-transparent cursor-pointer bg-transparent; }
     .settings-tab.active { @apply text-primary border-primary; }
 
     .settings-panel { @apply animate-fadeIn; }
     .settings-panel.hidden { display: none; }
-    .panel-title { @apply text-sm font-condensed uppercase tracking-[.1em] text-foreground/80 mb-2; }
-    .panel-desc { @apply text-xs text-foreground/50 mb-6 font-light; }
+    .panel-title { @apply text-sm font-semibold text-text-secondary mb-2; }
+    .panel-desc { @apply text-xs text-text-muted mb-6; }
 
     .settings-form { @apply flex flex-col gap-5; }
     .form-row { @apply grid grid-cols-1 sm:grid-cols-2 gap-5; }
     .form-group { @apply flex flex-col gap-1.5; }
-    .form-group label { @apply text-xs font-condensed uppercase tracking-[.08em] text-foreground/60; }
-    .form-group input { @apply w-full p-3 bg-secondary/40 border border-foreground/20 text-foreground text-sm outline-none transition-colors; }
+    .form-group label { @apply text-xs font-semibold text-text-secondary; }
+    .form-group input { @apply w-full p-3 bg-surface border border-border text-text text-sm rounded outline-none transition-colors; }
     .form-group input:focus { @apply border-primary/50; }
     .form-group input:disabled { @apply opacity-50 cursor-not-allowed; }
-    .form-hint { @apply text-[.65rem] text-foreground/40 font-light; }
+    .form-hint { @apply text-[.65rem] text-text-muted; }
 
     .form-msg { @apply text-xs py-2 min-h-[1.5rem]; }
-    .form-msg.error { @apply text-red-400; }
-    .form-msg.success { @apply text-green-400; }
+    .form-msg.error { @apply text-danger; }
+    .form-msg.success { @apply text-success; }
 
     /* Security */
-    .security-info { @apply mt-8 pt-6 border-t border-foreground/10; }
+    .security-info { @apply mt-8 pt-6 border-t border-border; }
     .verif-status-list { @apply flex flex-col gap-2 mt-3; }
-    .verif-status-item { @apply flex items-center justify-between p-3 bg-foreground/[.04] border border-foreground/10 text-sm; }
-    .status-ok { @apply text-green-400 text-xs font-condensed tracking-wider; }
-    .status-pending { @apply text-yellow-400 text-xs font-condensed tracking-wider; }
+    .verif-status-item { @apply flex items-center justify-between p-3 bg-background border border-border text-sm rounded; }
+    .status-ok { @apply text-success text-xs font-semibold; }
+    .status-pending { @apply text-accent text-xs font-semibold; }
 
     /* Notifications */
     .notification-options { @apply flex flex-col gap-3; }
-    .notif-toggle { @apply flex items-center justify-between p-4 bg-foreground/[.04] border border-foreground/10 cursor-pointer transition-colors hover:bg-foreground/[.08]; }
-    .notif-label { @apply text-sm text-foreground/80 font-medium block; }
-    .notif-desc { @apply text-[.65rem] text-foreground/40 font-light block mt-0.5; }
+    .notif-toggle { @apply flex items-center justify-between p-4 bg-background border border-border cursor-pointer transition-colors hover:bg-surface rounded; }
+    .notif-label { @apply text-sm text-text font-medium block; }
+    .notif-desc { @apply text-[.65rem] text-text-muted block mt-0.5; }
 
     .notif-toggle input { @apply hidden; }
-    .toggle-slider { @apply relative w-10 h-5 bg-foreground/20 rounded-full flex-shrink-0 transition-colors; }
-    .toggle-slider::after { content:''; @apply absolute top-0.5 left-0.5 w-4 h-4 bg-foreground/60 rounded-full transition-transform; }
+    .toggle-slider { @apply relative w-10 h-5 bg-border rounded-full flex-shrink-0 transition-colors; }
+    .toggle-slider::after { content:''; @apply absolute top-0.5 left-0.5 w-4 h-4 bg-text-muted rounded-full transition-transform; }
     .notif-toggle input:checked ~ .toggle-slider { @apply bg-primary/60; }
     .notif-toggle input:checked ~ .toggle-slider::after { @apply translate-x-5 bg-primary; }
 
     /* Avatar */
     .avatar-section { @apply flex items-center gap-5 mb-2; }
-    .avatar-preview { @apply relative w-20 h-20 rounded-full bg-secondary/60 border border-foreground/20 flex items-center justify-center overflow-hidden cursor-pointer flex-shrink-0; }
+    .avatar-preview { @apply relative w-20 h-20 rounded-full bg-background border border-border flex items-center justify-center overflow-hidden cursor-pointer flex-shrink-0; }
     .avatar-img { @apply w-full h-full object-cover; }
-    .avatar-initials { @apply text-2xl font-headings text-primary font-light; }
-    .avatar-overlay { @apply absolute inset-0 bg-black/60 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity text-foreground/80; }
+    .avatar-initials { @apply text-2xl text-primary font-semibold; }
+    .avatar-overlay { @apply absolute inset-0 bg-black/60 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity text-white; }
     .avatar-info { @apply flex flex-col; }
     .avatar-progress { @apply h-1 bg-primary/30 rounded-full overflow-hidden mt-1; }
     .avatar-progress-bar { @apply h-full bg-primary transition-all duration-300; }
@@ -434,4 +434,3 @@ document.getElementById('password-form')?.addEventListener('submit', async (e) =
     btn.textContent = 'Passwort ändern';
 });
 </script>
-
