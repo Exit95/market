@@ -8,8 +8,8 @@ interface Props {
   canonicalPath?: string;
 }
 const {
-  title = "Ehren-Deal – Handeln mit Handschlag",
-  description = "Deutschlands sicherste C2C-Plattform für lokale Deals mit digitalem Handschlag und Identitätsprüfung.",
+  title = "Ehren-Deal – Sicher kaufen und verkaufen",
+  description = "Deutschlands sicherster C2C-Marktplatz mit Treuhand-Schutz. Dein Geld ist sicher, bis du zufrieden bist.",
   ogImage = "/og-default.png",
   canonicalPath,
 } = Astro.props;
@@ -24,8 +24,13 @@ const canonical = canonicalPath ? `${siteUrl}${canonicalPath}` : Astro.url.href;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#0a0a0b" />
+    <meta name="theme-color" content="#1B65A6" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="canonical" href={canonical} />
+
+    <!-- Preload Inter Variable Font -->
+    <link rel="preload" href="/fonts/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -57,15 +62,8 @@ const canonical = canonicalPath ? `${siteUrl}${canonicalPath}` : Astro.url.href;
         "query-input": "required name=search_term_string"
       }
     })} />
-
-    <!-- Google Fonts: Cormorant Garamond + Barlow + Barlow Condensed -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;1,300&family=Barlow:wght@300;400;500&family=Barlow+Condensed:wght@400;500;600&display=swap" />
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;1,300&family=Barlow:wght@300;400;500&family=Barlow+Condensed:wght@400;500;600&display=swap" rel="stylesheet" />
   </head>
-  <body class="bg-background text-foreground font-body antialiased">
-    <div class="bg-grain"></div>
+  <body class="bg-background text-text font-body antialiased">
     <slot />
   </body>
 </html>
