@@ -9,43 +9,40 @@ const totalListings = categories.reduce((s, c) => s + c.count, 0);
 
 <BaseLayout title="Kategorien – Ehren-Deal">
     <Header />
-    <main class="min-h-screen pt-12 pb-24">
+    <main id="main-content" class="min-h-screen pt-12 pb-24">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
             <!-- Breadcrumb -->
-            <nav class="flex items-center gap-2 text-foreground/50 mb-6 flex-wrap font-condensed tracking-wide uppercase text-xs">
+            <nav class="flex items-center gap-2 text-text-secondary mb-6 flex-wrap text-sm">
                 <a href="/" class="hover:text-primary transition-colors">Startseite</a>
-                <span class="text-foreground/25">&rsaquo;</span>
-                <span class="text-foreground/70">Kategorien</span>
+                <span class="text-text-muted">/</span>
+                <span class="text-text">Kategorien</span>
             </nav>
 
             <!-- Header -->
             <div class="mb-8 text-center">
-                <h1 class="text-3xl sm:text-4xl font-headings font-light text-foreground mb-3">Alle Kategorien</h1>
-                <p class="text-foreground/60 text-sm font-light mb-1">
+                <h1 class="text-h1 sm:text-3xl text-text mb-3">Alle Kategorien</h1>
+                <p class="text-text-secondary text-sm mb-1">
                     Finde genau das, was du suchst &ndash; in einer unserer Kategorien.
                 </p>
-                <p class="text-foreground/40 text-xs font-light">
+                <p class="text-text-muted text-caption">
                     {totalListings.toLocaleString('de-DE')} Anzeigen in {categories.length} Kategorien
                 </p>
             </div>
 
             <!-- Search Bar -->
             <form action="/" method="GET" class="max-w-xl mx-auto mb-12">
-                <div class="flex items-center gap-2 bg-secondary/30 border border-foreground/[.15] rounded p-1.5 focus-within:border-primary/40 transition-colors">
-                    <svg class="w-5 h-5 text-foreground/40 ml-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <div class="flex items-center gap-2 bg-surface border border-border rounded-DEFAULT p-1.5 focus-within:border-primary transition-colors">
+                    <svg class="w-5 h-5 text-text-muted ml-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                     </svg>
                     <input
                         name="query"
                         type="text"
                         placeholder="Was suchst du?"
-                        class="flex-1 bg-transparent text-sm text-foreground placeholder:text-foreground/40 outline-none py-2 px-1 font-light"
+                        class="flex-1 bg-transparent text-sm text-text placeholder:text-text-muted outline-none py-2 px-1"
                     />
-                    <button
-                        type="submit"
-                        class="bg-primary text-primary-foreground text-sm font-condensed uppercase tracking-wide px-5 py-2 rounded hover:bg-primary/90 transition-colors flex-shrink-0"
-                    >
+                    <button type="submit" class="btn-primary text-sm px-5 py-2">
                         Suchen
                     </button>
                 </div>
@@ -56,9 +53,9 @@ const totalListings = categories.reduce((s, c) => s + c.count, 0);
                 {categories.map((cat) => (
                     <a
                         href={`/?category=${cat.slug.toUpperCase()}`}
-                        class="group flex flex-col items-center text-center gap-3 bg-secondary/40 border border-foreground/[.15] p-5 sm:p-6 rounded hover:border-primary/40 hover:bg-primary/[.05] transition-all duration-200"
+                        class="group card flex flex-col items-center text-center gap-3 p-5 sm:p-6 hover:border-primary/40 transition-all duration-200"
                     >
-                        <div class="w-14 h-14 flex items-center justify-center bg-foreground/[.07] border border-foreground/[.15] rounded group-hover:border-primary/25 group-hover:bg-primary/[.08] transition-all duration-200">
+                        <div class="w-14 h-14 flex items-center justify-center bg-background border border-border rounded-DEFAULT group-hover:border-primary/25 group-hover:bg-primary-light transition-all duration-200">
                             <img
                                 src={cat.icon}
                                 alt=""
@@ -67,10 +64,10 @@ const totalListings = categories.reduce((s, c) => s + c.count, 0);
                             />
                         </div>
                         <div class="min-w-0">
-                            <h2 class="font-condensed font-medium text-base uppercase tracking-wide text-foreground/80 group-hover:text-primary transition-colors leading-tight">
+                            <h2 class="font-semibold text-sm text-text group-hover:text-primary transition-colors leading-tight">
                                 {cat.label}
                             </h2>
-                            <p class="text-xs text-foreground/40 font-light mt-1">
+                            <p class="text-caption text-text-muted mt-1">
                                 {cat.count.toLocaleString('de-DE')} Anzeigen
                             </p>
                         </div>
@@ -79,11 +76,11 @@ const totalListings = categories.reduce((s, c) => s + c.count, 0);
             </div>
 
             <!-- Trust Message -->
-            <div class="mt-14 flex items-center justify-center gap-2.5 text-foreground/50">
-                <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <div class="mt-14 flex items-center justify-center gap-2.5 text-text-secondary">
+                <svg class="w-5 h-5 text-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
                 </svg>
-                <p class="text-xs font-light">
+                <p class="text-sm">
                     Alle Anzeigen werden gepr&uuml;ft. Verd&auml;chtige Inserate werden automatisch erkannt und entfernt.
                 </p>
             </div>
