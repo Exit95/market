@@ -133,38 +133,39 @@ const STATUS_LABEL: Record<string, string> = {
 </BaseLayout>
 
 <style>
-    .dash-wrap { @apply py-10 pb-16 bg-background min-h-screen text-foreground font-body max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
+    .dash-wrap { @apply py-10 pb-16 bg-background min-h-screen text-text font-body max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
 
     /* Breadcrumb */
-    .breadcrumb { @apply flex items-center gap-2 text-xs font-condensed uppercase tracking-wider text-foreground/50 mb-6; }
-    .breadcrumb a { @apply text-foreground/50 hover:text-primary transition-colors no-underline; }
-    .breadcrumb-sep { @apply text-foreground/30; }
-    .breadcrumb-current { @apply text-foreground/80; }
+    .breadcrumb { @apply flex items-center gap-2 text-xs text-text-muted mb-6; }
+    .breadcrumb a { @apply text-text-muted hover:text-primary transition-colors no-underline; }
+    .breadcrumb-sep { @apply text-text-muted; }
+    .breadcrumb-current { @apply text-text; }
 
-    .dash-header { @apply flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-6 border-b border-secondary gap-4; }
-    .dash-header h1 { @apply text-2xl font-headings font-light text-foreground tracking-wide m-0; }
+    .dash-header { @apply flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-6 border-b border-border gap-4; }
+    .dash-header h1 { @apply text-2xl font-semibold text-text m-0; }
 
     /* Empty state */
-    .empty-state { @apply text-center py-16 px-4 bg-secondary/40 border border-dashed border-foreground/[.15] text-foreground/75 font-light rounded; }
-    .empty-icon { @apply w-12 h-12 mx-auto mb-4 text-foreground/30; }
-    .empty-title { @apply text-lg font-headings font-light text-foreground/80 mb-2; }
-    .empty-desc { @apply text-sm text-foreground/50 max-w-md mx-auto; }
+    .empty-state { @apply text-center py-16 px-4 bg-surface border border-dashed border-border text-text-secondary rounded; }
+    .empty-icon { @apply w-12 h-12 mx-auto mb-4 text-text-muted; }
+    .empty-title { @apply text-lg font-semibold text-text mb-2; }
+    .empty-desc { @apply text-sm text-text-muted max-w-md mx-auto; }
 
     /* Table */
-    .listing-table-wrap { @apply bg-secondary/40 border border-foreground/[.15] rounded overflow-x-auto; }
+    .listing-table-wrap { @apply bg-surface border border-border rounded overflow-x-auto; }
     .listing-table { @apply w-full border-collapse text-left whitespace-nowrap; }
-    .listing-table th, .listing-table td { @apply px-6 py-4 border-b border-secondary text-sm; }
-    .listing-table th { @apply font-condensed font-medium text-foreground/80 bg-foreground/[.12] uppercase tracking-[.12em] text-[10px]; }
+    .listing-table th, .listing-table td { @apply px-6 py-4 border-b border-border text-sm; }
+    .listing-table th { @apply font-medium text-text-secondary bg-background text-xs; }
     .listing-table tr { @apply transition-colors duration-200; }
-    .listing-table tr:hover td { @apply bg-secondary/30; }
+    .listing-table tr:hover td { @apply bg-background; }
     .listing-table tr:last-child td { @apply border-b-0; }
     .listing-table a { @apply font-bold text-primary hover:text-primary/80 transition-colors; }
 
-    .status-badge { @apply inline-flex items-center px-2.5 py-0.5 text-[10px] font-condensed tracking-[.1em] uppercase rounded; }
-    .status-active { @apply bg-success/10 text-success border border-success/20; }
-    .status-draft { @apply bg-foreground/20 text-foreground/80 border border-foreground/25; }
-    .status-sold { @apply bg-primary/10 text-primary border border-primary/20; }
-    .status-archived, .status-removed { @apply bg-destructive/10 text-destructive border border-destructive/20; }
+    .status-badge { @apply inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full; }
+    .status-active { @apply bg-success-light text-success; }
+    .status-draft { @apply bg-background text-text-muted; }
+    .status-sold { @apply bg-primary-light text-primary; }
+    .status-reserved { @apply bg-accent-light text-accent; }
+    .status-archived, .status-removed { @apply bg-danger-light text-danger; }
 
     .action-cell { @apply flex items-center gap-2; }
     .btn-xs { @apply px-3 py-1.5 text-xs; }
