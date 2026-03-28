@@ -62,6 +62,16 @@ const canonical = canonicalPath ? `${siteUrl}${canonicalPath}` : Astro.url.href;
         "query-input": "required name=search_term_string"
       }
     })} />
+
+    <!-- JSON-LD Organization -->
+    <script is:inline type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Ehren-Deal",
+      "url": siteUrl,
+      "description": "Deutschlands sicherster C2C-Marktplatz mit Treuhand-Schutz",
+      "logo": `${siteUrl}/logo.png`
+    })} />
   </head>
   <body class="bg-background text-text font-body antialiased">
     <slot />
