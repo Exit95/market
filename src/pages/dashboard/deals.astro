@@ -23,15 +23,15 @@ const STATUS_LABEL: Record<string, string> = {
     DISPUTED: "Strittig",
 };
 const STATUS_COLOR: Record<string, string> = {
-    PENDING: "bg-yellow-100 text-yellow-800",
-    PAYMENT_PENDING: "bg-orange-100 text-orange-800",
-    PAID: "bg-indigo-100 text-indigo-800",
-    SHIPPED: "bg-blue-100 text-blue-800",
-    DELIVERED: "bg-teal-100 text-teal-800",
-    COMPLETED: "bg-green-100 text-green-800",
-    CANCELLED: "bg-gray-100 text-gray-600",
-    REFUNDED: "bg-gray-100 text-gray-600",
-    DISPUTED: "bg-red-100 text-red-800",
+    PENDING: "bg-accent-light text-accent",
+    PAYMENT_PENDING: "bg-accent-light text-accent",
+    PAID: "bg-primary-light text-primary",
+    SHIPPED: "bg-primary-light text-primary",
+    DELIVERED: "bg-success-light text-success",
+    COMPLETED: "bg-success-light text-success",
+    CANCELLED: "bg-background text-text-muted",
+    REFUNDED: "bg-background text-text-muted",
+    DISPUTED: "bg-danger-light text-danger",
 };
 const fmt = (cents: number) => (cents / 100).toLocaleString("de-DE", { style: "currency", currency: "EUR" });
 ---
@@ -80,18 +80,18 @@ const fmt = (cents: number) => (cents / 100).toLocaleString("de-DE", { style: "c
                             <div class="deal-info">
                                 <div class="deal-title">{d.listing?.title ?? "Deal"}</div>
                                 <div class="deal-meta">
-                                    <span class={`status-badge ${STATUS_COLOR[d.status] ?? "bg-gray-100 text-gray-600"}`}>
+                                    <span class={`status-badge ${STATUS_COLOR[d.status] ?? "bg-background text-text-muted"}`}>
                                         {STATUS_LABEL[d.status] ?? d.status}
                                     </span>
                                     <span class="deal-role">{roleLabel}</span>
                                 </div>
                                 <div class="deal-price">{fmt(d.totalAmount)}</div>
                                 {isBuyer ? (
-                                    <div class="text-[.6rem] text-foreground/40 font-light">
+                                    <div class="text-caption text-text-muted">
                                         Gezahlt: {fmt(d.totalAmount + 50)} (inkl. 0,50 € Servicegebühr)
                                     </div>
                                 ) : (
-                                    <div class="text-[.6rem] text-foreground/40 font-light">
+                                    <div class="text-caption text-text-muted">
                                         Auszahlung: {fmt(Math.round(d.totalAmount * 0.95))} (abzgl. 5 % Provision)
                                     </div>
                                 )}
@@ -109,34 +109,34 @@ const fmt = (cents: number) => (cents / 100).toLocaleString("de-DE", { style: "c
 </BaseLayout>
 
 <style>
-    .dash-wrap { @apply py-10 pb-16 bg-background min-h-screen text-foreground font-body max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
+    .dash-wrap { @apply py-10 pb-16 bg-background min-h-screen text-text font-body max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
 
     /* Breadcrumb */
-    .breadcrumb { @apply flex items-center gap-2 text-xs font-condensed uppercase tracking-wider text-foreground/50 mb-6; }
-    .breadcrumb a { @apply text-foreground/50 hover:text-primary transition-colors no-underline; }
-    .breadcrumb-sep { @apply text-foreground/30; }
-    .breadcrumb-current { @apply text-foreground/80; }
+    .breadcrumb { @apply flex items-center gap-2 text-xs text-text-muted mb-6; }
+    .breadcrumb a { @apply text-text-muted hover:text-primary transition-colors no-underline; }
+    .breadcrumb-sep { @apply text-text-muted; }
+    .breadcrumb-current { @apply text-text; }
 
-    .dash-header { @apply flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-6 border-b border-secondary gap-4; }
-    .dash-header h1 { @apply text-2xl font-headings font-light text-foreground tracking-wide m-0; }
+    .dash-header { @apply flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-6 border-b border-border gap-4; }
+    .dash-header h1 { @apply text-2xl font-semibold text-text m-0; }
 
     /* Empty state */
-    .empty-state { @apply text-center py-16 px-4 bg-secondary/40 border border-dashed border-foreground/[.15] text-foreground/75 font-light rounded; }
-    .empty-icon { @apply w-12 h-12 mx-auto mb-4 text-foreground/30; }
-    .empty-title { @apply text-lg font-headings font-light text-foreground/80 mb-2; }
-    .empty-desc { @apply text-sm text-foreground/50 max-w-md mx-auto; }
+    .empty-state { @apply text-center py-16 px-4 bg-surface border border-dashed border-border text-text-secondary rounded; }
+    .empty-icon { @apply w-12 h-12 mx-auto mb-4 text-text-muted; }
+    .empty-title { @apply text-lg font-semibold text-text mb-2; }
+    .empty-desc { @apply text-sm text-text-muted max-w-md mx-auto; }
 
     /* Deal grid & cards */
     .deal-grid { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4; }
-    .deal-card { @apply flex gap-4 p-4 bg-secondary/40 border border-foreground/[.15] rounded hover:border-foreground/25 transition-all no-underline text-foreground; }
-    .deal-img { @apply w-20 h-20 shrink-0 rounded overflow-hidden bg-secondary; }
+    .deal-card { @apply flex gap-4 p-4 bg-surface border border-border rounded hover:border-primary/40 hover:shadow-sm transition-all no-underline text-text; }
+    .deal-img { @apply w-20 h-20 shrink-0 rounded overflow-hidden bg-background; }
     .deal-img img { @apply w-full h-full object-cover; }
-    .deal-img-placeholder { @apply w-full h-full bg-secondary; }
+    .deal-img-placeholder { @apply w-full h-full bg-background; }
     .deal-info { @apply flex flex-col gap-1 min-w-0; }
     .deal-title { @apply font-semibold text-sm truncate; }
     .deal-meta { @apply flex items-center gap-2 flex-wrap; }
     .status-badge { @apply text-xs px-2 py-0.5 rounded-full font-medium; }
-    .deal-role { @apply text-xs text-foreground/50; }
-    .deal-price { @apply text-sm font-bold text-[var(--ehren-primary)]; }
-    .deal-partner { @apply text-xs text-foreground/50; }
+    .deal-role { @apply text-xs text-text-muted; }
+    .deal-price { @apply text-sm font-bold text-primary; }
+    .deal-partner { @apply text-xs text-text-muted; }
 </style>
