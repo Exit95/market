@@ -47,11 +47,11 @@ const imageUrl = listing.images?.[0]?.url ?? null;
 
 <BaseLayout title={`Checkout – ${listing.title} – Ehren-Deal`}>
     <Header />
-    <main class="min-h-screen pt-10 pb-24">
+    <main class="min-h-screen pt-10 pb-24 bg-background">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
             <!-- Breadcrumb -->
-            <nav class="mb-8 flex items-center gap-2 text-xs font-condensed tracking-wider uppercase text-foreground/50">
+            <nav class="mb-8 flex items-center gap-2 text-xs text-text-muted">
                 <a href="/" class="hover:text-primary transition-colors">Start</a>
                 <span>/</span>
                 <a href={`/listing/${id}`} class="hover:text-primary transition-colors truncate max-w-[200px]">{listing.title}</a>
@@ -61,12 +61,12 @@ const imageUrl = listing.images?.[0]?.url ?? null;
 
             <!-- Page Title -->
             <div class="text-center mb-10">
-                <p class="font-condensed text-[.7rem] font-medium tracking-[.2em] uppercase text-primary mb-4">Sicherer Checkout</p>
-                <h1 class="font-headings font-light text-3xl md:text-4xl leading-tight text-foreground mb-2">
+                <p class="text-label text-primary mb-4">Sicherer Checkout</p>
+                <h1 class="text-h1 text-text mb-2">
                     Treuhand-Zahlung
                 </h1>
-                <hr class="gold-rule" />
-                <p class="text-sm text-foreground/60 font-light max-w-lg mx-auto">
+                <div class="w-16 h-0.5 bg-primary mx-auto my-4"></div>
+                <p class="text-body-sm text-text-secondary max-w-lg mx-auto">
                     Dein Geld wird sicher auf dem Ehren-Deal Treuhandkonto verwahrt und erst nach Bestatigung des Wareneingangs freigegeben.
                 </p>
             </div>
@@ -78,145 +78,145 @@ const imageUrl = listing.images?.[0]?.url ?? null;
                 <div class="space-y-6">
 
                     <!-- Security Banner -->
-                    <div class="flex gap-3 p-4 border border-primary/20 bg-primary/[.03]">
+                    <div class="info-box flex gap-3 p-4">
                         <svg class="w-5 h-5 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                        <div class="text-sm text-foreground/80 font-light leading-relaxed">
+                        <div class="text-sm text-text leading-relaxed">
                             <strong class="text-primary font-medium">Treuhand-Schutz aktiv:</strong> Deine Zahlung wird auf einem separaten Sicherheitskonto verwahrt. Der Verkaufer erhalt das Geld erst, wenn du den Erhalt der Ware bestatigst.
                         </div>
                     </div>
 
                     <!-- Article Details -->
-                    <section class="border border-foreground/[.12] bg-secondary/30">
-                        <div class="p-4 border-b border-foreground/[.08]">
-                            <h2 class="font-condensed text-[.7rem] font-medium tracking-[.12em] uppercase text-foreground/60">Artikeldetails</h2>
+                    <section class="card">
+                        <div class="p-4 border-b border-border">
+                            <h2 class="text-label text-text-secondary">Artikeldetails</h2>
                         </div>
                         <div class="p-5 flex gap-5">
                             {imageUrl ? (
-                                <img src={imageUrl} alt={listing.title} class="w-28 h-28 object-cover border border-foreground/[.10] flex-shrink-0" />
+                                <img src={imageUrl} alt={listing.title} class="w-28 h-28 object-cover rounded border border-border flex-shrink-0" />
                             ) : (
-                                <div class="w-28 h-28 bg-secondary/60 border border-foreground/[.10] flex items-center justify-center flex-shrink-0">
-                                    <svg class="w-8 h-8 text-foreground/20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                                <div class="w-28 h-28 bg-background border border-border rounded flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-8 h-8 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                                 </div>
                             )}
                             <div class="flex-1 min-w-0">
                                 <div class="flex flex-wrap gap-2 mb-2">
-                                    <span class="inline-flex items-center px-2 py-0.5 text-[.6rem] font-condensed font-medium uppercase tracking-wider bg-secondary/60 text-foreground/70">{listing.category}</span>
+                                    <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded bg-background text-text-secondary">{listing.category}</span>
                                     {listing.condition && (
-                                        <span class="inline-flex items-center px-2 py-0.5 text-[.6rem] font-condensed font-medium uppercase tracking-wider bg-secondary/60 text-foreground/70">{listing.condition}</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded bg-background text-text-secondary">{listing.condition}</span>
                                     )}
-                                    <span class="inline-flex items-center px-2 py-0.5 text-[.6rem] font-condensed font-medium uppercase tracking-wider bg-primary/10 text-primary border border-primary/15">Treuhand</span>
+                                    <span class="badge-treuhand">Treuhand</span>
                                 </div>
-                                <h3 class="font-headings font-light text-xl text-foreground mb-1 truncate">{listing.title}</h3>
-                                <p class="text-sm text-foreground/50 font-light mb-2">{location}</p>
-                                <p class="font-headings text-lg text-primary font-light">{priceFormatted}</p>
+                                <h3 class="text-h3 text-text mb-1 truncate">{listing.title}</h3>
+                                <p class="text-body-sm text-text-muted mb-2">{location}</p>
+                                <p class="text-lg text-primary font-semibold">{priceFormatted}</p>
                             </div>
                         </div>
                     </section>
 
                     <!-- Seller Info -->
-                    <section class="border border-foreground/[.12] bg-secondary/30">
-                        <div class="p-4 border-b border-foreground/[.08]">
-                            <h2 class="font-condensed text-[.7rem] font-medium tracking-[.12em] uppercase text-foreground/60">Verkäufer</h2>
+                    <section class="card">
+                        <div class="p-4 border-b border-border">
+                            <h2 class="text-label text-text-secondary">Verkäufer</h2>
                         </div>
                         <div class="p-5 flex items-center gap-4">
-                            <div class="w-12 h-12 bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
-                                <span class="font-headings text-lg text-primary">{(seller.firstName ?? "?")[0]}</span>
+                            <div class="w-12 h-12 bg-primary-light rounded-full border border-primary/20 flex items-center justify-center flex-shrink-0">
+                                <span class="text-lg text-primary font-semibold">{(seller.firstName ?? "?")[0]}</span>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <p class="text-sm text-foreground font-light">{seller.firstName} {seller.lastName?.charAt(0)}.</p>
+                                <p class="text-sm text-text">{seller.firstName} {seller.lastName?.charAt(0)}.</p>
                                 <div class="flex flex-wrap gap-2 mt-1">
                                     {seller.emailVerified && (
-                                        <span class="inline-flex items-center gap-1 text-[.6rem] font-condensed font-medium uppercase tracking-wider text-green-400">
+                                        <span class="badge-verifiziert">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
                                             E-Mail verifiziert
                                         </span>
                                     )}
                                     {seller.idVerified && (
-                                        <span class="inline-flex items-center gap-1 text-[.6rem] font-condensed font-medium uppercase tracking-wider text-green-400">
+                                        <span class="badge-verifiziert">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
                                             Identität verifiziert
                                         </span>
                                     )}
                                 </div>
                             </div>
-                            <a href={`/nachrichten?listing=${id}`} class="btn-outline text-[.65rem] px-3 py-1.5">Kontaktieren</a>
+                            <a href={`/nachrichten?listing=${id}`} class="btn-outline text-xs px-3 py-1.5">Kontaktieren</a>
                         </div>
                     </section>
 
                     <!-- Delivery / Pickup -->
-                    <section class="border border-foreground/[.12] bg-secondary/30">
-                        <div class="p-4 border-b border-foreground/[.08]">
-                            <h2 class="font-condensed text-[.7rem] font-medium tracking-[.12em] uppercase text-foreground/60">Übergabe & Versand</h2>
+                    <section class="card">
+                        <div class="p-4 border-b border-border">
+                            <h2 class="text-label text-text-secondary">Übergabe & Versand</h2>
                         </div>
                         <div class="p-5 space-y-4">
                             <label class="flex items-start gap-3 cursor-pointer group">
-                                <input type="radio" name="delivery" value="pickup" checked class="mt-1 accent-[#c8973a]" />
+                                <input type="radio" name="delivery" value="pickup" checked class="mt-1 accent-primary" />
                                 <div>
-                                    <p class="text-sm text-foreground font-light group-hover:text-primary transition-colors">Persönliche Abholung</p>
-                                    <p class="text-xs text-foreground/50 font-light mt-0.5">Du holst den Artikel beim Verkäufer ab. Standort: {location || "Wird nach Kauf mitgeteilt"}</p>
+                                    <p class="text-sm text-text group-hover:text-primary transition-colors">Persönliche Abholung</p>
+                                    <p class="text-xs text-text-muted mt-0.5">Du holst den Artikel beim Verkäufer ab. Standort: {location || "Wird nach Kauf mitgeteilt"}</p>
                                 </div>
                             </label>
                             <label class="flex items-start gap-3 cursor-pointer group">
-                                <input type="radio" name="delivery" value="shipping" class="mt-1 accent-[#c8973a]" />
+                                <input type="radio" name="delivery" value="shipping" class="mt-1 accent-primary" />
                                 <div>
-                                    <p class="text-sm text-foreground font-light group-hover:text-primary transition-colors">Versand</p>
-                                    <p class="text-xs text-foreground/50 font-light mt-0.5">Der Verkäufer sendet den Artikel per versichertem Paketdienst. Versandkosten werden separat vereinbart.</p>
+                                    <p class="text-sm text-text group-hover:text-primary transition-colors">Versand</p>
+                                    <p class="text-xs text-text-muted mt-0.5">Der Verkäufer sendet den Artikel per versichertem Paketdienst. Versandkosten werden separat vereinbart.</p>
                                 </div>
                             </label>
                         </div>
                     </section>
 
                     <!-- Payment Method -->
-                    <section class="border border-foreground/[.12] bg-secondary/30">
-                        <div class="p-4 border-b border-foreground/[.08]">
-                            <h2 class="font-condensed text-[.7rem] font-medium tracking-[.12em] uppercase text-foreground/60">Zahlungsmethode</h2>
+                    <section class="card">
+                        <div class="p-4 border-b border-border">
+                            <h2 class="text-label text-text-secondary">Zahlungsmethode</h2>
                         </div>
                         <div class="p-5 space-y-4">
-                            <label class="flex items-start gap-3 cursor-pointer group border border-primary/20 bg-primary/[.03] p-3">
-                                <input type="radio" name="payment" value="stripe" checked class="mt-1 accent-[#c8973a]" />
+                            <label class="flex items-start gap-3 cursor-pointer group border border-primary/20 bg-primary-light/50 rounded p-3">
+                                <input type="radio" name="payment" value="stripe" checked class="mt-1 accent-primary" />
                                 <div class="flex-1">
                                     <div class="flex items-center gap-2">
-                                        <p class="text-sm text-foreground font-light">Kreditkarte / Debitkarte</p>
+                                        <p class="text-sm text-text">Kreditkarte / Debitkarte</p>
                                         <div class="flex gap-1 ml-auto">
-                                            <span class="px-1.5 py-0.5 text-[.55rem] font-condensed font-medium uppercase bg-secondary/60 text-foreground/60">VISA</span>
-                                            <span class="px-1.5 py-0.5 text-[.55rem] font-condensed font-medium uppercase bg-secondary/60 text-foreground/60">MC</span>
-                                            <span class="px-1.5 py-0.5 text-[.55rem] font-condensed font-medium uppercase bg-secondary/60 text-foreground/60">AMEX</span>
+                                            <span class="px-1.5 py-0.5 text-[.55rem] font-medium bg-background text-text-secondary rounded">VISA</span>
+                                            <span class="px-1.5 py-0.5 text-[.55rem] font-medium bg-background text-text-secondary rounded">MC</span>
+                                            <span class="px-1.5 py-0.5 text-[.55rem] font-medium bg-background text-text-secondary rounded">AMEX</span>
                                         </div>
                                     </div>
-                                    <p class="text-xs text-foreground/50 font-light mt-1">Sichere Zahlung über Stripe. Deine Kartendaten werden nie auf unseren Servern gespeichert.</p>
+                                    <p class="text-xs text-text-muted mt-1">Sichere Zahlung über Stripe. Deine Kartendaten werden nie auf unseren Servern gespeichert.</p>
                                 </div>
                             </label>
-                            <label class="flex items-start gap-3 cursor-pointer group border border-foreground/[.08] p-3 opacity-50">
+                            <label class="flex items-start gap-3 cursor-pointer group border border-border rounded p-3 opacity-50">
                                 <input type="radio" name="payment" value="sofort" disabled class="mt-1" />
                                 <div>
-                                    <p class="text-sm text-foreground font-light">Sofortüberweisung / Klarna</p>
-                                    <p class="text-xs text-foreground/50 font-light mt-0.5">Demnächst verfügbar</p>
+                                    <p class="text-sm text-text">Sofortüberweisung / Klarna</p>
+                                    <p class="text-xs text-text-muted mt-0.5">Demnächst verfügbar</p>
                                 </div>
                             </label>
                         </div>
                     </section>
 
                     <!-- Terms & Conditions -->
-                    <section class="border border-foreground/[.12] bg-secondary/30">
-                        <div class="p-4 border-b border-foreground/[.08]">
-                            <h2 class="font-condensed text-[.7rem] font-medium tracking-[.12em] uppercase text-foreground/60">Bestätigungen</h2>
+                    <section class="card">
+                        <div class="p-4 border-b border-border">
+                            <h2 class="text-label text-text-secondary">Bestätigungen</h2>
                         </div>
                         <div class="p-5 space-y-3">
                             <label class="flex items-start gap-3 cursor-pointer group" id="lbl-agb">
-                                <input type="checkbox" id="chk-agb" class="mt-1 accent-[#c8973a]" />
-                                <span class="text-xs text-foreground/70 font-light leading-relaxed">
+                                <input type="checkbox" id="chk-agb" class="mt-1 accent-primary" />
+                                <span class="text-xs text-text-secondary leading-relaxed">
                                     Ich akzeptiere die <a href="/agb" class="text-primary underline underline-offset-2">AGB</a> und die <a href="/datenschutz" class="text-primary underline underline-offset-2">Datenschutzerklärung</a> von Ehren-Deal.
                                 </span>
                             </label>
                             <label class="flex items-start gap-3 cursor-pointer group" id="lbl-treuhand">
-                                <input type="checkbox" id="chk-treuhand" class="mt-1 accent-[#c8973a]" />
-                                <span class="text-xs text-foreground/70 font-light leading-relaxed">
+                                <input type="checkbox" id="chk-treuhand" class="mt-1 accent-primary" />
+                                <span class="text-xs text-text-secondary leading-relaxed">
                                     Ich verstehe, dass die Zahlung auf das Ehren-Deal Treuhandkonto erfolgt und der Verkäufer das Geld erst nach meiner Bestätigung erhält.
                                 </span>
                             </label>
                             <label class="flex items-start gap-3 cursor-pointer group" id="lbl-widerruf">
-                                <input type="checkbox" id="chk-widerruf" class="mt-1 accent-[#c8973a]" />
-                                <span class="text-xs text-foreground/70 font-light leading-relaxed">
+                                <input type="checkbox" id="chk-widerruf" class="mt-1 accent-primary" />
+                                <span class="text-xs text-text-secondary leading-relaxed">
                                     Ich verzichte auf mein Widerrufsrecht, da es sich um einen Privatverkauf über die Ehren-Deal Plattform handelt.
                                 </span>
                             </label>
@@ -229,40 +229,40 @@ const imageUrl = listing.images?.[0]?.url ?? null;
                 <aside class="lg:sticky lg:top-6 space-y-6">
 
                     <!-- Price Breakdown -->
-                    <div class="border border-foreground/[.12] bg-secondary/30">
-                        <div class="p-4 border-b border-foreground/[.08]">
-                            <h2 class="font-condensed text-[.7rem] font-medium tracking-[.12em] uppercase text-foreground/60">Bestellübersicht</h2>
+                    <div class="card">
+                        <div class="p-4 border-b border-border">
+                            <h2 class="text-label text-text-secondary">Bestellübersicht</h2>
                         </div>
                         <div class="p-5 space-y-3">
                             <div class="flex justify-between text-sm">
-                                <span class="text-foreground/70 font-light">Artikelpreis</span>
-                                <span class="text-foreground font-light">{priceFormatted}</span>
+                                <span class="text-text-secondary">Artikelpreis</span>
+                                <span class="text-text">{priceFormatted}</span>
                             </div>
                             <div class="flex justify-between text-sm">
-                                <span class="text-foreground/70 font-light">Servicegebühr (Käuferschutz)</span>
-                                <span class="text-foreground font-light">{buyerFeeFormatted}</span>
+                                <span class="text-text-secondary">Servicegebühr (Käuferschutz)</span>
+                                <span class="text-text">{buyerFeeFormatted}</span>
                             </div>
                             <div class="flex justify-between text-sm">
-                                <span class="text-foreground/70 font-light">Versand</span>
-                                <span class="text-foreground/50 font-light text-xs" id="shipping-display">Wird vereinbart</span>
+                                <span class="text-text-secondary">Versand</span>
+                                <span class="text-text-muted text-xs" id="shipping-display">Wird vereinbart</span>
                             </div>
-                            <hr class="border-foreground/[.08]" />
+                            <hr class="border-border" />
                             <div class="flex justify-between">
-                                <span class="text-sm text-foreground font-medium">Gesamtbetrag</span>
-                                <span class="font-headings text-xl text-primary">{totalFormatted}</span>
+                                <span class="text-sm text-text font-medium">Gesamtbetrag</span>
+                                <span class="text-xl text-primary font-bold">{totalFormatted}</span>
                             </div>
-                            <p class="text-[.6rem] text-foreground/40 font-light">Alle Preise inkl. MwSt. (Privatverkauf, keine MwSt. ausweisbar)</p>
+                            <p class="text-caption text-text-muted">Alle Preise inkl. MwSt. (Privatverkauf, keine MwSt. ausweisbar)</p>
 
                             <!-- Verkäufer-Info -->
-                            <div class="mt-3 pt-3 border-t border-foreground/[.08]">
-                                <p class="text-[.65rem] text-foreground/50 font-light font-condensed uppercase tracking-wider mb-2">Info für Verkäufer</p>
+                            <div class="mt-3 pt-3 border-t border-border">
+                                <p class="text-label text-text-muted mb-2">Info für Verkäufer</p>
                                 <div class="flex justify-between text-xs">
-                                    <span class="text-foreground/50 font-light">Verkaufsprovision ({sellerCommPercent}%)</span>
-                                    <span class="text-foreground/50 font-light">−{sellerCommFormatted}</span>
+                                    <span class="text-text-muted">Verkaufsprovision ({sellerCommPercent}%)</span>
+                                    <span class="text-text-muted">−{sellerCommFormatted}</span>
                                 </div>
                                 <div class="flex justify-between text-xs mt-1">
-                                    <span class="text-foreground/70 font-light">Auszahlung an Verkäufer</span>
-                                    <span class="text-foreground/70 font-light">{sellerPayoutFormatted}</span>
+                                    <span class="text-text-secondary">Auszahlung an Verkäufer</span>
+                                    <span class="text-text-secondary">{sellerPayoutFormatted}</span>
                                 </div>
                             </div>
                         </div>
@@ -272,50 +272,55 @@ const imageUrl = listing.images?.[0]?.url ?? null;
                     <button
                         id="btn-pay"
                         disabled
-                        class="w-full py-4 font-condensed font-medium uppercase tracking-[.12em] text-sm text-primary-foreground bg-primary/40 cursor-not-allowed transition-all duration-300"
+                        class="w-full py-4 font-semibold text-sm text-white bg-primary/40 rounded cursor-not-allowed transition-all duration-300"
                     >
                         Jetzt sicher bezahlen
                     </button>
-                    <p class="text-center text-[.6rem] text-foreground/40 font-light -mt-4" id="btn-hint">Bitte alle Bestätigungen akzeptieren</p>
+                    <p class="text-center text-caption text-text-muted -mt-4" id="btn-hint">Bitte alle Bestätigungen akzeptieren</p>
+
+                    <!-- Trust info box -->
+                    <div class="info-box p-4 text-center">
+                        <p class="text-sm text-text-secondary">Dein Geld wird erst freigegeben, wenn du den Erhalt bestätigst</p>
+                    </div>
 
                     <!-- Escrow Process Visual -->
-                    <div class="border border-foreground/[.12] bg-secondary/30 p-5">
-                        <h3 class="font-condensed text-[.65rem] font-medium tracking-[.12em] uppercase text-foreground/60 mb-4">So funktioniert der Treuhand-Schutz</h3>
+                    <div class="card p-5">
+                        <h3 class="text-label text-text-secondary mb-4">So funktioniert der Treuhand-Schutz</h3>
                         <div class="space-y-4">
                             <div class="flex gap-3">
-                                <div class="w-6 h-6 border border-primary/40 flex items-center justify-center flex-shrink-0">
-                                    <span class="text-[.6rem] font-condensed font-medium text-primary">1</span>
+                                <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                                    <span class="text-xs font-semibold text-white">1</span>
                                 </div>
                                 <div>
-                                    <p class="text-xs text-foreground font-light">Du zahlst auf das Treuhandkonto</p>
-                                    <p class="text-[.6rem] text-foreground/40 font-light">Dein Geld ist sicher verwahrt</p>
+                                    <p class="text-xs text-text">Du zahlst auf das Treuhandkonto</p>
+                                    <p class="text-caption text-text-muted">Dein Geld ist sicher verwahrt</p>
                                 </div>
                             </div>
                             <div class="flex gap-3">
-                                <div class="w-6 h-6 border border-primary/40 flex items-center justify-center flex-shrink-0">
-                                    <span class="text-[.6rem] font-condensed font-medium text-primary">2</span>
+                                <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                                    <span class="text-xs font-semibold text-white">2</span>
                                 </div>
                                 <div>
-                                    <p class="text-xs text-foreground font-light">Verkäufer sendet die Ware</p>
-                                    <p class="text-[.6rem] text-foreground/40 font-light">Benachrichtigung per E-Mail</p>
+                                    <p class="text-xs text-text">Verkäufer sendet die Ware</p>
+                                    <p class="text-caption text-text-muted">Benachrichtigung per E-Mail</p>
                                 </div>
                             </div>
                             <div class="flex gap-3">
-                                <div class="w-6 h-6 border border-primary/40 flex items-center justify-center flex-shrink-0">
-                                    <span class="text-[.6rem] font-condensed font-medium text-primary">3</span>
+                                <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                                    <span class="text-xs font-semibold text-white">3</span>
                                 </div>
                                 <div>
-                                    <p class="text-xs text-foreground font-light">Du bestätigst den Erhalt</p>
-                                    <p class="text-[.6rem] text-foreground/40 font-light">Ehren-Handschlag abschließen</p>
+                                    <p class="text-xs text-text">Du bestätigst den Erhalt</p>
+                                    <p class="text-caption text-text-muted">Ehren-Handschlag abschließen</p>
                                 </div>
                             </div>
                             <div class="flex gap-3">
-                                <div class="w-6 h-6 border border-primary/40 flex items-center justify-center flex-shrink-0">
-                                    <span class="text-[.6rem] font-condensed font-medium text-primary">4</span>
+                                <div class="w-6 h-6 rounded-full bg-success flex items-center justify-center flex-shrink-0">
+                                    <span class="text-xs font-semibold text-white">4</span>
                                 </div>
                                 <div>
-                                    <p class="text-xs text-foreground font-light">Geld wird an Verkäufer freigegeben</p>
-                                    <p class="text-[.6rem] text-foreground/40 font-light">Automatisch nach Bestätigung</p>
+                                    <p class="text-xs text-text">Geld wird an Verkäufer freigegeben</p>
+                                    <p class="text-caption text-text-muted">Automatisch nach Bestätigung</p>
                                 </div>
                             </div>
                         </div>
@@ -323,21 +328,21 @@ const imageUrl = listing.images?.[0]?.url ?? null;
 
                     <!-- Trust Badges -->
                     <div class="grid grid-cols-2 gap-3">
-                        <div class="border border-foreground/[.08] p-3 text-center">
+                        <div class="card p-3 text-center">
                             <svg class="w-5 h-5 text-primary mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                            <p class="text-[.6rem] font-condensed uppercase tracking-wider text-foreground/60">Käuferschutz</p>
+                            <p class="text-caption text-text-secondary">Käuferschutz</p>
                         </div>
-                        <div class="border border-foreground/[.08] p-3 text-center">
+                        <div class="card p-3 text-center">
                             <svg class="w-5 h-5 text-primary mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                            <p class="text-[.6rem] font-condensed uppercase tracking-wider text-foreground/60">SSL-verschlüsselt</p>
+                            <p class="text-caption text-text-secondary">SSL-verschlüsselt</p>
                         </div>
-                        <div class="border border-foreground/[.08] p-3 text-center">
+                        <div class="card p-3 text-center">
                             <svg class="w-5 h-5 text-primary mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                            <p class="text-[.6rem] font-condensed uppercase tracking-wider text-foreground/60">Stripe-Zahlung</p>
+                            <p class="text-caption text-text-secondary">Stripe-Zahlung</p>
                         </div>
-                        <div class="border border-foreground/[.08] p-3 text-center">
+                        <div class="card p-3 text-center">
                             <svg class="w-5 h-5 text-primary mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            <p class="text-[.6rem] font-condensed uppercase tracking-wider text-foreground/60">Geld-zurück</p>
+                            <p class="text-caption text-text-secondary">Geld-zurück</p>
                         </div>
                     </div>
 
@@ -348,28 +353,28 @@ const imageUrl = listing.images?.[0]?.url ?? null;
     </main>
     <!-- Error / Status Display -->
     <div id="checkout-error" class="hidden max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-        <div class="flex gap-3 p-4 border border-red-500/30 bg-red-500/[.05]">
-            <svg class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
-            <p class="text-sm text-red-300 font-light" id="checkout-error-text"></p>
+        <div class="flex gap-3 p-4 border border-danger/30 bg-danger-light rounded">
+            <svg class="w-5 h-5 text-danger flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+            <p class="text-sm text-danger" id="checkout-error-text"></p>
         </div>
     </div>
 
     <!-- Loading Overlay -->
-    <div id="checkout-loading" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+    <div id="checkout-loading" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-surface">
         <div class="text-center space-y-4">
             <div class="w-10 h-10 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto"></div>
-            <p class="font-condensed text-sm tracking-wider uppercase text-primary" id="loading-text">Deal wird erstellt...</p>
+            <p class="text-sm text-primary font-semibold" id="loading-text">Deal wird erstellt...</p>
         </div>
     </div>
 
     <!-- Success Overlay -->
-    <div id="checkout-success" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-md">
+    <div id="checkout-success" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-surface">
         <div class="text-center space-y-6 max-w-md mx-auto px-6">
-            <div class="w-16 h-16 border-2 border-primary mx-auto flex items-center justify-center">
-                <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+            <div class="w-16 h-16 border-2 border-success rounded-full mx-auto flex items-center justify-center">
+                <svg class="w-8 h-8 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
             </div>
-            <h2 class="font-headings text-2xl text-foreground font-light">Zahlung erfolgreich</h2>
-            <p class="text-sm text-foreground/60 font-light">Deine Zahlung wurde sicher auf dem Treuhandkonto hinterlegt. Der Verkäufer wurde benachrichtigt.</p>
+            <h2 class="text-h2 text-text">Zahlung erfolgreich</h2>
+            <p class="text-sm text-text-secondary">Deine Zahlung wurde sicher auf dem Treuhandkonto hinterlegt. Der Verkäufer wurde benachrichtigt.</p>
             <a id="deal-link" href="/deals" class="btn-primary inline-block mt-4">Zum Deal</a>
         </div>
     </div>
@@ -478,4 +483,3 @@ const imageUrl = listing.images?.[0]?.url ?? null;
         }
     });
 </script>
-
