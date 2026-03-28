@@ -8,7 +8,6 @@ const navLinks = [
 ];
 const currentPath = Astro.url.pathname;
 
-// Check auth status
 let authUser: { firstName: string | null; lastName: string | null; email: string; role: string } | null = null;
 const sessionId = Astro.cookies.get(lucia.sessionCookieName)?.value;
 if (sessionId) {
@@ -22,33 +21,25 @@ if (sessionId) {
 const displayName = authUser?.firstName || authUser?.email?.split('@')[0] || 'Konto';
 ---
 
-<header class="sticky top-0 z-50 bg-background/90 backdrop-blur-xl border-b border-foreground/[.20]">
+<a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-primary focus:text-white focus:px-4 focus:py-2 focus:rounded">
+    Zum Inhalt springen
+</a>
+
+<header class="sticky top-0 z-50 bg-surface border-b border-border">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
-            <!-- Logo -->
-            <a href="/" class="flex items-center gap-2.5 flex-shrink-0">
-                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:28px;height:28px;">
-                    <path d="M4 20 L13 14 L19 18 L21 18 L27 14 L36 20" stroke="#c8973a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M13 14 L13 27" stroke="#c8973a" stroke-width="1.5" stroke-linecap="round" opacity=".45"/>
-                    <path d="M27 14 L27 27" stroke="#c8973a" stroke-width="1.5" stroke-linecap="round" opacity=".45"/>
-                    <path d="M19 18 L19 28" stroke="#c8973a" stroke-width="1.5" stroke-linecap="round" opacity=".65"/>
-                    <path d="M21 18 L21 28" stroke="#c8973a" stroke-width="1.5" stroke-linecap="round" opacity=".65"/>
-                    <line x1="13" y1="27" x2="27" y2="27" stroke="#c8973a" stroke-width="1.5" stroke-linecap="round" opacity=".3"/>
-                </svg>
-                <span class="font-condensed font-medium text-base tracking-[.12em] uppercase text-foreground">
-                    Ehren‑Deal
-                </span>
+            <a href="/" class="flex items-center gap-2 flex-shrink-0">
+                <span class="font-bold text-lg text-navy tracking-tight">Ehren-Deal</span>
             </a>
 
-            <!-- Desktop Nav -->
             <nav class="hidden md:flex items-center gap-8">
                 {navLinks.map((link) => (
                     <a
                         href={link.href}
-                        class={`font-condensed text-[.78rem] font-medium tracking-[.08em] uppercase transition-colors duration-200 ${
+                        class={`text-sm font-medium transition-colors duration-200 ${
                             currentPath === link.href
                             ? "text-primary"
-                            : "text-foreground/80 hover:text-foreground"
+                            : "text-text-secondary hover:text-text"
                         }`}
                     >
                         {link.label}
@@ -56,59 +47,59 @@ const displayName = authUser?.firstName || authUser?.email?.split('@')[0] || 'Ko
                 ))}
             </nav>
 
-            <!-- Right side -->
-            <div class="hidden md:flex items-center gap-5">
+            <div class="hidden md:flex items-center gap-4">
                 {authUser ? (
                     <>
-                        <a href="/dashboard/deals" class="font-condensed text-[.78rem] font-medium tracking-[.08em] uppercase text-foreground/80 hover:text-foreground transition-colors">
+                        <a href="/dashboard/deals" class="text-sm font-medium text-text-secondary hover:text-text transition-colors">
                             Meine Deals
                         </a>
                         <div class="relative" id="userMenuWrap">
-                            <button id="userMenuBtn" class="flex items-center gap-2 font-condensed text-[.78rem] font-medium tracking-[.08em] uppercase text-foreground/80 hover:text-foreground transition-colors">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <button id="userMenuBtn" class="flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-text transition-colors">
+                                <div class="w-8 h-8 rounded-full bg-primary-light text-primary flex items-center justify-center text-xs font-bold">
+                                    {(authUser.firstName?.[0] || authUser.email[0]).toUpperCase()}
+                                </div>
                                 {displayName}
                             </button>
-                            <div id="userDropdown" class="hidden absolute right-0 top-full mt-2 w-48 bg-background border border-foreground/[.20] shadow-lg z-50">
-                                <a href="/profil" class="block px-4 py-2.5 text-xs font-condensed uppercase tracking-wider text-foreground/80 hover:bg-foreground/[.06] hover:text-foreground transition-colors">Profil</a>
-                                <a href="/dashboard/deals" class="block px-4 py-2.5 text-xs font-condensed uppercase tracking-wider text-foreground/80 hover:bg-foreground/[.06] hover:text-foreground transition-colors">Meine Deals</a>
+                            <div id="userDropdown" class="hidden absolute right-0 top-full mt-2 w-52 bg-surface border border-border rounded-DEFAULT shadow-lg z-50 py-1">
+                                <a href="/profil" class="block px-4 py-2.5 text-sm text-text-secondary hover:bg-background hover:text-text transition-colors">Profil</a>
+                                <a href="/merkliste" class="block px-4 py-2.5 text-sm text-text-secondary hover:bg-background hover:text-text transition-colors">Merkliste</a>
+                                <a href="/dashboard/deals" class="block px-4 py-2.5 text-sm text-text-secondary hover:bg-background hover:text-text transition-colors">Meine Deals</a>
                                 {authUser.role === 'ADMIN' && (
-                                    <a href="/admin" class="block px-4 py-2.5 text-xs font-condensed uppercase tracking-wider text-primary/80 hover:bg-primary/[.06] hover:text-primary transition-colors">Admin</a>
+                                    <a href="/admin" class="block px-4 py-2.5 text-sm text-primary hover:bg-primary-light transition-colors">Admin</a>
                                 )}
-                                <button id="logoutBtn" class="w-full text-left px-4 py-2.5 text-xs font-condensed uppercase tracking-wider text-foreground/80 hover:bg-foreground/[.06] hover:text-foreground transition-colors border-t border-foreground/[.12]">Abmelden</button>
+                                <button id="logoutBtn" class="w-full text-left px-4 py-2.5 text-sm text-text-secondary hover:bg-background hover:text-text transition-colors border-t border-border">Abmelden</button>
                             </div>
                         </div>
                     </>
                 ) : (
-                    <a href="/anmelden" class="font-condensed text-[.78rem] font-medium tracking-[.08em] uppercase text-foreground/80 hover:text-foreground transition-colors">
+                    <a href="/anmelden" class="text-sm font-medium text-text-secondary hover:text-text transition-colors">
                         Anmelden
                     </a>
                 )}
-                <a href="/inserat-erstellen" class="btn-outline text-[.72rem] py-1.5 px-4">
+                <a href="/inserat-erstellen" class="btn-primary text-sm py-2 px-5">
                     Anzeige aufgeben
                 </a>
             </div>
 
-            <!-- Mobile Menu Button -->
             <button
-                class="md:hidden p-2 text-foreground/75 hover:text-foreground transition-colors focus:outline-none"
+                class="md:hidden p-2 text-text-secondary hover:text-text transition-colors focus:outline-none"
                 id="mobileMenuBtn"
                 aria-label="Menü öffnen"
                 aria-expanded="false"
                 aria-controls="mobileMenu"
             >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
         </div>
     </div>
 
-    <!-- Mobile Menu -->
-    <div class="md:hidden hidden absolute top-full left-0 w-full bg-background border-b border-foreground/[.20]" id="mobileMenu">
+    <div class="md:hidden absolute top-full left-0 w-full bg-surface border-b border-border z-40" id="mobileMenu" style="max-height:0;overflow:hidden;transition:max-height 0.3s ease;">
         <div class="px-6 pt-3 pb-6 space-y-1">
             {navLinks.map((link) => (
                 <a
                     href={link.href}
-                    class={`block py-3 font-condensed text-sm font-medium tracking-wider uppercase border-b border-foreground/[.20] ${
-                        currentPath === link.href ? "text-primary" : "text-foreground/75 hover:text-foreground"
+                    class={`block py-3 text-sm font-medium border-b border-border-light ${
+                        currentPath === link.href ? "text-primary" : "text-text-secondary hover:text-text"
                     }`}
                 >
                     {link.label}
@@ -117,21 +108,14 @@ const displayName = authUser?.firstName || authUser?.email?.split('@')[0] || 'Ko
             <div class="pt-4 space-y-3">
                 {authUser ? (
                     <>
-                        <a href="/dashboard/deals" class="block text-center py-3 font-condensed text-sm font-medium text-foreground/75 hover:text-foreground transition-colors uppercase tracking-wider">
-                            Meine Deals
-                        </a>
-                        <button id="mobileLogoutBtn" class="block w-full text-center py-3 font-condensed text-sm font-medium text-foreground/75 hover:text-foreground transition-colors uppercase tracking-wider">
-                            Abmelden
-                        </button>
+                        <a href="/dashboard/deals" class="block text-center py-3 text-sm font-medium text-text-secondary hover:text-text transition-colors">Meine Deals</a>
+                        <a href="/merkliste" class="block text-center py-3 text-sm font-medium text-text-secondary hover:text-text transition-colors">Merkliste</a>
+                        <button id="mobileLogoutBtn" class="block w-full text-center py-3 text-sm font-medium text-text-secondary hover:text-text transition-colors">Abmelden</button>
                     </>
                 ) : (
-                    <a href="/anmelden" class="block text-center py-3 font-condensed text-sm font-medium text-foreground/75 hover:text-foreground transition-colors uppercase tracking-wider">
-                        Anmelden
-                    </a>
+                    <a href="/anmelden" class="block text-center py-3 text-sm font-medium text-text-secondary hover:text-text transition-colors">Anmelden</a>
                 )}
-                <a href="/inserat-erstellen" class="btn-outline w-full flex items-center justify-center py-2.5">
-                    Anzeige aufgeben
-                </a>
+                <a href="/inserat-erstellen" class="btn-primary w-full flex items-center justify-center py-3">Anzeige aufgeben</a>
             </div>
         </div>
     </div>
@@ -139,28 +123,34 @@ const displayName = authUser?.firstName || authUser?.email?.split('@')[0] || 'Ko
 
 <script>
     const btn = document.getElementById("mobileMenuBtn");
-    const menu = document.getElementById("mobileMenu");
+    const menu = document.getElementById("mobileMenu") as HTMLElement | null;
+    const btnSvg = btn?.querySelector("svg");
+
+    const hamburgerPath = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"></path>';
+    const xPath = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 6l12 12M6 18L18 6"></path>';
+
+    let mobileMenuOpen = false;
 
     btn?.addEventListener("click", () => {
-        const isHidden = menu?.classList.contains('hidden');
-        if (isHidden) {
-            menu?.classList.remove('hidden');
+        mobileMenuOpen = !mobileMenuOpen;
+        if (mobileMenuOpen) {
+            if (menu) menu.style.maxHeight = "500px";
+            if (btnSvg) btnSvg.innerHTML = xPath;
             btn.setAttribute('aria-expanded', 'true');
             btn.setAttribute('aria-label', 'Menü schließen');
         } else {
-            menu?.classList.add('hidden');
+            if (menu) menu.style.maxHeight = "0";
+            if (btnSvg) btnSvg.innerHTML = hamburgerPath;
             btn.setAttribute('aria-expanded', 'false');
             btn.setAttribute('aria-label', 'Menü öffnen');
         }
     });
 
-    // User dropdown toggle
     const userMenuBtn = document.getElementById("userMenuBtn");
     const userDropdown = document.getElementById("userDropdown");
     userMenuBtn?.addEventListener("click", () => {
         userDropdown?.classList.toggle("hidden");
     });
-    // Close dropdown on outside click
     document.addEventListener("click", (e) => {
         if (userDropdown && !userDropdown.classList.contains("hidden")) {
             const wrap = document.getElementById("userMenuWrap");
@@ -170,7 +160,6 @@ const displayName = authUser?.firstName || authUser?.email?.split('@')[0] || 'Ko
         }
     });
 
-    // Logout handler
     async function doLogout() {
         try {
             await fetch("/api/auth/logout", { method: "POST" });
@@ -180,5 +169,3 @@ const displayName = authUser?.firstName || authUser?.email?.split('@')[0] || 'Ko
     document.getElementById("logoutBtn")?.addEventListener("click", doLogout);
     document.getElementById("mobileLogoutBtn")?.addEventListener("click", doLogout);
 </script>
-
-
