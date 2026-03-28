@@ -81,7 +81,6 @@ const fullName = [seller.firstName, seller.lastName].filter(Boolean).join(' ') |
 const initial = (seller.firstName || 'V')[0].toUpperCase();
 const trustScore = seller.trustScore?.score ?? 0;
 const memberSince = seller.createdAt.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
-const stars = '★'.repeat(Math.round(trustScore / 20)) + '☆'.repeat(5 - Math.round(trustScore / 20));
 
 const mockReviews = [
     { name: 'Max B.', initial: 'M', stars: 5, text: 'Sehr netter Kontakt, schneller Versand. Gerne wieder!', date: 'vor 2 Wochen' },
@@ -91,22 +90,22 @@ const mockReviews = [
 
 <BaseLayout title={`${fullName} – Ehren-Deal`}>
     <Header />
-    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-20">
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-20 bg-background min-h-screen">
 
         <!-- Breadcrumb -->
-        <nav class="flex items-center gap-2 text-foreground/50 mb-6 font-condensed tracking-wide uppercase text-xs">
+        <nav class="flex items-center gap-2 text-text-muted mb-6 text-caption">
             <a href="/" class="hover:text-primary transition-colors">Startseite</a>
-            <span class="text-foreground/25">›</span>
+            <span class="text-border">›</span>
             <span>Verkäufer</span>
-            <span class="text-foreground/25">›</span>
-            <span class="text-foreground/70">{fullName}</span>
+            <span class="text-border">›</span>
+            <span class="text-text-secondary">{fullName}</span>
         </nav>
 
         <!-- Profile Header -->
-        <div class="bg-secondary/40 border border-foreground/[.15] rounded p-5 sm:p-8 mb-10">
+        <div class="bg-surface border border-border rounded-lg p-5 sm:p-8 mb-10 shadow-card">
             <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6">
                 <!-- Avatar -->
-                <div class="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-3xl sm:text-4xl font-bold text-background flex-shrink-0">
+                <div class="w-20 h-20 sm:w-24 sm:h-24 bg-primary-light rounded-full flex items-center justify-center text-3xl sm:text-4xl font-bold text-primary flex-shrink-0">
                     {seller.avatarUrl
                         ? <img src={seller.avatarUrl} alt={fullName} class="w-full h-full rounded-full object-cover" />
                         : initial
@@ -115,32 +114,32 @@ const mockReviews = [
 
                 <!-- Info -->
                 <div class="flex-grow min-w-0 text-center sm:text-left">
-                    <h1 class="font-headings text-2xl sm:text-3xl font-light mb-2">{fullName}</h1>
+                    <h1 class="text-h2 text-text mb-2">{fullName}</h1>
 
                     <!-- Badges -->
                     <div class="flex flex-wrap gap-2 mb-4 justify-center sm:justify-start">
                         {seller.idVerified && (
-                            <span class="trust-badge text-[.65rem]">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            <span class="badge-verifiziert text-label">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                                 KYC verifiziert
                             </span>
                         )}
                         {seller.emailVerified && (
-                            <span class="trust-badge text-[.65rem]">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span class="badge-verifiziert text-label">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="mr-1"><polyline points="20 6 9 17 4 12"/></svg>
                                 E-Mail bestätigt
                             </span>
                         )}
                         {seller.phoneVerified && (
-                            <span class="trust-badge text-[.65rem]">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span class="badge-verifiziert text-label">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="mr-1"><polyline points="20 6 9 17 4 12"/></svg>
                                 Telefon bestätigt
                             </span>
                         )}
                     </div>
 
                     <!-- Stats -->
-                    <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-3 sm:gap-5 text-sm text-foreground/60">
+                    <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-3 sm:gap-5 text-body-sm text-text-secondary">
                         <span class="flex items-center gap-1.5 justify-center sm:justify-start">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             Seit {memberSince}
@@ -162,21 +161,23 @@ const mockReviews = [
                     </div>
 
                     <!-- Zuletzt aktiv -->
-                    <div class="flex items-center gap-2 mt-3 text-sm text-foreground/60 justify-center sm:justify-start">
+                    <div class="flex items-center gap-2 mt-3 text-body-sm text-text-secondary justify-center sm:justify-start">
                         <span class="relative flex h-2.5 w-2.5">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-success"></span>
                         </span>
-                        <span class="font-condensed text-xs tracking-wide">Zuletzt aktiv: {isMock ? 'Heute' : 'Heute'}</span>
+                        <span class="text-caption">Zuletzt aktiv: {isMock ? 'Heute' : 'Heute'}</span>
                     </div>
                 </div>
 
                 <!-- Trust Score + Contact -->
                 <div class="flex-shrink-0 flex flex-col gap-3 items-center">
-                    <div class="text-center bg-secondary/30 border border-foreground/10 rounded p-4 min-w-[110px]">
-                        <div class="text-3xl font-bold text-primary mb-1">{trustScore}</div>
-                        <div class="text-xs text-foreground/50 font-condensed uppercase tracking-wider mb-1">Trust Score</div>
-                        <div class="text-primary text-lg">{stars}</div>
+                    <div class="text-center bg-surface border border-border rounded-lg p-4 min-w-[110px] shadow-card">
+                        <div class="text-3xl font-bold text-success mb-1">{trustScore}</div>
+                        <div class="text-label text-text-muted mb-2">Trust Score</div>
+                        <div class="w-full bg-background h-1.5 rounded-full overflow-hidden">
+                            <div class="h-full bg-success rounded-full" style={`width:${trustScore}%`}></div>
+                        </div>
                     </div>
                     <a href="/nachrichten" class="btn-primary w-full gap-2 text-xs py-2.5">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -189,75 +190,75 @@ const mockReviews = [
         <!-- Active Listings -->
         {listings.length > 0 ? (
             <section>
-                <h2 class="font-headings text-xl font-light mb-6">
+                <h2 class="text-h3 text-text mb-6">
                     Aktive Anzeigen
-                    <span class="text-foreground/40 text-base ml-1">({listings.length})</span>
+                    <span class="text-text-muted text-base ml-1">({listings.length})</span>
                 </h2>
                 <div class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                     {listings.map((l) => (
-                        <a href={`/inserat/${l.id}`} class="group block bg-secondary/40 border border-foreground/[.15] rounded overflow-hidden hover:border-primary/30 transition-all duration-300">
-                            <div class="aspect-[4/3] bg-secondary relative overflow-hidden">
+                        <a href={`/inserat/${l.id}`} class="group block bg-surface border border-border rounded-lg overflow-hidden hover:border-primary/30 hover:shadow-card-hover transition-all duration-300" style="text-decoration:none; color:inherit;">
+                            <div class="aspect-[4/3] bg-background relative overflow-hidden">
                                 {l.image
                                     ? <img src={l.image} alt={l.title} class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500" loading="lazy" />
-                                    : <div class="w-full h-full flex items-center justify-center text-foreground/30">
+                                    : <div class="w-full h-full flex items-center justify-center text-text-muted">
                                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                       </div>
                                 }
                                 {l.treuhand && (
-                                    <span class="absolute top-2 right-2 bg-primary/90 text-primary-foreground text-[.6rem] px-1.5 py-0.5 font-condensed uppercase tracking-wider">Treuhand</span>
+                                    <span class="absolute top-2 right-2 badge-treuhand text-label px-1.5 py-0.5">Treuhand</span>
                                 )}
                             </div>
                             <div class="p-3 sm:p-4">
-                                <div class="text-base font-headings font-light text-primary mb-0.5">
+                                <div class="text-base font-bold text-primary mb-0.5">
                                     {l.price.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
                                 </div>
-                                <p class="text-sm text-foreground/70 line-clamp-2 leading-snug">{l.title}</p>
-                                <p class="text-[.65rem] text-foreground/40 mt-2 font-condensed uppercase tracking-wide">{l.city}</p>
+                                <p class="text-body-sm text-text-secondary line-clamp-2 leading-snug">{l.title}</p>
+                                <p class="text-caption text-text-muted mt-2">{l.city}</p>
                             </div>
                         </a>
                     ))}
                 </div>
             </section>
         ) : (
-            <div class="text-center py-16 border border-dashed border-foreground/20 rounded">
-                <svg class="w-10 h-10 mx-auto mb-3 text-foreground/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                <p class="text-foreground/50 text-sm">Dieser Verkäufer hat derzeit keine aktiven Anzeigen.</p>
+            <div class="text-center py-16 border border-dashed border-border rounded-lg bg-surface">
+                <svg class="w-10 h-10 mx-auto mb-3 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                <p class="text-text-secondary text-body-sm">Dieser Verkäufer hat derzeit keine aktiven Anzeigen.</p>
             </div>
         )}
 
         <!-- Bewertungen -->
         <section class="mt-12">
-            <h2 class="font-headings text-xl font-light mb-6">
+            <h2 class="text-h3 text-text mb-6">
                 Bewertungen
-                <span class="text-foreground/40 text-base ml-1">({isMock ? mockReviews.length : 0})</span>
+                <span class="text-text-muted text-base ml-1">({isMock ? mockReviews.length : 0})</span>
             </h2>
 
             {isMock ? (
                 <div class="space-y-4">
                     {mockReviews.map((review) => (
-                        <div class="bg-secondary/30 border border-foreground/[.15] rounded p-5">
+                        <div class="bg-surface border border-border rounded-lg p-5 shadow-card">
                             <div class="flex items-start gap-4">
-                                <div class="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-sm font-bold text-background flex-shrink-0">
+                                <div class="w-10 h-10 bg-primary-light rounded-full flex items-center justify-center text-sm font-bold text-primary flex-shrink-0">
                                     {review.initial}
                                 </div>
                                 <div class="flex-grow min-w-0">
                                     <div class="flex items-center gap-2 mb-1.5">
-                                        <span class="font-headings font-medium text-sm">{review.name}</span>
-                                        <span class="text-primary text-sm">
+                                        <span class="font-semibold text-sm text-text">{review.name}</span>
+                                        <span class="text-accent text-sm">
                                             {'★'.repeat(review.stars)}{'☆'.repeat(5 - review.stars)}
                                         </span>
                                     </div>
-                                    <p class="text-sm text-foreground/70 leading-relaxed">{review.text}</p>
-                                    <span class="text-foreground/50 text-xs mt-2 block">{review.date}</span>
+                                    <p class="text-body-sm text-text-secondary leading-relaxed">{review.text}</p>
+                                    <span class="text-text-muted text-caption mt-2 block">{review.date}</span>
                                 </div>
                             </div>
                         </div>
                     ))}
                 </div>
             ) : (
-                <div class="text-center py-12 border border-dashed border-foreground/20 rounded">
-                    <svg class="w-8 h-8 mx-auto mb-3 text-foreground/30" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    <p class="text-foreground/50 text-sm">Noch keine Bewertungen vorhanden.</p>
+                <div class="text-center py-12 border border-dashed border-border rounded-lg bg-surface">
+                    <svg class="w-8 h-8 mx-auto mb-3 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <p class="text-text-secondary text-body-sm">Noch keine Bewertungen vorhanden.</p>
                 </div>
             )}
         </section>
