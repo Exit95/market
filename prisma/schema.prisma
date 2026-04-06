@@ -165,6 +165,22 @@ enum ServiceDealStatus {
   CANCELLED
 }
 
+enum ServiceDisputeReason {
+  NICHT_ERSCHIENEN
+  LEISTUNG_MANGELHAFT
+  ANDERE_LEISTUNG
+  KEINE_LEISTUNG
+  KOMMUNIKATION
+  SONSTIGES
+}
+
+enum ServiceDisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  CLOSED
+}
+
 // ─── Service Category (Leistungstausch) ──────────────────────────────────────
 
 model ServiceCategory {
@@ -242,6 +258,9 @@ model User {
   serviceProposalsReceived ServiceProposal[]      @relation("ServiceProposalsReceived")
   serviceDealsAsPartyA     ServiceDeal[]          @relation("ServiceDealsAsPartyA")
   serviceDealsAsPartyB     ServiceDeal[]          @relation("ServiceDealsAsPartyB")
+  serviceReviewsGiven      ServiceReview[]        @relation("ServiceReviewsGiven")
+  serviceReviewsReceived   ServiceReview[]        @relation("ServiceReviewsReceived")
+  serviceDisputesOpened    ServiceDispute[]       @relation("ServiceDisputesOpened")
 
   @@index([email])
   @@index([role])
@@ -743,8 +762,52 @@ model ServiceDeal {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
+  reviews ServiceReview[]
+  dispute ServiceDispute?
+
   @@index([partyAId])
   @@index([partyBId])
   @@index([status])
   @@map("service_deals")
+}
+
+// ─── Service Review (Leistungstausch) ───────────────────────────────────────
+
+model ServiceReview {
+  id                  String      @id @default(cuid())
+  dealId              String
+  deal                ServiceDeal @relation(fields: [dealId], references: [id])
+  reviewerId          String
+  reviewer            User        @relation("ServiceReviewsGiven", fields: [reviewerId], references: [id])
+  revieweeId          String
+  reviewee            User        @relation("ServiceReviewsReceived", fields: [revieweeId], references: [id])
+  rating              Int
+  comment             String?     @db.Text
+  qualityRating       Int?
+  reliabilityRating   Int?
+  communicationRating Int?
+  createdAt           DateTime    @default(now())
+
+  @@unique([dealId, reviewerId])
+  @@index([revieweeId])
+  @@map("service_reviews")
+}
+
+// ─── Service Dispute (Leistungstausch) ──────────────────────────────────────
+
+model ServiceDispute {
+  id          String               @id @default(cuid())
+  dealId      String               @unique
+  deal        ServiceDeal          @relation(fields: [dealId], references: [id])
+  openedById  String
+  openedBy    User                 @relation("ServiceDisputesOpened", fields: [openedById], references: [id])
+  reason      ServiceDisputeReason
+  description String               @db.Text
+  status      ServiceDisputeStatus @default(OPEN)
+  resolution  String?              @db.Text
+  resolvedAt  DateTime?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  @@map("service_disputes")
 }
