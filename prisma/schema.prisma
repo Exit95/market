@@ -158,6 +158,13 @@ enum ServiceProposalStatus {
   EXPIRED
 }
 
+enum ServiceDealStatus {
+  ACTIVE
+  COMPLETED
+  DISPUTED
+  CANCELLED
+}
+
 // ─── Service Category (Leistungstausch) ──────────────────────────────────────
 
 model ServiceCategory {
@@ -233,6 +240,8 @@ model User {
   serviceListingReports    ServiceListingReport[] @relation("UserServiceListingReports")
   serviceProposalsSent     ServiceProposal[]      @relation("ServiceProposalsSent")
   serviceProposalsReceived ServiceProposal[]      @relation("ServiceProposalsReceived")
+  serviceDealsAsPartyA     ServiceDeal[]          @relation("ServiceDealsAsPartyA")
+  serviceDealsAsPartyB     ServiceDeal[]          @relation("ServiceDealsAsPartyB")
 
   @@index([email])
   @@index([role])
@@ -703,10 +712,39 @@ model ServiceProposal {
   parentProposalId String?
   parentProposal   ServiceProposal?  @relation("CounterProposals", fields: [parentProposalId], references: [id])
   counterProposals ServiceProposal[] @relation("CounterProposals")
+  deal             ServiceDeal?
 
   @@index([serviceListingId])
   @@index([proposerId])
   @@index([receiverId])
   @@index([status])
   @@map("service_proposals")
+}
+
+// ─── Service Deal (Leistungstausch) ─────────────────────────────────────────
+
+model ServiceDeal {
+  id                String            @id @default(cuid())
+  proposalId        String            @unique
+  proposal          ServiceProposal   @relation(fields: [proposalId], references: [id])
+  partyAId          String
+  partyA            User              @relation("ServiceDealsAsPartyA", fields: [partyAId], references: [id])
+  partyBId          String
+  partyB            User              @relation("ServiceDealsAsPartyB", fields: [partyBId], references: [id])
+  partyACompleted   Boolean           @default(false)
+  partyACompletedAt DateTime?
+  partyBCompleted   Boolean           @default(false)
+  partyBCompletedAt DateTime?
+  cancelRequestedBy String?
+  status            ServiceDealStatus @default(ACTIVE)
+  completedAt       DateTime?
+  cancelledAt       DateTime?
+  cancelReason      String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([partyAId])
+  @@index([partyBId])
+  @@index([status])
+  @@map("service_deals")
 }
