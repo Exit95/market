@@ -131,3 +131,41 @@ export async function sendDealCompletedEmail(opts: {
   `);
   return sendMail({ to: opts.to, subject: `Deal abgeschlossen: "${opts.listingTitle}"`, html });
 }
+
+export async function sendDealDisputedEmail(opts: {
+  to: string;
+  otherName: string;
+  listingTitle: string;
+  reason: string;
+  dealUrl: string;
+}) {
+  const html = wrapTemplate(`
+    <h2 style="color:${NAVY};font-size:20px;margin:0 0 12px">Dispute eröffnet</h2>
+    <p style="color:#64748B;font-size:14px;line-height:1.6;margin:0 0 16px">
+      <strong>${opts.otherName}</strong> hat einen Dispute für den Deal <strong>"${opts.listingTitle}"</strong> eröffnet.
+    </p>
+    <div style="background:#FEE2E2;border:1px solid #FECACA;border-radius:8px;padding:16px;margin:0 0 20px">
+      <p style="color:#991B1B;font-size:14px;margin:0;font-weight:600">Grund: ${opts.reason}</p>
+    </div>
+    ${ctaButton(opts.dealUrl, 'Deal ansehen')}
+    <p style="color:#94A3B8;font-size:13px;line-height:1.5">Unser Team wird den Fall prüfen.</p>
+  `);
+  return sendMail({ to: opts.to, subject: `Dispute: "${opts.listingTitle}"`, html });
+}
+
+export async function sendReviewRequestEmail(opts: {
+  to: string;
+  otherName: string;
+  listingTitle: string;
+  dealUrl: string;
+}) {
+  const html = wrapTemplate(`
+    <h2 style="color:${NAVY};font-size:20px;margin:0 0 12px">Bitte bewerte deinen Deal</h2>
+    <p style="color:#64748B;font-size:14px;line-height:1.6;margin:0 0 20px">
+      Der Leistungstausch <strong>"${opts.listingTitle}"</strong> mit <strong>${opts.otherName}</strong> ist abgeschlossen. Bitte hinterlasse eine Bewertung.
+    </p>
+    ${ctaButton(opts.dealUrl, 'Jetzt bewerten')}
+    <p style="color:#94A3B8;font-size:13px;line-height:1.5">Bewertungen werden erst sichtbar, wenn beide Seiten bewertet haben (oder nach 14 Tagen).</p>
+  `);
+  return sendMail({ to: opts.to, subject: `Bewerte deinen Deal: "${opts.listingTitle}"`, html });
+}
