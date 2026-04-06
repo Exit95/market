@@ -73,3 +73,31 @@ export const ServiceReportSchema = z.object({
   ], { message: 'Ungültiger Meldegrund.' }),
   description: z.string().max(1000).optional(),
 });
+
+export const ServiceProposalCreateSchema = z.object({
+  serviceListingId: z.string().min(1, 'Listing-ID ist erforderlich.'),
+  offeredDescription: z.string()
+    .min(30, 'Beschreibe dein Angebot mit mindestens 30 Zeichen.')
+    .max(2000, 'Beschreibung darf maximal 2000 Zeichen haben.'),
+  offeredCategoryId: z.string().min(1, 'Kategorie ist erforderlich.'),
+  offeredEffort: z.enum([
+    'UNTER_1_STUNDE', 'EIN_BIS_DREI_STUNDEN', 'DREI_BIS_ACHT_STUNDEN',
+    'MEHRERE_TAGE', 'FORTLAUFEND',
+  ], { message: 'Ungültiger Aufwand.' }),
+  soughtDescription: z.string()
+    .min(30, 'Beschreibe deine Erwartung mit mindestens 30 Zeichen.')
+    .max(2000, 'Beschreibung darf maximal 2000 Zeichen haben.'),
+  soughtEffort: z.enum([
+    'UNTER_1_STUNDE', 'EIN_BIS_DREI_STUNDEN', 'DREI_BIS_ACHT_STUNDEN',
+    'MEHRERE_TAGE', 'FORTLAUFEND',
+  ], { message: 'Ungültiger Aufwand.' }),
+  locationType: z.enum(['VOR_ORT', 'REMOTE', 'BEIDES'], { message: 'Ungültiger Durchführungsort.' }),
+  proposedLocation: z.string().max(200).optional(),
+  proposedTimeframe: z.string().max(200).optional(),
+  message: z.string().max(1000).optional(),
+  parentProposalId: z.string().optional(),
+});
+
+export const ServiceProposalActionSchema = z.object({
+  action: z.enum(['accept', 'decline', 'withdraw'], { message: 'Ungültige Aktion.' }),
+});
