@@ -149,6 +149,15 @@ enum ServiceReportReason {
   SONSTIGES
 }
 
+enum ServiceProposalStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  COUNTERED
+  WITHDRAWN
+  EXPIRED
+}
+
 // ─── Service Category (Leistungstausch) ──────────────────────────────────────
 
 model ServiceCategory {
@@ -220,8 +229,10 @@ model User {
   reviewsReceived      Review[]        @relation("ReviewsReceived")
 
   // Leistungstausch
-  serviceListings       ServiceListing[]       @relation("UserServiceListings")
-  serviceListingReports ServiceListingReport[] @relation("UserServiceListingReports")
+  serviceListings          ServiceListing[]       @relation("UserServiceListings")
+  serviceListingReports    ServiceListingReport[] @relation("UserServiceListingReports")
+  serviceProposalsSent     ServiceProposal[]      @relation("ServiceProposalsSent")
+  serviceProposalsReceived ServiceProposal[]      @relation("ServiceProposalsReceived")
 
   @@index([email])
   @@index([role])
@@ -611,6 +622,7 @@ model ServiceListing {
   soughtCategories  ServiceListingSoughtCategory[]
   images            ServiceListingImage[]
   reports           ServiceListingReport[]
+  proposals         ServiceProposal[]
 
   @@index([userId])
   @@index([offeredCategoryId])
@@ -663,4 +675,38 @@ model ServiceListingReport {
   @@unique([serviceListingId, reporterId])
   @@index([serviceListingId])
   @@map("service_listing_reports")
+}
+
+// ─── Service Proposal (Leistungstausch) ──────────────────────────────────────
+
+model ServiceProposal {
+  id                 String                @id @default(cuid())
+  serviceListingId   String
+  serviceListing     ServiceListing        @relation(fields: [serviceListingId], references: [id])
+  proposerId         String
+  proposer           User                  @relation("ServiceProposalsSent", fields: [proposerId], references: [id])
+  receiverId         String
+  receiver           User                  @relation("ServiceProposalsReceived", fields: [receiverId], references: [id])
+  offeredDescription String                @db.Text
+  offeredCategoryId  String
+  offeredEffort      ServiceEffort
+  soughtDescription  String                @db.Text
+  soughtEffort       ServiceEffort
+  locationType       ServiceLocationType
+  proposedLocation   String?
+  proposedTimeframe  String?
+  message            String?               @db.Text
+  status             ServiceProposalStatus @default(PENDING)
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+
+  parentProposalId String?
+  parentProposal   ServiceProposal?  @relation("CounterProposals", fields: [parentProposalId], references: [id])
+  counterProposals ServiceProposal[] @relation("CounterProposals")
+
+  @@index([serviceListingId])
+  @@index([proposerId])
+  @@index([receiverId])
+  @@index([status])
+  @@map("service_proposals")
 }
