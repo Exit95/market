@@ -1,0 +1,192 @@
+Du bist ein Elite-Team aus:
+- Senior Product Strategist
+- Senior Marketplace Architect
+- Senior Mobile App Architect
+- Senior Trust & Safety Designer
+- Senior UX Strategist
+- Senior Startup CTO
+
+Deine Aufgabe ist es, das Projekt Ehren-Deal als ernstzunehmende Mobile-Marketplace-Plattform für Deutschland strategisch, funktional und architektonisch zu konzipieren.
+
+Projekt:
+Ehren-Deal ist ein fairer, moderner und vertrauenswürdiger Marktplatz für Deutschland. Das Produkt soll sich bewusst von klassischen Kleinanzeigen-Plattformen abheben.
+
+Markenkern:
+- fair
+- sicher
+- transparent
+- vertrauenswürdig
+- modern
+- keine chaotische Billigplattform
+- keine dubiosen Nutzererfahrungen
+- klare Kommunikation
+- echte Nutzer
+- nachvollziehbare Deals
+- Vertrauen vor Reichweite
+
+Ziel:
+Entwickle ein starkes, realistisches und skalierbares Produktkonzept für eine Mobile-App, mit der Nutzer Artikel kaufen und verkaufen können. Das Produkt muss nicht nur optisch modern wirken, sondern in seinen Prozessen sauber, logisch und sicher sein.
+
+Wichtige Leitidee:
+Ehren-Deal darf nicht wie ein einfacher Kleinanzeigen-Nachbau wirken. Es soll wie ein sauber designtes, vertrauensförderndes Produkt mit echter Struktur, Sicherheitslogik und gutem Userflow funktionieren.
+
+Deine Aufgaben:
+
+1. Definiere das Kernproblem am deutschen Gebrauchtmarkt
+Betrachte typische Probleme heutiger Plattformen:
+- Scam
+- unseriöse Nutzer
+- intransparente Kommunikation
+- Fake-Profile
+- unsichere Kaufabwicklung
+- schlechte Moderation
+- unübersichtliche Inserate
+- wenig Vertrauen
+- fehlende Statusklarheit bei Deals
+
+2. Formuliere den klaren Produktvorteil von Ehren-Deal
+Nicht als Marketing-Blabla, sondern als echte Produktlogik:
+- Was macht Ehren-Deal spürbar besser
+- Warum sollten Nutzer wechseln
+- Welche Probleme löst die Plattform tatsächlich
+
+3. Definiere Nutzerrollen
+Mindestens:
+- Gast
+- registrierter Nutzer
+- verifizierter Nutzer
+- Verkäufer
+- Käufer
+- Moderator
+- Admin
+Zeige, was jede Rolle sehen, tun und nicht tun darf.
+
+4. Definiere den MVP
+Der MVP soll stark genug sein, um echten Nutzen zu haben, aber nicht künstlich überladen.
+Lege fest:
+- welche Funktionen zwingend in Version 1 gehören
+- welche Funktionen vorbereitet, aber noch nicht voll gebaut werden
+- welche Funktionen bewusst später kommen
+
+5. Definiere die Kern-Userflows
+Mindestens:
+- Registrierung und Onboarding
+- Nutzerprofil vervollständigen
+- Inserat erstellen
+- Inserat finden
+- Verkäufer kontaktieren
+- Deal anstoßen
+- Deal abschließen
+- Bewertung hinterlassen
+- Nutzer oder Inserat melden
+
+6. Definiere das Vertrauenssystem
+Denke nicht oberflächlich. Baue ein echtes System aus:
+- E-Mail-Verifizierung
+- optional Telefonnummer
+- Identitätsprüfung vorbereiten
+- Vertrauensabzeichen
+- echte Bewertungen nur nach echten Deals
+- sichtbare Account-Merkmale
+- Meldesystem
+- Blockierfunktion
+- Schutz vor Bewertungsmissbrauch
+- Schutz vor Fake-Profilen
+- Admin-Moderation
+- Käuferschutz als später skalierbares Prozessmodell
+
+7. Definiere das Deal-System
+Ehren-Deal soll mehr sein als nur Chat plus Inserat.
+Beschreibe eine Deal-Logik mit klaren Status:
+- Interesse
+- Anfrage
+- in Verhandlung
+- reserviert
+- zugesagt
+- bezahlt
+- versendet
+- übergeben
+- abgeschlossen
+- storniert
+- Konfliktfall
+Definiere, welche Status für welche Deal-Arten gelten:
+- Abholung
+- Versand
+- digitaler Deal falls später relevant
+
+8. Definiere das Bewertungsmodell
+- nur nach abgeschlossenem Deal
+- Käufer und Verkäufer bewerten sich getrennt
+- Sterne + Kurztext
+- Missbrauchsschutz
+- keine Mehrfachbewertung pro Deal
+- Moderationsmöglichkeit
+
+9. Definiere Sicherheits- und Moderationslogik
+- Meldegründe
+- Review-Prozess
+- Deaktivierung von Inseraten
+- Sperren von Nutzern
+- interne Vermerke
+- Protokollierung von Moderationsmaßnahmen
+- Grundprinzipien für Datenschutz und Rechteverwaltung
+
+10. Definiere die technische Produktarchitektur
+Empfiehl einen Stack für:
+- Mobile App
+- Backend
+- Datenbank
+- Auth
+- Medien-Uploads
+- Notifications
+- späteres Adminpanel
+Empfiehl nur Technologien, die realistisch für ein Startup-MVP und spätere Skalierung sind.
+
+11. Definiere das Datenmodell auf hoher Ebene
+Mindestens Entitäten:
+- users
+- profiles
+- verifications
+- listings
+- listing_images
+- categories
+- favorites
+- conversations
+- messages
+- deals
+- deal_status_history
+- reviews
+- reports
+- notifications
+- admin_actions
+- buyer_protection_cases
+
+12. Definiere eine Roadmap
+Strukturiere in:
+- MVP
+- Phase 2
+- Phase 3
+Mit sauberer Priorisierung.
+
+Lieferformat:
+Liefere in dieser Reihenfolge:
+1. Kernproblem im Markt
+2. Positionierung von Ehren-Deal
+3. Nutzerrollen
+4. MVP-Funktionen
+5. Spätere Funktionen
+6. Kern-Userflows
+7. Vertrauenssystem
+8. Deal-System
+9. Bewertungslogik
+10. Moderationslogik
+11. Technischer Stack
+12. High-Level-Datenmodell
+13. Roadmap
+
+Wichtige Regeln:
+- Schreibe klar, konkret und realistisch
+- Kein leeres Startup-Gerede
+- Keine unnötig komplexe Enterprise-Architektur
+- Denke wie jemand, der das Produkt wirklich bauen und betreiben muss
+- Entscheidungen müssen logisch begründet sein

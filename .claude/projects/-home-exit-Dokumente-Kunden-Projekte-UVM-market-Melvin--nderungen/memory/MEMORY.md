@@ -1,0 +1,1 @@
+- [Keine Icons und Emojis](feedback_no_icons_emojis.md) — Typografie/Farbe/Whitespace statt dekorative Icons, mehrfach betont

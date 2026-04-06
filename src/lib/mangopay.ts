@@ -155,9 +155,9 @@ export async function refundPayIn(payInId: string, authorId: string) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/** Berechne Ehren-Deal-Gebühr: 2.4% des Kaufpreises */
+/** Berechne Verkäufer-Provision: 5% des Artikelpreises */
 export function calculateFee(amountCents: number): number {
-    return Math.round(amountCents * 0.024);
+    return Math.round(amountCents * 0.05);
 }
 
 /** Konvertiere Euro-Betrag zu Cent (Mangopay arbeitet immer in Cent) */

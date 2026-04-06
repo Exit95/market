@@ -10,24 +10,24 @@ if (!id) return Astro.redirect('/404');
 
 // ── Category labels ──
 const catLabels: Record<string, string> = {
-    ELEKTRONIK: 'Elektronik', FAHRZEUGE: 'Fahrzeuge', MODE: 'Mode & Kleidung',
-    MOEBEL: 'Möbel & Wohnen', SPORT: 'Sport & Freizeit', HAUSHALT: 'Haushalt',
-    BUCHER: 'Bücher & Medien', SPIELZEUG: 'Spielzeug', SONSTIGES: 'Sonstiges',
+ ELEKTRONIK: 'Elektronik', FAHRZEUGE: 'Fahrzeuge', MODE: 'Mode & Kleidung',
+ MOEBEL: 'Möbel & Wohnen', SPORT: 'Sport & Freizeit', HAUSHALT: 'Haushalt',
+ BUCHER: 'Bücher & Medien', SPIELZEUG: 'Spielzeug', SONSTIGES: 'Sonstiges',
 };
 
 // ── Time-ago helper ──
 function timeAgo(date: Date): string {
-    const ms = Date.now() - date.getTime();
-    const mins = Math.floor(ms / 60000);
-    if (mins < 1) return 'Gerade eben';
-    if (mins < 60) return `vor ${mins} Min.`;
-    const hrs = Math.floor(mins / 60);
-    if (hrs < 24) return `vor ${hrs} Std.`;
-    const days = Math.floor(hrs / 24);
-    if (days === 1) return 'Gestern';
-    if (days < 30) return `vor ${days} Tagen`;
-    const months = Math.floor(days / 30);
-    return `vor ${months} Monat${months > 1 ? 'en' : ''}`;
+ const ms = Date.now() - date.getTime();
+ const mins = Math.floor(ms / 60000);
+ if (mins < 1) return 'Gerade eben';
+ if (mins < 60) return `vor ${mins} Min.`;
+ const hrs = Math.floor(mins / 60);
+ if (hrs < 24) return `vor ${hrs} Std.`;
+ const days = Math.floor(hrs / 24);
+ if (days === 1) return 'Gestern';
+ if (days < 30) return `vor ${days} Tagen`;
+ const months = Math.floor(days / 30);
+ return `vor ${months} Monat${months > 1 ? 'en' : ''}`;
 }
 
 // ── 1) Try DB first ──
@@ -40,84 +40,127 @@ let sellerId = '';
 let isFromDB = false;
 let dbCategory = '';
 
-const dbListing = await prisma.listing.findUnique({
-    where: { id },
-    include: {
-        images: { orderBy: { position: 'asc' } },
-        seller: {
-            select: {
-                id: true,
-                firstName: true,
-                lastName: true,
-                idVerified: true,
-                emailVerified: true,
-                phoneVerified: true,
-                createdAt: true,
-                trustScore: true,
-                _count: { select: { listings: true } },
-            },
-        },
-    },
-});
+let dbListing: any = null;
+try {
+ dbListing = await prisma.listing.findUnique({
+ where: { id },
+ include: {
+ images: { orderBy: { position: 'asc' } },
+ seller: {
+ select: {
+ id: true,
+ firstName: true,
+ lastName: true,
+ idVerified: true,
+ emailVerified: true,
+ phoneVerified: true,
+ createdAt: true,
+ trustScore: true,
+ _count: { select: { listings: true } },
+ },
+ },
+ },
+ });
+} catch { /* DB not available, fall through to static data */ }
 
 if (dbListing) {
-    isFromDB = true;
-    dbCategory = dbListing.category;
-    sellerId = dbListing.seller.id;
+ isFromDB = true;
+ dbCategory = dbListing.category;
+ sellerId = dbListing.seller.id;
 
-    // Increment view count (fire & forget)
-    prisma.listing.update({ where: { id }, data: { viewCount: { increment: 1 } } }).catch(() => {});
+ // Increment view count (fire & forget)
+ prisma.listing.update({ where: { id }, data: { viewCount: { increment: 1 } } }).catch(() => {});
 
-    const s = dbListing.seller;
-    const sellerFirst = s.firstName || '';
-    const sellerLast = s.lastName || '';
-    const sellerName = sellerFirst
-        ? `${sellerFirst} ${sellerLast ? sellerLast.charAt(0) + '.' : ''}`.trim()
-        : 'Verkäufer';
+ const s = dbListing.seller;
+ const sellerFirst = s.firstName || '';
+ const sellerLast = s.lastName || '';
+ const sellerName = sellerFirst
+ ? `${sellerFirst} ${sellerLast ? sellerLast.charAt(0) + '.' : ''}`.trim()
+ : 'Verkäufer';
 
-    // Seller stats
-    sellerMemberSince = s.createdAt.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
-    sellerListingCount = s._count.listings;
-    sellerTrustScore = s.trustScore?.score ?? 0;
+ // Seller stats
+ sellerMemberSince = s.createdAt.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+ sellerListingCount = s._count.listings;
+ sellerTrustScore = s.trustScore?.score ?? 0;
 
-    // All images
-    allImages = dbListing.images.map((img: any) => ({ url: img.url, id: img.id }));
-    const mainImage = allImages[0]?.url || 'https://placehold.co/600x400/1a1a2e/c8973a?text=Kein+Bild';
+ // All images
+ allImages = dbListing.images.map((img: any) => ({ url: img.url, id: img.id }));
+ const mainImage = allImages[0]?.url || 'https://placehold.co/600x400/F8FAFB/1B65A6?text=Kein+Bild';
 
-    listing = {
-        id: dbListing.id,
-        title: dbListing.title,
-        price: dbListing.price / 100,
-        location: [dbListing.postalCode, dbListing.city].filter(Boolean).join(' '),
-        category: catLabels[dbListing.category] || dbListing.category,
-        image: mainImage,
-        sellerName,
-        sellerRating: sellerTrustScore / 20, // 0-100 → 0-5
-        sellerVerified: s.emailVerified || s.phoneVerified,
-        sellerKYC: s.idVerified,
-        postedAt: timeAgo(dbListing.createdAt),
-        condition: dbListing.condition || 'Gut',
-        treuhandAvailable: dbListing.treuhand,
-        description: dbListing.description,
-        viewCount: dbListing.viewCount + 1,
-        status: dbListing.status,
-    };
+ listing = {
+ id: dbListing.id,
+ title: dbListing.title,
+ price: dbListing.price / 100,
+ location: [dbListing.postalCode, dbListing.city].filter(Boolean).join(' '),
+ category: catLabels[dbListing.category] || dbListing.category,
+ image: mainImage,
+ sellerName,
+ sellerRating: sellerTrustScore / 20, // 0-100 → 0-5
+ sellerVerified: s.emailVerified || s.phoneVerified,
+ sellerKYC: s.idVerified,
+ postedAt: timeAgo(dbListing.createdAt),
+ condition: dbListing.condition || 'Gut',
+ treuhandAvailable: dbListing.treuhand,
+ description: dbListing.description,
+ viewCount: dbListing.viewCount + 1,
+ status: dbListing.status,
+ };
 }
 
 // ── 2) Fallback: static demo data ──
 if (!listing) {
-    const staticListing = staticListings.find((l) => l.id === id);
-    if (staticListing) {
-        listing = { ...staticListing, viewCount: 0, status: 'ACTIVE' };
-        allImages = [{ url: staticListing.image, id: 'static-0' }];
-        sellerMemberSince = 'Januar 2024';
-        sellerListingCount = 3;
-        sellerTrustScore = 75;
-    }
+ const staticListing = staticListings.find((l) => l.id === id);
+ if (staticListing) {
+ listing = { ...staticListing, viewCount: 0, status: 'ACTIVE' };
+ allImages = [{ url: staticListing.image, id: 'static-0' }];
+ sellerMemberSince = 'Januar 2024';
+ sellerListingCount = 3;
+ sellerTrustScore = 75;
+ sellerId = `mock-seller-${id}`;
+ }
 }
 
 // ── 404 ──
 if (!listing) return Astro.redirect('/404');
+
+// ── Schema.org condition mapping ──
+const conditionMap: Record<string, string> = {
+ 'Neu': 'https://schema.org/NewCondition',
+ 'Sehr gut': 'https://schema.org/UsedCondition',
+ 'Gut': 'https://schema.org/UsedCondition',
+ 'Akzeptabel': 'https://schema.org/UsedCondition',
+};
+
+// ── JSON-LD structured data ──
+const jsonLd = {
+ "@context": "https://schema.org",
+ "@type": "Product",
+ "name": listing.title,
+ "description": listing.description,
+ "image": listing.image,
+ "offers": {
+ "@type": "Offer",
+ "price": listing.price,
+ "priceCurrency": "EUR",
+ "availability": listing.status === "ACTIVE" ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
+ "itemCondition": conditionMap[listing.condition] || "https://schema.org/UsedCondition",
+ "seller": {
+ "@type": "Person",
+ "name": listing.sellerName,
+ },
+ },
+};
+
+// ── JSON-LD BreadcrumbList ──
+const breadcrumbJsonLd = {
+ "@context": "https://schema.org",
+ "@type": "BreadcrumbList",
+ "itemListElement": [
+ { "@type": "ListItem", "position": 1, "name": "Startseite", "item": "https://ehren-deal.de/" },
+ { "@type": "ListItem", "position": 2, "name": listing.category, "item": `https://ehren-deal.de/?category=${(listing.category || '').toUpperCase()}` },
+ { "@type": "ListItem", "position": 3, "name": listing.title }
+ ]
+};
 
 // ── Stars ──
 const rating = Math.max(0, Math.min(5, Math.round(listing.sellerRating)));
@@ -137,374 +180,762 @@ const securityColor = securityScore >= 80 ? '#52b788' : securityScore >= 50 ? '#
 // ── Related Listings (DB + static fallback) ──
 let relatedListings: any[] = [];
 if (isFromDB && dbCategory) {
-    const dbRelated = await prisma.listing.findMany({
-        where: { category: dbCategory as any, status: 'ACTIVE', id: { not: id } },
-        include: { images: { orderBy: { position: 'asc' }, take: 1 } },
-        orderBy: { createdAt: 'desc' },
-        take: 3,
-    });
-    relatedListings = dbRelated.map((r: any) => ({
-        id: r.id,
-        title: r.title,
-        price: r.price / 100,
-        location: [r.postalCode, r.city].filter(Boolean).join(' '),
-        image: r.images[0]?.url || 'https://placehold.co/400x300/1a1a2e/c8973a?text=Kein+Bild',
-    }));
+ const dbRelated = await prisma.listing.findMany({
+ where: { category: dbCategory as any, status: 'ACTIVE', id: { not: id } },
+ include: { images: { orderBy: { position: 'asc' }, take: 1 } },
+ orderBy: { createdAt: 'desc' },
+ take: 3,
+ });
+ relatedListings = dbRelated.map((r: any) => ({
+ id: r.id,
+ title: r.title,
+ price: r.price / 100,
+ location: [r.postalCode, r.city].filter(Boolean).join(' '),
+ image: r.images[0]?.url || 'https://placehold.co/400x300/F8FAFB/1B65A6?text=Kein+Bild',
+ }));
 }
 // Fill up with static if needed
 if (relatedListings.length < 3) {
-    const staticRelated = staticListings
-        .filter((l) => l.id !== listing!.id && l.category === listing!.category)
-        .slice(0, 3 - relatedListings.length)
-        .map((l) => ({ id: l.id, title: l.title, price: l.price, location: l.location, image: l.image }));
-    relatedListings = [...relatedListings, ...staticRelated];
+ const staticRelated = staticListings
+ .filter((l) => l.id !== listing!.id && l.category === listing!.category)
+ .slice(0, 3 - relatedListings.length)
+ .map((l) => ({ id: l.id, title: l.title, price: l.price, location: l.location, image: l.image }));
+ relatedListings = [...relatedListings, ...staticRelated];
 }
 ---
 
-<BaseLayout title={`${listing.title} – Ehren-Deal`}>
-    <Header />
+<BaseLayout
+ title={`${listing.title} – Ehren-Deal`}
+ description={listing.description?.slice(0, 160)}
+ ogImage={listing.image}
+ canonicalPath={`/inserat/${listing.id}`}
+>
+ <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+ <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />
+ <Header />
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20">
+ <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20">
 
-        <!-- ═══ 1. Breadcrumb ═══ -->
-        <nav class="flex items-center gap-2 text-sm text-foreground/50 mb-8 flex-wrap font-condensed tracking-wide uppercase text-xs">
-            <a href="/" class="hover:text-primary transition-colors">Startseite</a>
-            <span class="text-foreground/25">›</span>
-            <a href={`/kategorie/${listing.category.toLowerCase()}`} class="hover:text-primary transition-colors">{listing.category}</a>
-            <span class="text-foreground/25">›</span>
-            <span class="text-foreground/70 normal-case tracking-normal text-sm font-body">{listing.title}</span>
-        </nav>
+ <!-- ═══ 1. Breadcrumb ═══ -->
+ <nav class="flex items-center gap-2 text-text-muted mb-4 flex-wrap text-xs">
+ <a href="/" class="hover:text-primary transition-colors">Startseite</a>
+ <span class="text-text-muted">›</span>
+ <a href={`/?category=${(listing.category || '').toUpperCase()}`} class="hover:text-primary transition-colors">{listing.category}</a>
+ <span class="text-text-muted">›</span>
+ <span class="text-text-secondary normal-case tracking-normal text-sm font-body">{listing.title}</span>
+ </nav>
 
-        <!-- ═══ 2. Main Grid: Gallery + Kaufbox ═══ -->
-        <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
+ <!-- ═══ Titel (Mobile: über Gallery, Desktop: unsichtbar weil in Kaufbox) ═══ -->
+ <h1 class="text-2xl sm:text-3xl mb-6 lg:hidden">{listing.title}</h1>
 
-            <!-- ── LEFT COLUMN ── -->
-            <div class="space-y-6">
+ <!-- ═══ 2. Main Grid: Gallery + Kaufbox ═══ -->
+ <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 lg:gap-8 items-start">
 
-                <!-- 2a. Image Gallery -->
-                <div>
-                    <div class="relative rounded-default overflow-hidden bg-secondary aspect-[4/3]">
-                        <img
-                            src={allImages[0]?.url || listing.image}
-                            alt={listing.title}
-                            class="w-full h-full object-cover"
-                            id="mainImg"
-                        />
-                        {listing.condition === "Neu" && (
-                            <span class="absolute top-4 left-4 bg-success text-white text-xs font-condensed font-medium uppercase tracking-wider px-3 py-1 rounded-default">Neu</span>
-                        )}
-                        {listing.treuhandAvailable && (
-                            <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-success/90 to-transparent text-white px-4 pb-3 pt-8 text-sm font-semibold flex items-center gap-2">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                Käuferschutz aktiv
-                            </div>
-                        )}
-                        {allImages.length > 1 && (
-                            <button class="gallery-nav left-3" id="galleryPrev" aria-label="Vorheriges Bild">‹</button>
-                        )}
-                        {allImages.length > 1 && (
-                            <button class="gallery-nav right-3" id="galleryNext" aria-label="Nächstes Bild">›</button>
-                        )}
-                        <div class="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-3 py-0.5 rounded-full z-10" id="imgCounter">
-                            {allImages.length > 1 ? `1 / ${allImages.length}` : ''}
-                        </div>
-                    </div>
-                    {allImages.length > 1 && (
-                        <div class="flex gap-2 mt-3 overflow-x-auto pb-2">
-                            {allImages.map((img, i) => (
-                                <button
-                                    class={`img-thumb shrink-0 w-[72px] h-[54px] rounded-default overflow-hidden border-2 ${i === 0 ? 'border-primary' : 'border-transparent'} bg-secondary p-0 cursor-pointer transition-colors hover:border-foreground/30`}
-                                    data-index={i}
-                                    data-url={img.url}
-                                >
-                                    <img src={img.url} alt={`Bild ${i + 1}`} class="w-full h-full object-cover" />
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
+ <!-- ── LEFT COLUMN ── -->
+ <div class="space-y-6">
 
-                <!-- 2b. Beschreibung -->
-                <div class="bg-secondary/30 border border-foreground/10 rounded-default p-6">
-                    <h2 class="font-headings text-lg font-semibold mb-4">Beschreibung</h2>
-                    <p class="text-foreground/70 text-sm leading-relaxed whitespace-pre-line">{listing.description}</p>
-                </div>
+ <!-- 2a. Image Gallery -->
+ <div>
+ <div class="relative rounded overflow-hidden bg-background aspect-[4/3]">
+ <img
+ src={allImages[0]?.url || listing.image}
+ alt={listing.title}
+ class="w-full h-full object-cover"
+ id="mainImg"
+ fetchpriority="high"
+ />
+ {listing.condition === "Neu" && (
+ <span class="absolute top-4 left-4 bg-success text-white text-xs font-semibold px-3 py-1 rounded">Neu</span>
+ )}
+ {listing.treuhandAvailable && (
+ <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-success/90 to-transparent text-white px-4 pb-3 pt-8 text-sm font-semibold flex items-center gap-2">
+ <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+ Käuferschutz aktiv
+ </div>
+ )}
+ {allImages.length > 1 && (
+ <button class="gallery-nav left-3" id="galleryPrev" aria-label="Vorheriges Bild">‹</button>
+ )}
+ {allImages.length > 1 && (
+ <button class="gallery-nav right-3" id="galleryNext" aria-label="Nächstes Bild">›</button>
+ )}
+ <div class="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-3 py-0.5 rounded-full z-10" id="imgCounter">
+ {allImages.length > 1 ? `1 / ${allImages.length}` : ''}
+ </div>
+ </div>
+ {allImages.length > 1 && (
+ <div class="flex gap-2 mt-3 overflow-x-auto pb-2 scrollbar-hide">
+ {allImages.map((img, i) => (
+ <button
+ class={`img-thumb shrink-0 w-16 h-12 sm:w-[72px] sm:h-[54px] rounded overflow-hidden border-2 ${i === 0 ? 'border-primary' : 'border-transparent'} bg-background p-0 cursor-pointer transition-colors hover:border-border`}
+ data-index={i}
+ data-url={img.url}
+ >
+ <img src={img.url} alt={`Bild ${i + 1}`} class="w-full h-full object-cover" loading="lazy" />
+ </button>
+ ))}
+ </div>
+ )}
+ </div>
 
-                <!-- 2c. Detailtabelle -->
-                <div class="bg-secondary/30 border border-foreground/10 rounded-default p-6">
-                    <h2 class="font-headings text-lg font-semibold mb-4">Details</h2>
-                    <div class="flex flex-col gap-3">
-                        <div class="detail-row"><span class="text-foreground/60 font-medium text-sm">Zustand</span>
-                            <span class={`text-xs font-condensed font-medium uppercase tracking-wider px-2.5 py-0.5 rounded-default border ${listing.condition === 'Neu' ? 'bg-success/10 text-success border-success/20' : listing.condition === 'Sehr gut' ? 'bg-primary/10 text-primary border-primary/20' : 'bg-warning/10 text-warning border-warning/20'}`}>{listing.condition}</span>
-                        </div>
-                        <div class="detail-row"><span class="text-foreground/60 font-medium text-sm">Kategorie</span><span class="text-foreground font-medium text-sm">{listing.category}</span></div>
-                        <div class="detail-row"><span class="text-foreground/60 font-medium text-sm">Standort</span><span class="text-foreground font-medium text-sm">{listing.location}</span></div>
-                        <div class="detail-row"><span class="text-foreground/60 font-medium text-sm">Eingestellt</span><span class="text-foreground font-medium text-sm">{listing.postedAt}</span></div>
-                        <div class="detail-row"><span class="text-foreground/60 font-medium text-sm">Aufrufe</span><span class="text-foreground font-medium text-sm">{listing.viewCount ?? 0}</span></div>
-                        <div class="detail-row border-none pb-0"><span class="text-foreground/60 font-medium text-sm">Inserat-ID</span>
-                            <span class="text-foreground/40 text-xs font-mono">{listing.id.length > 12 ? listing.id.slice(-8) : listing.id}</span>
-                        </div>
-                    </div>
-                </div>
+ <!-- 2b. Beschreibung -->
+ <div class="bg-surface border border-border rounded p-6">
+ <h2 class="text-lg font-semibold mb-4">Beschreibung</h2>
+ <p class="text-text-secondary text-sm leading-relaxed whitespace-pre-line">{listing.description}</p>
+ </div>
 
-                <!-- 2d. Sicherheitstipps -->
-                <div class="bg-warning/[.04] border border-warning/20 rounded-default p-6">
-                    <div class="flex items-center gap-2 text-warning text-sm font-semibold mb-4">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                        Sicherheitstipps für Käufer
-                    </div>
-                    <ul class="flex flex-col gap-3">
-                        <li class="text-sm text-foreground/60 pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-warning">Kaufe nur über unser <strong class="text-foreground/80">Treuhandkonto</strong> – nie direkt via PayPal Freunde & Familie</li>
-                        <li class="text-sm text-foreground/60 pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-warning">Triff Verkäufer <strong class="text-foreground/80">persönlich an öffentlichen Orten</strong> oder nutze Versand mit Treuhand</li>
-                        <li class="text-sm text-foreground/60 pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-warning">Lass dich <strong class="text-foreground/80">nie zu schnellen Entscheidungen drängen</strong> – seriöse Verkäufer haben Zeit</li>
-                        <li class="text-sm text-foreground/60 pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-warning">Kaufe <strong class="text-foreground/80">keine Codes oder Geschenkgutscheine</strong> als Zahlungsmittel</li>
-                        <li class="text-sm text-foreground/60 pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-warning">Melde verdächtige Anzeigen sofort über den <strong class="text-foreground/80">"Melden"-Button</strong></li>
-                    </ul>
-                </div>
-            </div>
+ <!-- 2c. Detailtabelle -->
+ <div class="bg-surface border border-border rounded p-6">
+ <h2 class="text-lg font-semibold mb-4">Details</h2>
+ <div class="flex flex-col gap-3">
+ <div class="detail-row"><span class="text-text-secondary font-medium text-sm">Zustand</span>
+ <span class={`text-xs font-semibold px-2.5 py-0.5 rounded border ${listing.condition === 'Neu' ? 'bg-success/10 text-success border-success/20' : listing.condition === 'Sehr gut' ? 'bg-primary/10 text-primary border-primary/20' : 'bg-warning/10 text-warning border-warning/20'}`}>{listing.condition}</span>
+ </div>
+ <div class="detail-row"><span class="text-text-secondary font-medium text-sm">Kategorie</span><span class="text-text font-medium text-sm">{listing.category}</span></div>
+ <div class="detail-row"><span class="text-text-secondary font-medium text-sm">Standort</span><span class="text-text font-medium text-sm">{listing.location}</span></div>
+ <div class="detail-row"><span class="text-text-secondary font-medium text-sm">Eingestellt</span><span class="text-text font-medium text-sm">{listing.postedAt}</span></div>
+ <div class="detail-row"><span class="text-text-secondary font-medium text-sm">Aufrufe</span><span class="text-text font-medium text-sm">{listing.viewCount ?? 0}</span></div>
+ <div class="detail-row border-none pb-0"><span class="text-text-secondary font-medium text-sm">Inserat-ID</span>
+ <span class="text-text-muted text-xs font-mono">{listing.id.length > 12 ? listing.id.slice(-8) : listing.id}</span>
+ </div>
+ </div>
+ </div>
 
-            <!-- ── RIGHT COLUMN: Kaufbox + Sidebar ── -->
-            <div class="space-y-4 lg:sticky lg:top-24">
+ <!-- 2d. Sicherheitstipps -->
+ <div class="bg-warning/[.04] border border-warning/20 rounded p-6">
+ <div class="flex items-center gap-2 text-warning text-sm font-semibold mb-4">
+ <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+ Sicherheitstipps für Käufer
+ </div>
+ <ul class="flex flex-col gap-3">
+ <li class="text-sm text-text-secondary pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-warning">Kaufe nur über unser <strong class="text-text-secondary">Treuhandkonto</strong> – nie direkt via PayPal Freunde & Familie</li>
+ <li class="text-sm text-text-secondary pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-warning">Triff Verkäufer <strong class="text-text-secondary">persönlich an öffentlichen Orten</strong> oder nutze Versand mit Treuhand</li>
+ <li class="text-sm text-text-secondary pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-warning">Lass dich <strong class="text-text-secondary">nie zu schnellen Entscheidungen drängen</strong> – seriöse Verkäufer haben Zeit</li>
+ <li class="text-sm text-text-secondary pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-warning">Kaufe <strong class="text-text-secondary">keine Codes oder Geschenkgutscheine</strong> als Zahlungsmittel</li>
+ <li class="text-sm text-text-secondary pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-warning">Melde verdächtige Anzeigen sofort über den <strong class="text-text-secondary">"Melden"-Button</strong></li>
+ </ul>
+ </div>
+ </div>
 
-                <!-- Kaufbox -->
-                <div class="bg-secondary/40 border border-foreground/[.15] rounded-default p-6 backdrop-blur-sm">
-                    <!-- Preis -->
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-3xl font-black tracking-tight text-foreground">{listing.price.toLocaleString("de-DE")} €</span>
-                        {listing.treuhandAvailable && (
-                            <span class="trust-badge text-[0.65rem]">Treuhand</span>
-                        )}
-                    </div>
-                    <!-- Standort + Datum -->
-                    <div class="flex items-center gap-2 text-sm text-foreground/60 mb-5">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                        {listing.location}
-                        <span class="ml-auto text-xs bg-secondary px-2 py-0.5 rounded-full">{listing.postedAt}</span>
-                    </div>
+ <!-- ── RIGHT COLUMN: Kaufbox + Sidebar ── -->
+ <div class="space-y-4 lg:sticky lg:top-24">
 
-                    <!-- Treuhand-Info -->
-                    {listing.treuhandAvailable && (
-                        <div class="bg-success/[.08] border border-success/25 rounded-default p-4 mb-4">
-                            <div class="flex items-center gap-2 text-success text-sm font-bold mb-1">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-                                Käuferschutz verfügbar
-                            </div>
-                            <p class="text-xs text-foreground/60 leading-relaxed">Dein Geld liegt sicher auf dem Treuhandkonto und wird erst nach bestätigtem Warenerhalt freigegeben.</p>
-                        </div>
-                    )}
+ <!-- Kaufbox -->
+ <div class="bg-surface border border-border rounded p-6 backdrop-blur-sm">
+ <!-- Titel (Desktop only) -->
+ <h1 class="hidden lg:block text-xl mb-3 text-text leading-snug">{listing.title}</h1>
+ <!-- Preis -->
+ <div class="flex items-center justify-between mb-2">
+ <span class="text-3xl font-black tracking-tight text-text">{listing.price.toLocaleString("de-DE")} €</span>
+ {listing.treuhandAvailable && (
+ <span class="trust-badge text-[0.65rem]">Treuhand</span>
+ )}
+ </div>
+ <!-- Standort + Datum -->
+ <div class="flex items-center gap-2 text-sm text-text-secondary mb-5">
+ <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+ {listing.location}
+ <span class="ml-auto text-xs bg-background px-2 py-0.5 rounded-full">{listing.postedAt}</span>
+ </div>
 
-                    <!-- Aktions-Buttons -->
-                    <div class="flex flex-col gap-3 mb-3">
-                        <button class="btn-primary w-full flex items-center justify-center gap-2" id="contactBtn">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                            Verkäufer kontaktieren
-                        </button>
-                        {listing.treuhandAvailable && (
-                            <a href={`/checkout/${listing.id}`} class="btn-outline w-full flex items-center justify-center gap-2 no-underline">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                Sicher kaufen (Treuhand)
-                            </a>
-                        )}
-                        <button class="inline-flex items-center justify-center gap-2 px-4 py-2 text-foreground/50 text-sm hover:text-foreground transition-colors">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                            Merken
-                        </button>
-                    </div>
+ <!-- Treuhand-Info -->
+ {listing.treuhandAvailable && (
+ <div class="bg-success/[.08] border border-success/25 rounded p-4 mb-4">
+ <div class="flex items-center gap-2 text-success text-sm font-bold mb-1">
+ <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+ Käuferschutz verfügbar
+ </div>
+ <p class="text-xs text-text-secondary leading-relaxed">Dein Geld liegt sicher auf dem Treuhandkonto und wird erst nach bestätigtem Warenerhalt freigegeben.</p>
+ </div>
+ )}
 
-                    <!-- Melden -->
-                    <div class="flex justify-center">
-                        <button class="text-danger text-xs flex items-center gap-1 hover:underline">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
-                            Anzeige melden
-                        </button>
-                    </div>
-                </div>
+ <!-- Aktions-Buttons -->
+ <div class="flex flex-col gap-3 mb-3">
+ <button class="btn-primary w-full flex items-center justify-center gap-2" id="contactBtn">
+ <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+ Verkäufer kontaktieren
+ </button>
+ {listing.treuhandAvailable && (
+ <>
+ <a href={`/checkout/${listing.id}`} class="btn-outline w-full flex items-center justify-center gap-2 no-underline">
+ <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+ Sicher kaufen (Treuhand)
+ </a>
+ <p class="text-[.6rem] text-text-muted text-center leading-relaxed -mt-1">
+ zzgl. 0,50 € Servicegebühr für Käuferschutz.
+ Verkäufer: 5 % Verkaufsprovision.
+ <a href="/agb#gebuehren" class="text-primary/60 hover:text-primary underline underline-offset-2">Details</a>
+ </p>
+ </>
+ )}
+ <div class="flex items-center gap-1">
+ <div class="flex flex-col items-center">
+ <button
+ id="saveBtn"
+ data-listing-id={listing.id}
+ class="inline-flex items-center justify-center gap-2 px-4 py-2 text-text-muted text-sm hover:text-text transition-colors"
+ >
+ <svg id="saveIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+ <span id="saveBtnText">Merken</span>
+ </button>
+ <a href="/merkliste" id="merklisteHint" class="hidden text-[.65rem] text-text-muted hover:text-primary transition-colors ">
+ → Zur Merkliste
+ </a>
+ </div>
+ <button
+ type="button"
+ id="shareBtn"
+ class="inline-flex items-center justify-center gap-2 px-4 py-2 text-text-muted text-sm hover:text-text transition-colors"
+ >
+ <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+ Teilen
+ </button>
+ </div>
+ </div>
 
-                <!-- Sicherheits-Score -->
-                <div class="bg-secondary/30 border border-foreground/10 rounded-default p-5">
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="text-sm font-bold">Sicherheits-Score</span>
-                        <span class={`text-[0.65rem] font-condensed font-medium uppercase tracking-wider px-2 py-0.5 rounded-default border ${securityScore >= 80 ? 'bg-success/10 text-success border-success/20' : securityScore >= 50 ? 'bg-warning/10 text-warning border-warning/20' : 'bg-danger/10 text-danger border-danger/20'}`}>{securityLabel}</span>
-                    </div>
-                    <div class="bg-secondary rounded-full h-2 mb-2 overflow-hidden">
-                        <div class="h-full bg-gradient-to-r from-success to-emerald-400 rounded-full transition-all duration-1000" style={`width:${securityScore}%`}></div>
-                    </div>
-                    <div class="flex justify-between text-xs text-foreground/50 mb-4">
-                        <span>Risiko</span>
-                        <span class="font-semibold" style={`color:${securityColor}`}>{securityScore} / 100</span>
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        {[
-                            { ok: listing.sellerVerified, yes: 'Verifizierter Verkäufer', no: 'Verkäufer nicht verifiziert' },
-                            { ok: listing.sellerKYC, yes: 'KYC-Identität bestätigt', no: 'Keine KYC-Verifizierung' },
-                            { ok: listing.treuhandAvailable, yes: 'Treuhandkonto verfügbar', no: 'Kein Treuhandschutz' },
-                        ].map((c) => (
-                            <div class={`flex items-center gap-2 text-xs ${c.ok ? 'text-success' : 'text-warning'}`}>
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                    {c.ok ? <polyline points="20 6 9 17 4 12"/> : <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>}
-                                </svg>
-                                {c.ok ? c.yes : c.no}
-                            </div>
-                        ))}
-                    </div>
-                </div>
+ <!-- Melden -->
+ <div class="flex justify-center">
+ <button type="button" id="reportBtn" class="text-danger text-xs flex items-center gap-1 hover:underline transition-colors">
+ <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+ Anzeige melden
+ </button>
+ </div>
+ </div>
 
-                <!-- Verkäufer-Karte -->
-                <div class="bg-secondary/30 border border-foreground/10 rounded-default p-5">
-                    <h3 class="text-xs font-bold text-foreground/50 uppercase tracking-[.06em] mb-4 font-condensed">Über den Verkäufer</h3>
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-xl font-bold text-background shrink-0">
-                            {listing.sellerName.charAt(0)}
-                        </div>
-                        <div>
-                            <div class="font-bold mb-1">{listing.sellerName}</div>
-                            <div class="flex gap-1 flex-wrap">
-                                {listing.sellerKYC && (<span class="trust-badge text-[0.6rem] py-0.5 px-2">KYC</span>)}
-                                {listing.sellerVerified && (<span class="trust-badge text-[0.6rem] py-0.5 px-2">Bestätigt</span>)}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="border-t border-foreground/10 pt-3 flex flex-col gap-1">
-                        <div class="flex items-center gap-2">
-                            <span class="text-primary text-base">{stars}</span>
-                            <span class="text-sm font-semibold">{listing.sellerRating > 0 ? listing.sellerRating.toFixed(1) : '–'}</span>
-                        </div>
-                        <span class="text-xs text-foreground/50">Mitglied seit {sellerMemberSince} · {sellerListingCount} {sellerListingCount === 1 ? 'Anzeige' : 'Anzeigen'}</span>
-                    </div>
-                    <a href={sellerId ? `/profil/${sellerId}` : '/profil'} class="btn-outline w-full flex items-center justify-center mt-4 text-xs no-underline">
-                        Profil ansehen
-                    </a>
-                </div>
-            </div>
-        </div>
+ <!-- Sicherheits-Score -->
+ <div class="bg-surface border border-border rounded p-5">
+ <div class="flex justify-between items-center mb-3">
+ <span class="text-sm font-bold">Sicherheits-Score</span>
+ <span class={`text-[0.65rem] font-semibold px-2 py-0.5 rounded border ${securityScore >= 80 ? 'bg-success/10 text-success border-success/20' : securityScore >= 50 ? 'bg-warning/10 text-warning border-warning/20' : 'bg-danger/10 text-danger border-danger/20'}`}>{securityLabel}</span>
+ </div>
+ <div class="bg-background rounded-full h-2 mb-2 overflow-hidden">
+ <div class="h-full bg-gradient-to-r from-success to-emerald-400 rounded-full transition-all duration-1000" style={`width:${securityScore}%`}></div>
+ </div>
+ <div class="flex justify-between text-xs text-text-muted mb-4">
+ <span>Risiko</span>
+ <span class="font-semibold" style={`color:${securityColor}`}>{securityScore} / 100</span>
+ </div>
+ <div class="flex flex-col gap-2">
+ {[
+ { ok: listing.sellerVerified, yes: 'Verifizierter Verkäufer', no: 'Verkäufer nicht verifiziert' },
+ { ok: listing.sellerKYC, yes: 'KYC-Identität bestätigt', no: 'Keine KYC-Verifizierung' },
+ { ok: listing.treuhandAvailable, yes: 'Treuhandkonto verfügbar', no: 'Kein Treuhandschutz' },
+ ].map((c) => (
+ <div class={`flex items-center gap-2 text-xs ${c.ok ? 'text-success' : 'text-warning'}`}>
+ <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+ {c.ok ? <polyline points="20 6 9 17 4 12"/> : <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>}
+ </svg>
+ {c.ok ? c.yes : c.no}
+ </div>
+ ))}
+ </div>
+ </div>
 
-        <!-- ═══ 3. Ähnliche Anzeigen ═══ -->
-        {relatedListings.length > 0 && (
-            <section class="mt-16">
-                <h2 class="font-headings text-2xl font-light mb-6">Ähnliche Anzeigen</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {relatedListings.map((l) => (
-                        <a href={`/inserat/${l.id}`} class="group block bg-secondary/40 border border-foreground/10 rounded-default overflow-hidden hover:border-primary/20 transition-all duration-300 no-underline">
-                            <img src={l.image} alt={l.title} class="w-full aspect-video object-cover" />
-                            <div class="p-4">
-                                <div class="text-sm font-semibold text-foreground mb-1 line-clamp-2">{l.title}</div>
-                                <div class="text-lg font-extrabold text-primary mb-1">{l.price.toLocaleString("de-DE")} €</div>
-                                <div class="text-xs text-foreground/50">{l.location}</div>
-                            </div>
-                        </a>
-                    ))}
-                </div>
-            </section>
-        )}
-    </main>
+ <!-- Verkäufer-Karte -->
+ <div class="bg-surface border border-border rounded p-5">
+ <h3 class="text-xs font-bold text-text-muted mb-4 ">Über den Verkäufer</h3>
+ <div class="flex items-center gap-3 mb-4">
+ <div class="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-xl font-bold text-background shrink-0">
+ {listing.sellerName.charAt(0)}
+ </div>
+ <div>
+ <div class="font-bold mb-1">{listing.sellerName}</div>
+ <div class="flex gap-1 flex-wrap">
+ {listing.sellerKYC && (<span class="trust-badge text-[0.6rem] py-0.5 px-2">KYC</span>)}
+ {listing.sellerVerified && (<span class="trust-badge text-[0.6rem] py-0.5 px-2">Bestätigt</span>)}
+ </div>
+ </div>
+ </div>
+ <div class="border-t border-border pt-3 flex flex-col gap-1">
+ <div class="flex items-center gap-2">
+ <span class="text-primary text-base">{stars}</span>
+ <span class="text-sm font-semibold">{listing.sellerRating > 0 ? listing.sellerRating.toFixed(1) : '–'}</span>
+ </div>
+ <span class="text-xs text-text-muted">Mitglied seit {sellerMemberSince} · {sellerListingCount} {sellerListingCount === 1 ? 'Anzeige' : 'Anzeigen'}</span>
+ </div>
+ <a href={sellerId ? `/profil/${sellerId}` : '/profil'} class="btn-outline w-full flex items-center justify-center mt-4 text-xs no-underline">
+ Profil ansehen
+ </a>
+ </div>
+ </div>
+ </div>
 
-    <!-- ═══ Kontakt-Modal ═══ -->
-    <div class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[999] hidden items-center justify-center p-6" id="contactModal">
-        <div class="bg-secondary border border-foreground/15 rounded-default p-8 w-full max-w-lg">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-headings text-lg font-semibold">Nachricht an {listing.sellerName}</h3>
-                <button class="text-foreground/50 hover:text-foreground transition-colors" id="closeModal" aria-label="Schließen">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
-            </div>
-            <div class="flex items-center gap-2 text-xs text-warning bg-warning/[.08] border border-warning/20 p-3 rounded-default mb-4">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                Gib niemals deine Bankdaten oder zahle nicht außerhalb der Plattform.
-            </div>
-            <textarea class="input-field w-full" rows="5" placeholder="Hallo, ich interessiere mich für dein Inserat..."></textarea>
-            <div class="flex gap-3 justify-end mt-4">
-                <button class="btn-outline" id="closeModal2">Abbrechen</button>
-                <button class="btn-primary">Nachricht senden</button>
-            </div>
-        </div>
-    </div>
+ <!-- ═══ 3. Ähnliche Anzeigen ═══ -->
+ {relatedListings.length > 0 && (
+ <section class="mt-16">
+ <h2 class="text-2xl mb-6">Ähnliche Anzeigen</h2>
+ <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+ {relatedListings.map((l) => (
+ <a href={`/inserat/${l.id}`} class="group block bg-surface border border-border rounded overflow-hidden hover:border-primary/20 transition-all duration-300 no-underline">
+ <img src={l.image} alt={l.title} width="400" height="225" class="w-full aspect-video object-cover" loading="lazy" />
+ <div class="p-4">
+ <div class="text-sm font-semibold text-text mb-1 line-clamp-2">{l.title}</div>
+ <div class="text-lg font-extrabold text-primary mb-1">{l.price.toLocaleString("de-DE")} €</div>
+ <div class="text-xs text-text-muted">{l.location}</div>
+ </div>
+ </a>
+ ))}
+ </div>
+ </section>
+ )}
+ </main>
 
-    <Footer />
+ <!-- ═══ Kontakt-Modal ═══ -->
+ <div class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[999] hidden items-center justify-center p-6" id="contactModal">
+ <div class="bg-background border border-border rounded p-8 w-full max-w-lg">
+ <div class="flex justify-between items-center mb-4">
+ <h3 class="text-lg font-semibold">Nachricht an {listing.sellerName}</h3>
+ <button type="button" class="text-text-muted hover:text-text transition-colors" id="closeModal" aria-label="Schließen">
+ <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+ </button>
+ </div>
+ <!-- Success state -->
+ <div id="contactSuccess" class="hidden text-center py-6">
+ <div class="w-12 h-12 bg-success/10 border border-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
+ <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-success"><polyline points="20 6 9 17 4 12"/></svg>
+ </div>
+ <p class="text-text font-semibold mb-1">Nachricht gesendet!</p>
+ <p class="text-text-secondary text-sm">Der Verkäufer wurde benachrichtigt.</p>
+ <button type="button" id="closeContactSuccess" class="btn-outline mt-5 px-6">Schließen</button>
+ </div>
+
+ <!-- Form state -->
+ <div id="contactForm">
+ <div class="flex items-center gap-2 text-xs text-warning bg-warning/[.08] border border-warning/20 p-3 rounded mb-4">
+ <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+ Gib niemals deine Bankdaten oder zahle nicht außerhalb der Plattform.
+ </div>
+ <textarea id="contactMessage" class="input-field w-full" rows="5" placeholder="Hallo, ich interessiere mich für dein Inserat..."></textarea>
+ <div id="contactError" class="hidden text-danger text-xs mb-3 flex items-center gap-1.5">
+ <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+ <span id="contactErrorText"></span>
+ </div>
+ <div class="flex gap-3 justify-end mt-4">
+ <button type="button" class="btn-outline" id="closeModal2">Abbrechen</button>
+ <button type="button" class="btn-primary" id="sendMessageBtn">Nachricht senden</button>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- ═══ Melden-Modal ═══ -->
+ <div class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[999] hidden items-center justify-center p-6" id="reportModal">
+ <div class="bg-background border border-border rounded p-8 w-full max-w-lg">
+ <div class="flex justify-between items-center mb-5">
+ <h3 class="text-lg font-semibold">Anzeige melden</h3>
+ <button type="button" id="closeReportModal" class="text-text-muted hover:text-text transition-colors" aria-label="Schließen">
+ <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+ </button>
+ </div>
+
+ <!-- Success state -->
+ <div id="reportSuccess" class="hidden text-center py-6">
+ <div class="w-12 h-12 bg-success/10 border border-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
+ <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-success"><polyline points="20 6 9 17 4 12"/></svg>
+ </div>
+ <p class="text-text font-semibold mb-1">Meldung eingegangen</p>
+ <p class="text-text-secondary text-sm">Danke für deinen Hinweis. Wir prüfen die Anzeige zeitnah.</p>
+ <button type="button" id="closeReportSuccess" class="btn-outline mt-5 px-6">Schließen</button>
+ </div>
+
+ <!-- Form state -->
+ <div id="reportForm">
+ <p class="text-sm text-text-secondary mb-5">Wähle den Grund für deine Meldung:</p>
+
+ <div class="flex flex-col gap-2 mb-5" id="reportReasons">
+ {[
+ { value: 'FRAUD', label: 'Betrug / Scam' },
+ { value: 'SPAM', label: 'Spam oder Werbung' },
+ { value: 'PROHIBITED_ITEM', label: 'Verbotener Artikel' },
+ { value: 'WRONG_CATEGORY', label: 'Falsche Kategorie' },
+ { value: 'ALREADY_SOLD', label: 'Bereits verkauft' },
+ { value: 'DUPLICATE', label: 'Doppelte Anzeige' },
+ { value: 'OTHER', label: 'Sonstiges' },
+ ].map(({ value, label }) => (
+ <label class="report-reason flex items-center gap-3 p-3 border border-border rounded cursor-pointer hover:border-danger/40 hover:bg-danger/[.04] transition-all has-[:checked]:border-danger has-[:checked]:bg-danger/[.06]">
+ <input type="radio" name="reportReason" value={value} class="accent-danger" />
+ <span class="text-sm text-text-secondary">{label}</span>
+ </label>
+ ))}
+ </div>
+
+ <textarea
+ id="reportDetails"
+ placeholder="Weitere Details (optional)..."
+ rows="3"
+ maxlength="1000"
+ class="input-field w-full mb-4 text-sm"
+ ></textarea>
+
+ <div id="reportError" class="hidden text-danger text-xs mb-3 flex items-center gap-1.5">
+ <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+ <span id="reportErrorText"></span>
+ </div>
+
+ <div class="flex gap-3 justify-end">
+ <button type="button" id="cancelReportBtn" class="btn-outline">Abbrechen</button>
+ <button type="button" id="submitReportBtn" class="inline-flex items-center justify-center gap-2 px-5 py-2 bg-danger text-white text-sm border border-danger hover:bg-danger/90 transition-colors">
+ <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+ Melden
+ </button>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <Footer />
 </BaseLayout>
 
 <style>
-    .gallery-nav {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        background: rgba(0,0,0,0.5);
-        color: white;
-        border: none;
-        width: 40px;
-        height: 40px;
-        border-radius: 9999px;
-        font-size: 1.4rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background 0.2s;
-        z-index: 5;
-    }
-    .gallery-nav:hover { background: rgba(0,0,0,0.75); }
+ .gallery-nav {
+ position: absolute;
+ top: 50%;
+ transform: translateY(-50%);
+ background: rgba(0,0,0,0.5);
+ color: white;
+ border: none;
+ width: 40px;
+ height: 40px;
+ border-radius: 9999px;
+ font-size: 1.4rem;
+ cursor: pointer;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ transition: background 0.2s;
+ z-index: 5;
+ }
+ .gallery-nav:hover { background: rgba(0,0,0,0.75); }
 
-    .detail-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-bottom: 0.75rem;
-        border-bottom: 1px solid rgba(232,228,222,0.08);
-        font-size: 0.875rem;
-    }
-    .detail-row:last-child {
-        border: none;
-        padding: 0;
-    }
+ .detail-row {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ padding-bottom: 0.75rem;
+ border-bottom: 1px solid var(--color-border, #E5E7EB);
+ font-size: 0.875rem;
+ }
+ .detail-row:last-child {
+ border: none;
+ padding: 0;
+ }
 
-    #contactModal.open {
-        display: flex;
-        animation: fadeIn 0.2s ease;
-    }
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
+ #contactModal.open,
+ #reportModal.open {
+ display: flex;
+ animation: fadeIn 0.2s ease;
+ }
+ @keyframes fadeIn {
+ from { opacity: 0; }
+ to { opacity: 1; }
+ }
 </style>
 
 <script>
-    // ── Contact Modal ──
-    const contactBtn = document.getElementById("contactBtn");
-    const modal = document.getElementById("contactModal");
-    const closeModal = document.getElementById("closeModal");
-    const closeModal2 = document.getElementById("closeModal2");
+ // ── Share Button ──
+ document.getElementById("shareBtn")?.addEventListener("click", async () => {
+ const shareData = { title: document.title, url: window.location.href };
+ if (navigator.share) {
+ try { await navigator.share(shareData); } catch { /* user cancelled */ }
+ } else {
+ await navigator.clipboard.writeText(window.location.href);
+ showToast("Link kopiert");
+ }
+ });
 
-    contactBtn?.addEventListener("click", () => modal?.classList.add("open"));
-    closeModal?.addEventListener("click", () => modal?.classList.remove("open"));
-    closeModal2?.addEventListener("click", () => modal?.classList.remove("open"));
-    modal?.addEventListener("click", (e) => {
-        if (e.target === modal) modal.classList.remove("open");
-    });
+ // ── Contact Modal ──
+ const contactBtn = document.getElementById("contactBtn");
+ const modal = document.getElementById("contactModal");
+ const closeModal = document.getElementById("closeModal");
+ const closeModal2 = document.getElementById("closeModal2");
+ const contactSuccess = document.getElementById("contactSuccess");
+ const contactForm = document.getElementById("contactForm");
+ const closeContactSuccess = document.getElementById("closeContactSuccess");
 
-    // ── Image Gallery ──
-    const mainImg = document.getElementById("mainImg") as HTMLImageElement | null;
-    const thumbs = document.querySelectorAll<HTMLButtonElement>(".img-thumb");
-    const prevBtn = document.getElementById("galleryPrev");
-    const nextBtn = document.getElementById("galleryNext");
-    const counter = document.getElementById("imgCounter");
-    const urls = Array.from(thumbs).map((t) => t.dataset.url || "");
-    let currentIdx = 0;
+ function openContactModal() {
+ modal?.classList.add("open");
+ // Reset state
+ contactSuccess?.classList.add("hidden");
+ contactForm?.classList.remove("hidden");
+ contactError?.classList.add("hidden");
+ if (contactMessage) contactMessage.value = "";
+ }
 
-    function showImage(idx: number) {
-        if (!mainImg || urls.length === 0) return;
-        currentIdx = (idx + urls.length) % urls.length;
-        mainImg.src = urls[currentIdx];
-        thumbs.forEach((t, i) => t.classList.toggle("border-primary", i === currentIdx));
-        thumbs.forEach((t, i) => t.classList.toggle("border-transparent", i !== currentIdx));
-        if (counter && urls.length > 1) counter.textContent = `${currentIdx + 1} / ${urls.length}`;
-    }
+ function closeContactModal() { modal?.classList.remove("open"); }
 
-    thumbs.forEach((t) => t.addEventListener("click", () => showImage(Number(t.dataset.index))));
-    prevBtn?.addEventListener("click", () => showImage(currentIdx - 1));
-    nextBtn?.addEventListener("click", () => showImage(currentIdx + 1));
+ contactBtn?.addEventListener("click", openContactModal);
+ closeModal?.addEventListener("click", closeContactModal);
+ closeModal2?.addEventListener("click", closeContactModal);
+ closeContactSuccess?.addEventListener("click", closeContactModal);
+ modal?.addEventListener("click", (e) => {
+ if (e.target === modal) closeContactModal();
+ });
 
-    document.addEventListener("keydown", (e) => {
-        if (urls.length <= 1) return;
-        if (e.key === "ArrowLeft") showImage(currentIdx - 1);
-        if (e.key === "ArrowRight") showImage(currentIdx + 1);
-    });
+ // ── Send Message ──
+ const sendMessageBtn = document.getElementById("sendMessageBtn");
+ const contactMessage = document.getElementById("contactMessage") as HTMLTextAreaElement | null;
+ const contactError = document.getElementById("contactError");
+ const contactErrorText = document.getElementById("contactErrorText");
+ const listingId = document.querySelector<HTMLElement>("[data-listing-id]")?.dataset.listingId || window.location.pathname.split("/").pop();
+
+ sendMessageBtn?.addEventListener("click", async () => {
+ const msg = contactMessage?.value?.trim();
+ if (!msg) {
+ contactError?.classList.remove("hidden");
+ if (contactErrorText) contactErrorText.textContent = "Bitte gib eine Nachricht ein.";
+ return;
+ }
+ contactError?.classList.add("hidden");
+ if (sendMessageBtn) { (sendMessageBtn as HTMLButtonElement).disabled = true; sendMessageBtn.textContent = "Wird gesendet…"; }
+
+ try {
+ // Step 1: Create or get existing conversation
+ const convRes = await fetch("/api/conversations", {
+ method: "POST",
+ headers: { "Content-Type": "application/json" },
+ body: JSON.stringify({ listingId }),
+ });
+
+ if (convRes.status === 401) {
+ contactError?.classList.remove("hidden");
+ if (contactErrorText) contactErrorText.textContent = "Bitte melde dich an, um eine Nachricht zu senden.";
+ return;
+ }
+
+ if (!convRes.ok) {
+ const data = await convRes.json().catch(() => ({}));
+ contactError?.classList.remove("hidden");
+ if (contactErrorText) contactErrorText.textContent = data.error || "Nachricht konnte nicht gesendet werden.";
+ return;
+ }
+
+ const conv = await convRes.json();
+
+ // Step 2: Send message to the conversation
+ const msgRes = await fetch(`/api/conversations/${conv.id}/messages`, {
+ method: "POST",
+ headers: { "Content-Type": "application/json" },
+ body: JSON.stringify({ body: msg }),
+ });
+
+ if (msgRes.status === 401) {
+ contactError?.classList.remove("hidden");
+ if (contactErrorText) contactErrorText.textContent = "Bitte melde dich an, um eine Nachricht zu senden.";
+ return;
+ }
+
+ if (!msgRes.ok) {
+ const data = await msgRes.json().catch(() => ({}));
+ contactError?.classList.remove("hidden");
+ if (contactErrorText) contactErrorText.textContent = data.error || "Nachricht konnte nicht gesendet werden.";
+ return;
+ }
+
+ // Success: show success state
+ contactForm?.classList.add("hidden");
+ contactSuccess?.classList.remove("hidden");
+
+ // Auto-close after 2 seconds
+ setTimeout(() => {
+ closeContactModal();
+ if (contactMessage) contactMessage.value = "";
+ }, 2000);
+
+ } catch {
+ contactError?.classList.remove("hidden");
+ if (contactErrorText) contactErrorText.textContent = "Nachricht konnte nicht gesendet werden.";
+ } finally {
+ if (sendMessageBtn) { (sendMessageBtn as HTMLButtonElement).disabled = false; sendMessageBtn.textContent = "Nachricht senden"; }
+ }
+ });
+
+ // ── Image Gallery ──
+ const mainImg = document.getElementById("mainImg") as HTMLImageElement | null;
+ const thumbs = document.querySelectorAll<HTMLButtonElement>(".img-thumb");
+ const prevBtn = document.getElementById("galleryPrev");
+ const nextBtn = document.getElementById("galleryNext");
+ const counter = document.getElementById("imgCounter");
+ const urls = Array.from(thumbs).map((t) => t.dataset.url || "");
+ let currentIdx = 0;
+
+ function showImage(idx: number) {
+ if (!mainImg || urls.length === 0) return;
+ currentIdx = (idx + urls.length) % urls.length;
+ mainImg.src = urls[currentIdx];
+ thumbs.forEach((t, i) => t.classList.toggle("border-primary", i === currentIdx));
+ thumbs.forEach((t, i) => t.classList.toggle("border-transparent", i !== currentIdx));
+ if (counter && urls.length > 1) counter.textContent = `${currentIdx + 1} / ${urls.length}`;
+ }
+
+ thumbs.forEach((t) => t.addEventListener("click", () => showImage(Number(t.dataset.index))));
+ prevBtn?.addEventListener("click", () => showImage(currentIdx - 1));
+ nextBtn?.addEventListener("click", () => showImage(currentIdx + 1));
+
+ document.addEventListener("keydown", (e) => {
+ if (urls.length <= 1) return;
+ if (e.key === "ArrowLeft") showImage(currentIdx - 1);
+ if (e.key === "ArrowRight") showImage(currentIdx + 1);
+ });
+
+ // ── Merken ──
+ const saveBtn = document.getElementById("saveBtn") as HTMLButtonElement | null;
+ const saveIcon = document.getElementById("saveIcon") as SVGElement | null;
+ const saveBtnText = document.getElementById("saveBtnText");
+ // listingId already declared above in Contact Modal section
+ const SAVE_KEY = `saved_${listingId}`;
+
+ function isSaved(): boolean {
+ try { return localStorage.getItem(SAVE_KEY) === "1"; } catch { return false; }
+ }
+
+ function setSaved(val: boolean) {
+ try {
+ if (val) localStorage.setItem(SAVE_KEY, "1");
+ else localStorage.removeItem(SAVE_KEY);
+ } catch { /* private browsing */ }
+ }
+
+ const merklisteHint = document.getElementById("merklisteHint");
+
+ function updateSaveUI(saved: boolean) {
+ if (!saveBtn || !saveBtnText || !saveIcon) return;
+ if (saved) {
+ saveIcon.setAttribute("fill", "currentColor");
+ saveIcon.setAttribute("stroke", "currentColor");
+ saveBtnText.textContent = "Gemerkt";
+ saveBtn.classList.remove("text-text-muted");
+ saveBtn.classList.add("text-primary");
+ merklisteHint?.classList.remove("hidden");
+ } else {
+ saveIcon.setAttribute("fill", "none");
+ saveIcon.setAttribute("stroke", "currentColor");
+ saveBtnText.textContent = "Merken";
+ saveBtn.classList.add("text-text-muted");
+ saveBtn.classList.remove("text-primary");
+ merklisteHint?.classList.add("hidden");
+ }
+ }
+
+ // Init from localStorage
+ updateSaveUI(isSaved());
+
+ // Try to sync from server
+ if (listingId) {
+ fetch(`/api/listings/${listingId}/save`, { method: "GET" })
+ .then(r => r.ok ? r.json() : null)
+ .then(data => { if (data?.saved !== undefined) { setSaved(data.saved); updateSaveUI(data.saved); } })
+ .catch(() => {});
+ }
+
+ saveBtn?.addEventListener("click", async () => {
+ const newSaved = !isSaved();
+ setSaved(newSaved);
+ updateSaveUI(newSaved);
+
+ // Show toast
+ showToast(newSaved ? "Anzeige gespeichert" : "Anzeige entfernt", newSaved ? "success" : "info");
+
+ // Sync with server if possible
+ if (listingId) {
+ try {
+ const res = await fetch(`/api/listings/${listingId}/save`, { method: "POST" });
+ if (res.ok) {
+ const data = await res.json();
+ if (!data.fallback && data.saved !== undefined) {
+ setSaved(data.saved);
+ updateSaveUI(data.saved);
+ }
+ } else if (res.status === 401) {
+ // User not logged in — localStorage only, that's fine
+ }
+ } catch { /* offline / no DB */ }
+ }
+ });
+
+ // ── Anzeige melden ──
+ const reportBtn = document.getElementById("reportBtn");
+ const reportModal = document.getElementById("reportModal");
+ const closeReportModal = document.getElementById("closeReportModal");
+ const cancelReportBtn = document.getElementById("cancelReportBtn");
+ const submitReportBtn = document.getElementById("submitReportBtn") as HTMLButtonElement | null;
+ const reportSuccess = document.getElementById("reportSuccess");
+ const reportForm = document.getElementById("reportForm");
+ const reportError = document.getElementById("reportError");
+ const reportErrorText = document.getElementById("reportErrorText");
+ const closeReportSuccess = document.getElementById("closeReportSuccess");
+
+ function openReportModal() {
+ reportModal?.classList.add("open");
+ // Reset state
+ reportSuccess?.classList.add("hidden");
+ reportForm?.classList.remove("hidden");
+ reportError?.classList.add("hidden");
+ const radios = reportModal?.querySelectorAll<HTMLInputElement>('input[name="reportReason"]');
+ radios?.forEach(r => r.checked = false);
+ (document.getElementById("reportDetails") as HTMLTextAreaElement | null)!.value = "";
+ }
+
+ function closeReport() { reportModal?.classList.remove("open"); }
+
+ reportBtn?.addEventListener("click", openReportModal);
+ closeReportModal?.addEventListener("click", closeReport);
+ cancelReportBtn?.addEventListener("click", closeReport);
+ closeReportSuccess?.addEventListener("click", closeReport);
+ reportModal?.addEventListener("click", (e) => { if (e.target === reportModal) closeReport(); });
+
+ submitReportBtn?.addEventListener("click", async () => {
+ const selected = reportModal?.querySelector<HTMLInputElement>('input[name="reportReason"]:checked');
+ if (!selected) {
+ reportError?.classList.remove("hidden");
+ if (reportErrorText) reportErrorText.textContent = "Bitte wähle einen Grund aus.";
+ return;
+ }
+
+ reportError?.classList.add("hidden");
+ if (submitReportBtn) { submitReportBtn.disabled = true; submitReportBtn.textContent = "Wird gesendet…"; }
+
+ const details = (document.getElementById("reportDetails") as HTMLTextAreaElement | null)?.value?.trim() || undefined;
+
+ try {
+ const res = await fetch(`/api/listings/${listingId}/report`, {
+ method: "POST",
+ headers: { "Content-Type": "application/json" },
+ body: JSON.stringify({ reason: selected.value, details }),
+ });
+
+ const data = await res.json().catch(() => ({}));
+
+ if (res.ok || res.status === 409) {
+ reportForm?.classList.add("hidden");
+ reportSuccess?.classList.remove("hidden");
+ } else if (res.status === 401) {
+ reportError?.classList.remove("hidden");
+ if (reportErrorText) reportErrorText.textContent = "Bitte melde dich an, um Anzeigen zu melden.";
+ } else {
+ reportError?.classList.remove("hidden");
+ if (reportErrorText) reportErrorText.textContent = data.error || "Fehler beim Senden.";
+ }
+ } catch {
+ reportError?.classList.remove("hidden");
+ if (reportErrorText) reportErrorText.textContent = "Netzwerkfehler – bitte versuche es erneut.";
+ } finally {
+ if (submitReportBtn) {
+ submitReportBtn.disabled = false;
+ submitReportBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg> Melden`;
+ }
+ }
+ });
+
+ // ── Toast Helper ──
+ function showToast(message: string, type: "success" | "info" = "success") {
+ const toast = document.createElement("div");
+ toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] flex items-center gap-2 px-5 py-3 rounded text-sm border shadow-lg transition-all duration-300 opacity-0 ${type === "success" ? "bg-background border-success/40 text-success" : "bg-background border-border text-text-secondary"}`;
+ toast.textContent = message;
+ document.body.appendChild(toast);
+ requestAnimationFrame(() => { toast.style.opacity = "1"; });
+ setTimeout(() => {
+ toast.style.opacity = "0";
+ setTimeout(() => toast.remove(), 300);
+ }, 2500);
+ }
 </script>

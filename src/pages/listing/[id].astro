@@ -121,6 +121,43 @@ if (!listing) return Astro.redirect('/404');
 const rating = Math.max(0, Math.min(5, Math.round(listing.sellerRating)));
 const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
 
+// ── Category label for breadcrumb ──
+const categoryLabel = listing.category;
+
+// ── Seller info for JSON-LD ──
+const seller = isFromDB && dbListing ? dbListing.seller : null;
+
+// ── JSON-LD Product structured data ──
+const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": listing.title,
+    "description": listing.description,
+    "image": allImages[0]?.url || listing.image,
+    "offers": {
+        "@type": "Offer",
+        "price": listing.price.toFixed(2),
+        "priceCurrency": "EUR",
+        "availability": listing.status === "ACTIVE" ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
+        "itemCondition": "https://schema.org/UsedCondition"
+    },
+    "seller": {
+        "@type": "Person",
+        "name": seller?.firstName ? `${seller.firstName} ${seller.lastName?.[0] || ''}`.trim() : "Verkäufer"
+    }
+};
+
+// ── JSON-LD BreadcrumbList structured data ──
+const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Startseite", "item": "https://ehren-deal.de/" },
+        { "@type": "ListItem", "position": 2, "name": categoryLabel, "item": `https://ehren-deal.de/?category=${dbCategory || listing.category}` },
+        { "@type": "ListItem", "position": 3, "name": listing.title }
+    ]
+};
+
 // ── Security Score ──
 let securityScore = 40;
 if (listing.sellerVerified) securityScore += 15;
@@ -157,17 +194,19 @@ if (relatedListings.length < 3) {
 ---
 
 <BaseLayout title={`${listing.title} – Ehren-Deal`}>
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(productJsonLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />
     <Header />
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20">
 
         <!-- 1. Breadcrumb -->
-        <nav class="flex items-center gap-2 text-sm text-foreground/50 mb-8 flex-wrap font-condensed tracking-wide uppercase text-xs">
+        <nav class="flex items-center gap-2 text-body-sm text-text-muted mb-8 flex-wrap">
             <a href="/" class="hover:text-primary transition-colors">Startseite</a>
-            <span class="text-foreground/25">›</span>
+            <span class="text-text-muted/40">›</span>
             <a href={`/kategorie/${listing.category.toLowerCase()}`} class="hover:text-primary transition-colors">{listing.category}</a>
-            <span class="text-foreground/25">›</span>
-            <span class="text-foreground/70 normal-case tracking-normal text-sm font-body">{listing.title}</span>
+            <span class="text-text-muted/40">›</span>
+            <span class="text-text-secondary">{listing.title}</span>
         </nav>
 
         <!-- 2. Main Grid: Gallery + Kaufbox -->
@@ -176,12 +215,18 @@ if (relatedListings.length < 3) {
             <!-- LEFT COLUMN -->
             <div class="space-y-6">
 
-                <!-- 2a. Image Gallery -->
+                <!-- 2a. Title (mobile: above gallery; desktop: shown here too) -->
+                <div class="lg:hidden">
+                    <h1 class="text-h2 text-text leading-tight mb-1">{listing.title}</h1>
+                    <div class="text-2xl font-bold text-primary">{listing.price.toLocaleString("de-DE")} €</div>
+                </div>
+
+                <!-- 2b. Image Gallery -->
                 <div>
-                    <div class="relative rounded-default overflow-hidden bg-secondary aspect-[4/3]">
-                        <img src={allImages[0]?.url || listing.image} alt={listing.title} class="w-full h-full object-cover" id="mainImg" />
+                    <div class="relative rounded-lg overflow-hidden bg-background border border-border aspect-[4/3]">
+                        <img src={allImages[0]?.url || listing.image} alt={listing.title} width="800" height="600" class="w-full h-full object-cover" id="mainImg" fetchpriority="high" />
                         {listing.condition === "Neu" && (
-                            <span class="absolute top-4 left-4 bg-success text-white text-xs font-condensed font-medium uppercase tracking-wider px-3 py-1 rounded-default">Neu</span>
+                            <span class="absolute top-4 left-4 bg-success text-white text-xs font-semibold px-3 py-1 rounded">Neu</span>
                         )}
                         {listing.treuhandAvailable && (
                             <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-success/90 to-transparent text-white px-4 pb-3 pt-8 text-sm font-semibold flex items-center gap-2">
@@ -203,7 +248,7 @@ if (relatedListings.length < 3) {
                         <div class="flex gap-2 mt-3 overflow-x-auto pb-2">
                             {allImages.map((img, i) => (
                                 <button
-                                    class={`img-thumb shrink-0 w-[72px] h-[54px] rounded-default overflow-hidden border-2 ${i === 0 ? 'border-primary' : 'border-transparent'} bg-secondary p-0 cursor-pointer transition-colors hover:border-foreground/30`}
+                                    class={`img-thumb shrink-0 w-[72px] h-[54px] rounded overflow-hidden border-2 ${i === 0 ? 'border-primary' : 'border-transparent'} bg-background p-0 cursor-pointer transition-colors hover:border-text-muted`}
                                     data-index={i}
                                     data-url={img.url}
                                 >
@@ -215,40 +260,40 @@ if (relatedListings.length < 3) {
                 </div>
 
                 <!-- 2b. Beschreibung -->
-                <div class="bg-secondary/30 border border-foreground/10 rounded-default p-6">
-                    <h2 class="font-headings text-lg font-semibold mb-4">Beschreibung</h2>
-                    <p class="text-foreground/70 text-sm leading-relaxed whitespace-pre-line">{listing.description}</p>
+                <div class="card p-6">
+                    <h2 class="text-h3 text-text mb-4">Beschreibung</h2>
+                    <p class="text-text-secondary text-body-sm leading-relaxed whitespace-pre-line">{listing.description}</p>
                 </div>
 
                 <!-- 2c. Detailtabelle -->
-                <div class="bg-secondary/30 border border-foreground/10 rounded-default p-6">
-                    <h2 class="font-headings text-lg font-semibold mb-4">Details</h2>
+                <div class="card p-6">
+                    <h2 class="text-h3 text-text mb-4">Details</h2>
                     <div class="flex flex-col gap-3">
-                        <div class="detail-row"><span class="text-foreground/60 font-medium text-sm">Zustand</span>
-                            <span class={`text-xs font-condensed font-medium uppercase tracking-wider px-2.5 py-0.5 rounded-default border ${listing.condition === 'Neu' ? 'bg-success/10 text-success border-success/20' : listing.condition === 'Sehr gut' ? 'bg-primary/10 text-primary border-primary/20' : 'bg-warning/10 text-warning border-warning/20'}`}>{listing.condition}</span>
+                        <div class="detail-row"><span class="text-text-secondary font-medium text-body-sm">Zustand</span>
+                            <span class={`text-xs font-semibold px-2.5 py-0.5 rounded border ${listing.condition === 'Neu' ? 'bg-success-light text-success border-success/20' : listing.condition === 'Sehr gut' ? 'bg-primary-light text-primary border-primary/20' : 'bg-accent-light text-accent border-accent/20'}`}>{listing.condition}</span>
                         </div>
-                        <div class="detail-row"><span class="text-foreground/60 font-medium text-sm">Kategorie</span><span class="text-foreground font-medium text-sm">{listing.category}</span></div>
-                        <div class="detail-row"><span class="text-foreground/60 font-medium text-sm">Standort</span><span class="text-foreground font-medium text-sm">{listing.location}</span></div>
-                        <div class="detail-row"><span class="text-foreground/60 font-medium text-sm">Eingestellt</span><span class="text-foreground font-medium text-sm">{listing.postedAt}</span></div>
-                        <div class="detail-row"><span class="text-foreground/60 font-medium text-sm">Aufrufe</span><span class="text-foreground font-medium text-sm">{listing.viewCount ?? 0}</span></div>
-                        <div class="detail-row border-none pb-0"><span class="text-foreground/60 font-medium text-sm">Inserat-ID</span>
-                            <span class="text-foreground/40 text-xs font-mono">{listing.id.length > 12 ? listing.id.slice(-8) : listing.id}</span>
+                        <div class="detail-row"><span class="text-text-secondary font-medium text-body-sm">Kategorie</span><span class="text-text font-medium text-body-sm">{listing.category}</span></div>
+                        <div class="detail-row"><span class="text-text-secondary font-medium text-body-sm">Standort</span><span class="text-text font-medium text-body-sm">{listing.location}</span></div>
+                        <div class="detail-row"><span class="text-text-secondary font-medium text-body-sm">Eingestellt</span><span class="text-text font-medium text-body-sm">{listing.postedAt}</span></div>
+                        <div class="detail-row"><span class="text-text-secondary font-medium text-body-sm">Aufrufe</span><span class="text-text font-medium text-body-sm">{listing.viewCount ?? 0}</span></div>
+                        <div class="detail-row border-none pb-0"><span class="text-text-secondary font-medium text-body-sm">Inserat-ID</span>
+                            <span class="text-text-muted text-xs font-mono">{listing.id.length > 12 ? listing.id.slice(-8) : listing.id}</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- 2d. Sicherheitstipps -->
-                <div class="bg-warning/[.04] border border-warning/20 rounded-default p-6">
-                    <div class="flex items-center gap-2 text-warning text-sm font-semibold mb-4">
+                <div class="bg-accent-light border border-accent/20 rounded-lg p-6">
+                    <div class="flex items-center gap-2 text-accent text-body-sm font-semibold mb-4">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                         Sicherheitstipps für Käufer
                     </div>
                     <ul class="flex flex-col gap-3">
-                        <li class="text-sm text-foreground/60 pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-warning">Kaufe nur über unser <strong class="text-foreground/80">Treuhandkonto</strong> – nie direkt via PayPal Freunde & Familie</li>
-                        <li class="text-sm text-foreground/60 pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-warning">Triff Verkäufer <strong class="text-foreground/80">persönlich an öffentlichen Orten</strong> oder nutze Versand mit Treuhand</li>
-                        <li class="text-sm text-foreground/60 pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-warning">Lass dich <strong class="text-foreground/80">nie zu schnellen Entscheidungen drängen</strong> – seriöse Verkäufer haben Zeit</li>
-                        <li class="text-sm text-foreground/60 pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-warning">Kaufe <strong class="text-foreground/80">keine Codes oder Geschenkgutscheine</strong> als Zahlungsmittel</li>
-                        <li class="text-sm text-foreground/60 pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-warning">Melde verdächtige Anzeigen sofort über den <strong class="text-foreground/80">"Melden"-Button</strong></li>
+                        <li class="text-body-sm text-text-secondary pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-accent">Kaufe nur über unser <strong class="text-text">Treuhandkonto</strong> – nie direkt via PayPal Freunde & Familie</li>
+                        <li class="text-body-sm text-text-secondary pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-accent">Triff Verkäufer <strong class="text-text">persönlich an öffentlichen Orten</strong> oder nutze Versand mit Treuhand</li>
+                        <li class="text-body-sm text-text-secondary pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-accent">Lass dich <strong class="text-text">nie zu schnellen Entscheidungen drängen</strong> – seriöse Verkäufer haben Zeit</li>
+                        <li class="text-body-sm text-text-secondary pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-accent">Kaufe <strong class="text-text">keine Codes oder Geschenkgutscheine</strong> als Zahlungsmittel</li>
+                        <li class="text-body-sm text-text-secondary pl-5 relative leading-relaxed before:content-['→'] before:absolute before:left-0 before:text-accent">Melde verdächtige Anzeigen sofort über den <strong class="text-text">"Melden"-Button</strong></li>
                     </ul>
                 </div>
             </div>
@@ -257,26 +302,27 @@ if (relatedListings.length < 3) {
             <div class="space-y-4 lg:sticky lg:top-24">
 
                 <!-- Kaufbox -->
-                <div class="bg-secondary/40 border border-foreground/[.15] rounded-default p-6 backdrop-blur-sm">
+                <div class="card p-6">
+                    <h1 class="hidden lg:block text-h3 text-text leading-tight mb-3">{listing.title}</h1>
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-3xl font-black tracking-tight text-foreground">{listing.price.toLocaleString("de-DE")} €</span>
+                        <span class="text-2xl font-bold text-primary">{listing.price.toLocaleString("de-DE")} €</span>
                         {listing.treuhandAvailable && (
-                            <span class="trust-badge text-[0.65rem]">Treuhand</span>
+                            <span class="badge-treuhand">Treuhand</span>
                         )}
                     </div>
-                    <div class="flex items-center gap-2 text-sm text-foreground/60 mb-5">
+                    <div class="flex items-center gap-2 text-body-sm text-text-secondary mb-5">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                         {listing.location}
-                        <span class="ml-auto text-xs bg-secondary px-2 py-0.5 rounded-full">{listing.postedAt}</span>
+                        <span class="ml-auto text-xs bg-background text-text-muted px-2 py-0.5 rounded-full">{listing.postedAt}</span>
                     </div>
 
                     {listing.treuhandAvailable && (
-                        <div class="bg-success/[.08] border border-success/25 rounded-default p-4 mb-4">
-                            <div class="flex items-center gap-2 text-success text-sm font-bold mb-1">
+                        <div class="bg-success-light border border-success/20 rounded-lg p-4 mb-4">
+                            <div class="flex items-center gap-2 text-success text-body-sm font-bold mb-1">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
                                 Käuferschutz verfügbar
                             </div>
-                            <p class="text-xs text-foreground/60 leading-relaxed">Dein Geld liegt sicher auf dem Treuhandkonto und wird erst nach bestätigtem Warenerhalt freigegeben.</p>
+                            <p class="text-xs text-text-secondary leading-relaxed">Dein Geld liegt sicher auf dem Treuhandkonto und wird erst nach bestätigtem Warenerhalt freigegeben.</p>
                         </div>
                     )}
 
@@ -286,15 +332,27 @@ if (relatedListings.length < 3) {
                             Verkäufer kontaktieren
                         </a>
                         {listing.treuhandAvailable && (
-                            <a href={`/checkout/${listing.id}`} class="btn-outline w-full flex items-center justify-center gap-2 no-underline">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                Sicher kaufen (Treuhand)
-                            </a>
+                            <>
+                                <a href={`/checkout/${listing.id}`} class="btn-success w-full flex items-center justify-center gap-2 no-underline">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                    Sicher kaufen (Treuhand)
+                                </a>
+                                <p class="text-[0.6rem] text-text-muted text-center leading-relaxed -mt-1">
+                                    zzgl. 0,50 € Servicegebühr für Käuferschutz.
+                                    Verkäufer: 5 % Verkaufsprovision.
+                                    <a href="/agb#gebuehren" class="text-primary/60 hover:text-primary underline underline-offset-2">Details</a>
+                                </p>
+                            </>
                         )}
-                        <button class="inline-flex items-center justify-center gap-2 px-4 py-2 text-foreground/50 text-sm hover:text-foreground transition-colors">
+                        <button class="inline-flex items-center justify-center gap-2 px-4 py-2 text-text-muted text-body-sm hover:text-text transition-colors">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                             Merken
                         </button>
+                    </div>
+
+                    <!-- Risk Reversal Info-Box -->
+                    <div class="info-box mb-3">
+                        <p class="text-body-sm text-text-secondary leading-relaxed">Dein Kauf ist geschützt — Zahlung wird erst freigegeben, wenn du den Erhalt bestätigst.</p>
                     </div>
 
                     <div class="flex justify-center">
@@ -306,15 +364,15 @@ if (relatedListings.length < 3) {
                 </div>
 
                 <!-- Sicherheits-Score -->
-                <div class="bg-secondary/30 border border-foreground/10 rounded-default p-5">
+                <div class="card p-5">
                     <div class="flex justify-between items-center mb-3">
-                        <span class="text-sm font-bold">Sicherheits-Score</span>
-                        <span class={`text-[0.65rem] font-condensed font-medium uppercase tracking-wider px-2 py-0.5 rounded-default border ${securityScore >= 80 ? 'bg-success/10 text-success border-success/20' : securityScore >= 50 ? 'bg-warning/10 text-warning border-warning/20' : 'bg-danger/10 text-danger border-danger/20'}`}>{securityLabel}</span>
+                        <span class="text-h4 text-text">Sicherheits-Score</span>
+                        <span class={`text-xs font-semibold px-2 py-0.5 rounded border ${securityScore >= 80 ? 'bg-success-light text-success border-success/20' : securityScore >= 50 ? 'bg-accent-light text-accent border-accent/20' : 'bg-danger/10 text-danger border-danger/20'}`}>{securityLabel}</span>
                     </div>
-                    <div class="bg-secondary rounded-full h-2 mb-2 overflow-hidden">
+                    <div class="bg-background rounded-full h-2 mb-2 overflow-hidden">
                         <div class="h-full bg-gradient-to-r from-success to-emerald-400 rounded-full transition-all duration-1000" style={`width:${securityScore}%`}></div>
                     </div>
-                    <div class="flex justify-between text-xs text-foreground/50 mb-4">
+                    <div class="flex justify-between text-xs text-text-muted mb-4">
                         <span>Risiko</span>
                         <span class="font-semibold" style={`color:${securityColor}`}>{securityScore} / 100</span>
                     </div>
@@ -324,7 +382,7 @@ if (relatedListings.length < 3) {
                             { ok: listing.sellerKYC, yes: 'KYC-Identität bestätigt', no: 'Keine KYC-Verifizierung' },
                             { ok: listing.treuhandAvailable, yes: 'Treuhandkonto verfügbar', no: 'Kein Treuhandschutz' },
                         ].map((c) => (
-                            <div class={`flex items-center gap-2 text-xs ${c.ok ? 'text-success' : 'text-warning'}`}>
+                            <div class={`flex items-center gap-2 text-xs ${c.ok ? 'text-success' : 'text-accent'}`}>
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                     {c.ok ? <polyline points="20 6 9 17 4 12"/> : <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>}
                                 </svg>
@@ -335,26 +393,29 @@ if (relatedListings.length < 3) {
                 </div>
 
                 <!-- Verkäufer-Karte -->
-                <div class="bg-secondary/30 border border-foreground/10 rounded-default p-5">
-                    <h3 class="text-xs font-bold text-foreground/50 uppercase tracking-[.06em] mb-4 font-condensed">Über den Verkäufer</h3>
+                <div class="card p-5">
+                    <h3 class="text-label text-text-muted mb-4">Über den Verkäufer</h3>
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-xl font-bold text-background shrink-0">
+                        <div class="w-12 h-12 bg-primary-light rounded-full flex items-center justify-center text-xl font-bold text-primary shrink-0">
                             {listing.sellerName.charAt(0)}
                         </div>
                         <div>
-                            <div class="font-bold mb-1">{listing.sellerName}</div>
+                            <div class="font-bold text-text mb-1">{listing.sellerName}</div>
                             <div class="flex gap-1 flex-wrap">
-                                {listing.sellerKYC && (<span class="trust-badge text-[0.6rem] py-0.5 px-2">KYC</span>)}
-                                {listing.sellerVerified && (<span class="trust-badge text-[0.6rem] py-0.5 px-2">Bestätigt</span>)}
+                                {listing.sellerKYC && (<span class="badge-verifiziert">KYC</span>)}
+                                {listing.sellerVerified && (<span class="badge-verifiziert">Bestätigt</span>)}
                             </div>
                         </div>
                     </div>
-                    <div class="border-t border-foreground/10 pt-3 flex flex-col gap-1">
+                    <div class="border-t border-border pt-3 flex flex-col gap-1">
                         <div class="flex items-center gap-2">
                             <span class="text-primary text-base">{stars}</span>
-                            <span class="text-sm font-semibold">{listing.sellerRating > 0 ? listing.sellerRating.toFixed(1) : '–'}</span>
+                            <span class="text-body-sm font-semibold text-text">{listing.sellerRating > 0 ? listing.sellerRating.toFixed(1) : '–'}</span>
+                            {sellerTrustScore > 0 && (
+                                <span class="text-success font-bold text-body-sm ml-auto">Trust {sellerTrustScore}</span>
+                            )}
                         </div>
-                        <span class="text-xs text-foreground/50">Mitglied seit {sellerMemberSince} · {sellerListingCount} {sellerListingCount === 1 ? 'Anzeige' : 'Anzeigen'}</span>
+                        <span class="text-xs text-text-muted">Mitglied seit {sellerMemberSince} · {sellerListingCount} {sellerListingCount === 1 ? 'Anzeige' : 'Anzeigen'}</span>
                     </div>
                     <a href={sellerId ? `/profil/${sellerId}` : '/profil'} class="btn-outline w-full flex items-center justify-center mt-4 text-xs no-underline">
                         Profil ansehen
@@ -366,15 +427,15 @@ if (relatedListings.length < 3) {
         <!-- 3. Ähnliche Anzeigen -->
         {relatedListings.length > 0 && (
             <section class="mt-16">
-                <h2 class="font-headings text-2xl font-light mb-6">Ähnliche Anzeigen</h2>
+                <h2 class="text-h2 text-text mb-6">Ähnliche Anzeigen</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {relatedListings.map((l) => (
-                        <a href={`/listing/${l.id}`} class="group block bg-secondary/40 border border-foreground/10 rounded-default overflow-hidden hover:border-primary/20 transition-all duration-300 no-underline">
-                            <img src={l.image} alt={l.title} class="w-full aspect-video object-cover" />
+                        <a href={`/listing/${l.id}`} class="group block card overflow-hidden hover:border-primary/30 transition-all duration-300 no-underline">
+                            <img src={l.image} alt={l.title} width="400" height="225" class="w-full aspect-video object-cover" loading="lazy" />
                             <div class="p-4">
-                                <div class="text-sm font-semibold text-foreground mb-1 line-clamp-2">{l.title}</div>
-                                <div class="text-lg font-extrabold text-primary mb-1">{l.price.toLocaleString("de-DE")} €</div>
-                                <div class="text-xs text-foreground/50">{l.location}</div>
+                                <div class="text-body-sm font-semibold text-text mb-1 line-clamp-2">{l.title}</div>
+                                <div class="text-lg font-bold text-primary mb-1">{l.price.toLocaleString("de-DE")} €</div>
+                                <div class="text-xs text-text-muted">{l.location}</div>
                             </div>
                         </a>
                     ))}
@@ -412,7 +473,7 @@ if (relatedListings.length < 3) {
         justify-content: space-between;
         align-items: center;
         padding-bottom: 0.75rem;
-        border-bottom: 1px solid rgba(232,228,222,0.08);
+        border-bottom: 1px solid #E5E7EB;
         font-size: 0.875rem;
     }
     .detail-row:last-child {

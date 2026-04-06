@@ -21,6 +21,7 @@ const ListingQuerySchema = z.object({
     page: z.coerce.number().int().min(1).default(1),
     pageSize: z.coerce.number().int().min(1).max(100).default(20),
     status: z.enum(['DRAFT', 'ACTIVE', 'RESERVED', 'SOLD', 'ARCHIVED', 'REMOVED']).optional(),
+    treuhand: z.coerce.boolean().optional(),
 });
 
 /** Haversine-basierte Bounding Box (schneller Vorfilter) */
@@ -69,7 +70,7 @@ export const GET: APIRoute = async ({ url }) => {
         return json(getFallbackListings(parsed.data));
     }
 
-    const { query, category: rawCategory, minPrice, maxPrice, city, lat, lng, radius, page, pageSize, status } = parsed.data;
+    const { query, category: rawCategory, minPrice, maxPrice, city, lat, lng, radius, page, pageSize, status, treuhand } = parsed.data;
     const skip = (page - 1) * pageSize;
     const useGeo = lat !== undefined && lng !== undefined && radius !== undefined;
 
@@ -82,6 +83,7 @@ export const GET: APIRoute = async ({ url }) => {
         status: status ?? 'ACTIVE',
         seller: { shadowBanned: false },
         ...(safeCategory && { category: safeCategory }),
+        ...(treuhand && { treuhand: true }),
         ...(city && !useGeo && { city: { contains: city, mode: 'insensitive' } }),
         ...(minPrice !== undefined || maxPrice !== undefined
             ? { price: { ...(minPrice !== undefined && { gte: minPrice }), ...(maxPrice !== undefined && { lte: maxPrice }) } }

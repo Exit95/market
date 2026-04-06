@@ -4,3 +4,20 @@ dist/
 .env.*
 !.env.example
 .DS_Store
+.env.local
+.env.production
+*.pem
+*.key
+*.crt
+id_rsa*
+id_ed25519*
+*.db
+*.sqlite
+*.db-shm
+*.db-wal
+
+# Legacy / Build
+ehren-deal/
+
+# Logs
+*.log

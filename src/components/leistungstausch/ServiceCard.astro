@@ -1,0 +1,78 @@
+---
+import { effortLabels, locationTypeLabels } from '../../data/service-categories';
+
+interface Props {
+  listing: {
+    id: string;
+    title: string;
+    offeredDescription: string;
+    effort: string;
+    locationType: string;
+    city?: string | null;
+    viewCount: number;
+    createdAt: string;
+    offeredCategory: { name: string; slug: string; icon?: string | null };
+    soughtCategories: Array<{ category: { name: string; slug: string } }>;
+    user: {
+      firstName?: string | null;
+      lastName?: string | null;
+      emailVerified: boolean;
+      phoneVerified: boolean;
+      idVerified: boolean;
+    };
+    images: Array<{ url: string }>;
+  };
+}
+
+const { listing } = Astro.props;
+const isVerified = listing.user.emailVerified && listing.user.phoneVerified;
+const firstImage = listing.images[0]?.url;
+const effortLabel = effortLabels[listing.effort] ?? listing.effort;
+const locationLabel = locationTypeLabels[listing.locationType] ?? listing.locationType;
+---
+
+<a href={`/leistungstausch/angebot/${listing.id}`} class="lt-card group block">
+  <div class="aspect-[16/10] bg-teal-50 flex items-center justify-center overflow-hidden">
+    {firstImage ? (
+      <img src={firstImage} alt={listing.title} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+    ) : (
+      <div class="flex flex-col items-center gap-2 text-teal-400">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+          <path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+        </svg>
+        <span class="text-xs font-medium">{listing.offeredCategory.name}</span>
+      </div>
+    )}
+  </div>
+  <div class="p-4">
+    <div class="flex items-center gap-2 mb-2">
+      <span class="lt-badge">{listing.offeredCategory.name}</span>
+      {isVerified && (
+        <span class="inline-flex items-center gap-1 text-xs text-teal-700">
+          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+          Verifiziert
+        </span>
+      )}
+    </div>
+    <h3 class="text-base font-semibold text-text mb-2 line-clamp-2 group-hover:text-teal-700 transition-colors">{listing.title}</h3>
+    <div class="flex flex-wrap gap-1 mb-3">
+      {listing.soughtCategories.slice(0, 3).map((sc) => (
+        <span class="lt-badge-sm">{sc.category.name}</span>
+      ))}
+    </div>
+    <div class="flex items-center gap-3 text-xs text-text-secondary">
+      <span class="flex items-center gap-1">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        {effortLabel}
+      </span>
+      <span class="flex items-center gap-1">
+        {listing.locationType === 'REMOTE' ? (
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+        ) : (
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+        )}
+        {listing.locationType === 'REMOTE' ? 'Remote' : listing.city ?? locationLabel}
+      </span>
+    </div>
+  </div>
+</a>

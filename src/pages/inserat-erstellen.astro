@@ -3,20 +3,34 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { categories } from "../data/listings";
+import { lucia } from "../lib/auth";
+
+// Auth check – redirect to login if not authenticated
+const sessionId = Astro.cookies.get(lucia.sessionCookieName)?.value;
+if (!sessionId) return Astro.redirect("/anmelden?redirect=/inserat-erstellen");
+
+let sessionUser: { id: string } | null = null;
+try {
+    const result = await lucia.validateSession(sessionId);
+    sessionUser = result.user;
+} catch { /* session invalid */ }
+if (!sessionUser) return Astro.redirect("/anmelden?redirect=/inserat-erstellen");
 ---
 
 <BaseLayout title="Anzeige aufgeben – Ehren-Deal">
     <Header />
     <main class="create-main">
         <div class="container-sm">
+            <!-- Breadcrumb -->
+            <nav class="text-caption mb-6 text-text-muted" aria-label="Breadcrumb">
+                <a href="/" class="hover:text-text transition-colors">Startseite</a>
+                <span class="mx-1.5">&gt;</span>
+                <span class="text-text-secondary">Anzeige aufgeben</span>
+            </nav>
+
             <div class="create-header">
-                <a
-                    href="/"
-                    class="btn btn-ghost btn-sm"
-                    style="margin-bottom:var(--space-4);">← Zurück</a
-                >
-                <h1 class="section-title">Anzeige aufgeben</h1>
-                <p class="section-subtitle">
+                <h1 class="text-h1 text-text mb-2">Anzeige aufgeben</h1>
+                <p class="text-body-sm text-text-secondary max-w-2xl">
                     Inseriere deine Waren sicher und erreiche tausende
                     verifizierte Käufer.
                 </p>
@@ -88,6 +102,8 @@ import { categories } from "../data/listings";
                             <input
                                 type="text"
                                 id="title"
+                                name="title"
+                                autocomplete="off"
                                 class="input"
                                 placeholder="z.B. iPhone 15 Pro Max 256GB, unbenutzt"
                                 required
@@ -101,6 +117,8 @@ import { categories } from "../data/listings";
                             >
                             <textarea
                                 id="desc"
+                                name="description"
+                                autocomplete="off"
                                 class="input"
                                 rows="6"
                                 placeholder="Beschreibe deine Ware so genau wie möglich – Zustand, Mängel, Zubehör..."
@@ -114,6 +132,8 @@ import { categories } from "../data/listings";
                                 <input
                                     type="number"
                                     id="price"
+                                    name="price"
+                                    autocomplete="off"
                                     class="input"
                                     placeholder="0,00"
                                     min="0"
@@ -146,12 +166,19 @@ import { categories } from "../data/listings";
                                     >
                                     Ungewöhnlich niedriger Preis – könnte Betrug sein
                                 </div>
+                                <div class="mt-2 p-2.5 bg-primary-light border border-primary/15 rounded-sm">
+                                    <p class="text-[.65rem] text-text-secondary font-light leading-relaxed">
+                                        <strong class="text-primary font-medium">Hinweis:</strong> Bei jedem Verkauf fällt eine Verkaufsprovision von <strong class="text-text">5 %</strong> an.
+                                        Beispiel: Bei 100,00 € Verkaufspreis erhältst du <strong class="text-text">95,00 €</strong> ausgezahlt.
+                                        <span id="provisionPreview"></span>
+                                    </p>
+                                </div>
                             </div>
                             <div class="form-group" style="flex:1;">
                                 <label class="label" for="condition"
                                     >Zustand *</label
                                 >
-                                <select id="condition" class="input">
+                                <select id="condition" name="condition" autocomplete="off" class="input">
                                     <option value="">Bitte wählen</option>
                                     <option value="neu"
                                         >Neu (unbenutzt, mit OVP)</option
@@ -174,10 +201,13 @@ import { categories } from "../data/listings";
                                 <input
                                     type="text"
                                     id="plz"
+                                    name="postalCode"
+                                    autocomplete="postal-code"
                                     class="input"
                                     placeholder="z.B. 10115"
                                     maxlength="5"
                                     pattern="[0-9]{5}"
+                                    inputmode="numeric"
                                     required
                                 />
                             </div>
@@ -186,6 +216,8 @@ import { categories } from "../data/listings";
                                 <input
                                     type="text"
                                     id="city"
+                                    name="city"
+                                    autocomplete="address-level2"
                                     class="input"
                                     placeholder="wird automatisch ermittelt"
                                 />
@@ -203,7 +235,7 @@ import { categories } from "../data/listings";
                                 </button>
                             </div>
                         </div>
-                        <div id="geoStatus" class="hidden" style="font-size:0.85rem; margin-top:-8px; margin-bottom:8px; color:var(--ehren-accent,#c8973a);"></div>
+                        <div id="geoStatus" class="hidden" style="font-size:0.85rem; margin-top:-8px; margin-bottom:8px; color:#1B65A6;"></div>
                         <div class="form-group">
                             <label class="label">Versand & Übergabe</label>
                             <div class="toggle-group">
@@ -258,8 +290,8 @@ import { categories } from "../data/listings";
                 <div class="card">
                     <h2 class="card-title">Fotos hinzufügen</h2>
                     <p
-                        class="text-muted"
-                        style="font-size:var(--text-sm); margin-bottom:var(--space-6);"
+                        class="text-text-secondary"
+                        style="font-size:0.875rem; margin-bottom:24px;"
                     >
                         Bis zu 12 Fotos, max. 10 MB pro Bild. Klare, gut
                         beleuchtete Fotos erhöhen deine Chancen erheblich.
@@ -324,8 +356,8 @@ import { categories } from "../data/listings";
                     <!-- Upload Error -->
                     <div
                         id="uploadError"
-                        class="hidden bg-destructive/10 border border-destructive/25 text-red-400"
-                        style="margin-top:var(--space-3); padding:var(--space-3); border-radius:var(--radius); font-size:var(--text-sm);"
+                        class="hidden bg-danger-light border border-danger/25 text-danger"
+                        style="margin-top:12px; padding:12px; border-radius:8px; font-size:0.875rem;"
                     >
                     </div>
 
@@ -403,8 +435,8 @@ import { categories } from "../data/listings";
                         <div class="review-img-placeholder"></div>
                         <div class="review-body">
                             <div
-                                class="badge badge-neutral"
-                                style="margin-bottom:var(--space-2);"
+                                class="badge-neutral"
+                                style="margin-bottom:8px;"
                             >
                                 Kategorie
                             </div>
@@ -422,7 +454,7 @@ import { categories } from "../data/listings";
                                     fill="none"
                                     stroke="currentColor"
                                     stroke-width="2"
-                                    class="text-foreground/80"
+                                    class="text-text-secondary"
                                     ><path
                                         d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
                                     ></path><circle cx="12" cy="10" r="3"
@@ -500,6 +532,13 @@ import { categories } from "../data/listings";
                 </div>
             </div>
 
+            <!-- Bail-out link -->
+            <div class="text-center mt-6">
+                <a href="/" class="text-caption text-text-muted hover:text-text transition-colors">
+                    Zurück zur Startseite
+                </a>
+            </div>
+
             <!-- Success State (hidden initially) -->
             <div class="step-content hidden" id="successState">
                 <div class="card text-center" style="padding:var(--space-12);">
@@ -520,7 +559,7 @@ import { categories } from "../data/listings";
                     >
                         Anzeige aufgegeben!
                     </h2>
-                    <p class="text-muted" style="margin-bottom:var(--space-8);">
+                    <p class="text-text-secondary" style="margin-bottom:32px;">
                         Deine Anzeige wird innerhalb von 15 Minuten geprüft und
                         dann veröffentlicht. Du erhältst eine
                         Bestätigungs-Email.
@@ -537,94 +576,89 @@ import { categories } from "../data/listings";
                     </div>
                 </div>
             <style>
-    .create-main { @apply py-10 pb-16 bg-background min-h-screen text-foreground font-body; }
+    .create-main { @apply py-10 pb-16 bg-background min-h-screen text-text font-sans; }
     .create-header { @apply mb-8; }
-    
-    .btn-secondary { @apply inline-flex items-center justify-center px-6 py-3 rounded-default font-bold text-foreground bg-secondary hover:bg-secondary/70 transition-all duration-200; }
-    .btn-ghost { @apply inline-flex items-center justify-center px-4 py-2 rounded-default font-bold text-foreground/80 hover:text-foreground hover:bg-secondary/50 transition-all; }
+
     .btn-lg { @apply px-8 py-4 text-lg shadow-xl shadow-primary/10; }
     .btn-sm { @apply px-3 py-1.5 text-sm; }
-    .text-muted { @apply text-foreground/75; }
-    .section-title { @apply text-3xl md:text-4xl font-headings font-bold text-primary mb-2; }
-    .section-subtitle { @apply text-foreground/80 text-lg max-w-2xl; }
 
     /* Progress Steps */
     .progress-steps { @apply flex items-center mb-8; }
     .progress-step { @apply flex flex-col items-center gap-2; }
-    .step-circle { @apply w-10 h-10 bg-secondary border border-foreground/[.22] flex items-center justify-center text-xs font-condensed text-foreground/75 transition-all duration-300; }
-    .progress-step.active .step-circle { @apply bg-primary/10 border-primary text-primary; }
+    .step-circle { @apply w-10 h-10 bg-background border border-border rounded-full flex items-center justify-center text-xs font-semibold text-text-muted transition-all duration-300; }
+    .progress-step.active .step-circle { @apply bg-primary border-primary text-white; }
     .progress-step.done .step-circle { @apply bg-success border-success text-white; }
-    .progress-step span { @apply text-xs font-bold text-foreground/80 transition-colors; }
+    .progress-step span { @apply text-xs font-semibold text-text-muted transition-colors; }
     .progress-step.active span { @apply text-primary font-bold; }
     .progress-step.done span { @apply text-success; }
-    .progress-line { @apply flex-1 h-[2px] bg-foreground/[.15] border-none mx-2 mb-6; }
+    .progress-line { @apply flex-1 h-[2px] bg-border border-none mx-2 mb-6; }
 
-    /* Card */
-    .card { @apply bg-secondary/20 border border-foreground/[.20] rounded-default shadow-sm p-6 sm:p-8; }
-    .card-title { @apply text-2xl font-headings font-bold text-primary mb-6; }
-    .step-nav { @apply flex justify-between items-center mt-8 pt-6 border-t border-foreground/[.15]; }
+    /* Card – override global .card for this wizard context */
+    .step-content > .card { @apply bg-surface border border-border rounded-lg shadow-sm p-6 sm:p-8; }
+    .card-title { @apply text-h3 font-bold text-text mb-6; }
+    .step-nav { @apply flex justify-between items-center mt-8 pt-6 border-t border-border; }
     .hidden { display: none !important; }
 
     /* Category Select */
     .cat-select-grid { @apply grid grid-cols-2 md:grid-cols-4 gap-3 mb-6; }
-    .cat-select-btn { @apply flex flex-col items-center gap-3 p-4 border-2 border-foreground/[.18] rounded-default bg-secondary/40 cursor-pointer transition-all duration-200 hover:border-primary hover:bg-primary/5 hover:-translate-y-1; }
-    .cat-select-btn.selected { @apply border-primary bg-primary/10 ring-2 ring-primary/20; }
+    .cat-select-btn { @apply flex flex-col items-center gap-3 p-4 border-2 border-border rounded-lg bg-surface cursor-pointer transition-all duration-200 hover:border-primary hover:bg-primary-light hover:-translate-y-1; }
+    .cat-select-btn.selected { @apply border-primary bg-primary-light ring-2 ring-primary/20; }
     .cat-select-btn .cat-icon { @apply w-8 h-8 opacity-100; }
-    .cat-select-btn .cat-label { @apply text-xs font-bold text-foreground/80 text-center; }
+    .cat-select-btn .cat-label { @apply text-xs font-semibold text-text-secondary text-center; }
 
     /* Form */
     .form-row { @apply flex flex-col sm:flex-row gap-4; }
     .form-group { @apply flex flex-col gap-2 mb-4; }
-    .label { @apply text-sm font-bold text-foreground; }
-    .input { @apply w-full px-4 py-3 rounded-default border border-foreground/[.22] bg-transparent text-foreground placeholder-foreground/60 focus:outline-none focus:border-primary/50 transition-all duration-200; }
-    .char-count { @apply text-xs text-foreground/80 text-right mt-1; }
-    .price-warning { @apply flex items-center gap-2 mt-2 text-xs text-amber-600 bg-amber-500/10 p-2 px-3 rounded-sm border border-amber-500/20; }
+    .label { @apply text-label font-semibold text-text; }
+    .input { @apply w-full px-4 py-3 rounded-lg border border-border bg-surface text-text placeholder-text-muted focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200; }
+    .char-count { @apply text-xs text-text-muted text-right mt-1; }
+    .price-warning { @apply flex items-center gap-2 mt-2 text-xs text-accent bg-accent-light p-2 px-3 rounded-sm border border-accent/20; }
     .toggle-group { @apply flex gap-4 flex-wrap mt-2; }
-    .toggle-option { @apply flex items-center gap-2 text-sm cursor-pointer font-medium text-foreground/80; }
+    .toggle-option { @apply flex items-center gap-2 text-sm cursor-pointer font-medium text-text-secondary; }
     .toggle-check { @apply w-4 h-4 accent-primary rounded-sm; }
 
     /* Photo Upload */
-    .upload-area { @apply border-2 border-dashed border-foreground/[.22] rounded-default p-12 flex flex-col items-center justify-center gap-3 text-center cursor-pointer transition-all duration-200 hover:border-primary hover:bg-primary/5 relative; }
-    .upload-area p { @apply font-bold text-foreground; }
-    .upload-area span { @apply text-xs text-foreground/80; }
+    .upload-area { @apply border-2 border-dashed border-border rounded-lg p-12 flex flex-col items-center justify-center gap-3 text-center cursor-pointer transition-all duration-200 hover:border-primary hover:bg-primary-light relative; }
+    .upload-area p { @apply font-bold text-text; }
+    .upload-area span { @apply text-xs text-text-muted; }
     .upload-area input { @apply absolute inset-0 opacity-0 cursor-pointer; }
-    .photo-info-box { @apply flex gap-3 p-4 bg-primary/5 border border-primary/20 rounded-default mt-5 text-sm text-primary; }
-    .photo-info-box strong { @apply block mb-2 text-foreground font-bold; }
+    .photo-info-box { @apply flex gap-3 p-4 bg-primary-light border border-primary/20 rounded-lg mt-5 text-sm text-primary; }
+    .photo-info-box strong { @apply block mb-2 text-text font-bold; }
     .photo-info-box ul { @apply flex flex-col gap-2 list-none m-0 p-0; }
-    .photo-info-box li { @apply text-xs text-foreground/80 pl-3 relative; }
+    .photo-info-box li { @apply text-xs text-text-secondary pl-3 relative; }
     .photo-info-box li::before { content: "•"; @apply absolute left-0 text-primary; }
 
     /* Review Card */
-    .review-card { @apply flex gap-4 bg-secondary/50 border border-secondary rounded-default p-4 mb-6 shadow-sm; }
-    .review-img-placeholder { @apply w-[100px] h-[80px] bg-secondary rounded-sm flex-shrink-0 border border-secondary; }
+    .review-card { @apply flex gap-4 bg-background border border-border rounded-lg p-4 mb-6 shadow-sm; }
+    .review-img-placeholder { @apply w-[100px] h-[80px] bg-background rounded-sm flex-shrink-0 border border-border; }
     .review-body { @apply flex flex-col py-1; }
-    .review-title { @apply font-bold text-base mb-1 text-foreground leading-tight; }
-    .review-price { @apply text-2xl font-headings font-black text-primary; }
-    .review-location { @apply flex items-center gap-1 text-sm text-foreground/75 mt-1 font-medium; }
-    .badge-neutral { @apply inline-block px-2 py-0.5 bg-secondary text-foreground/75 text-[10px] font-bold uppercase rounded-sm tracking-wider w-max mb-2; }
+    .review-title { @apply font-bold text-base mb-1 text-text leading-tight; }
+    .review-price { @apply text-2xl font-sans font-black text-primary; }
+    .review-location { @apply flex items-center gap-1 text-sm text-text-secondary mt-1 font-medium; }
+    .badge-neutral { @apply inline-block px-2 py-0.5 bg-background text-text-muted text-[10px] font-semibold rounded-sm w-max mb-2; }
 
     /* Checklist */
-    .checklist-section { @apply bg-secondary/30 border border-secondary rounded-default p-5 mb-6; }
+    .checklist-section { @apply bg-background border border-border rounded-lg p-5 mb-6; }
     .checklist-items { @apply flex flex-col gap-3; }
-    .checklist-item { @apply flex items-start gap-3 text-sm cursor-pointer text-foreground/80 font-medium; }
+    .checklist-item { @apply flex items-start gap-3 text-sm cursor-pointer text-text-secondary font-medium; }
     .checklist-item input { @apply w-4 h-4 accent-primary flex-shrink-0 mt-0.5 rounded-sm; }
     .final-actions { @apply flex flex-col sm:flex-row justify-between items-center gap-4; }
-    .final-actions .btn { @apply w-full sm:w-auto; }
+    .final-actions .btn-primary, .final-actions .btn-secondary { @apply w-full sm:w-auto; }
 
     /* Success Icon */
-    .success-icon { @apply w-20 h-20 bg-success/10 border border-success/20 flex items-center justify-center text-success mx-auto mb-6; }
+    .success-icon { @apply w-20 h-20 bg-success-light border border-success/20 rounded-full flex items-center justify-center text-success mx-auto mb-6; }
 
     /* Photo Thumbnail Grid */
     .photo-thumb-grid { @apply grid grid-cols-2 md:grid-cols-4 gap-3; }
-    .photo-thumb { @apply relative aspect-[4/3] rounded-sm overflow-hidden border-2 border-secondary shadow-sm; }
+    .photo-thumb { @apply relative aspect-[4/3] rounded-sm overflow-hidden border-2 border-border shadow-sm; }
     .photo-thumb img { @apply w-full h-full object-cover; }
-    .photo-thumb-del { @apply absolute top-1 right-1 w-6 h-6 bg-black/70 flex items-center justify-center text-white text-xs cursor-pointer transition-colors hover:bg-destructive; }
-    .photo-thumb-add { @apply aspect-[4/3] border-2 border-dashed border-secondary rounded-sm flex items-center justify-center cursor-pointer transition-colors text-foreground/80 text-2xl hover:border-primary hover:bg-primary/5 hover:text-primary; }
+    .photo-thumb-del { @apply absolute top-1 right-1 w-6 h-6 bg-black/70 rounded-sm flex items-center justify-center text-white text-xs cursor-pointer transition-colors hover:bg-danger; }
+    .photo-thumb-add { @apply aspect-[4/3] border-2 border-dashed border-border rounded-sm flex items-center justify-center cursor-pointer transition-colors text-text-muted text-2xl hover:border-primary hover:bg-primary-light hover:text-primary; }
 
     /* Upload progress bar */
-    .upload-progress-bar-wrap { @apply bg-foreground/[.12] h-1.5 overflow-hidden mt-2; }
-    .upload-progress-bar { @apply h-full bg-primary/60 transition-all duration-300; }
-    .upload-spinner { @apply w-4 h-4 border-2 border-foreground/[.22] border-t-primary animate-spin flex-shrink-0; }
+    .upload-progress-bar-wrap { @apply bg-border h-1.5 rounded-full overflow-hidden mt-2; }
+    .upload-progress-bar { @apply h-full bg-primary transition-all duration-300 rounded-full; }
+    .upload-spinner { @apply w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin flex-shrink-0; }
 </style>
 
 <script>
@@ -679,7 +713,7 @@ import { categories } from "../data/listings";
 
     function showGeoStatus(msg: string, isError = false) {
         geoStatus.textContent = msg;
-        geoStatus.style.color = isError ? '#e53e3e' : 'var(--ehren-accent,#c8973a)';
+        geoStatus.style.color = isError ? '#DC2626' : 'var(--ehren-accent,#1B65A6)';
         geoStatus.classList.remove('hidden');
         if (!isError) setTimeout(() => geoStatus.classList.add('hidden'), 4000);
     }
@@ -792,6 +826,15 @@ import { categories } from "../data/listings";
         const val = parseFloat((e.target as HTMLInputElement).value);
         const warn = document.getElementById("priceWarning");
         if (warn) { val > 0 && val < 5 ? warn.classList.remove("hidden") : warn.classList.add("hidden"); }
+        // Dynamische Provisionsvorschau
+        const preview = document.getElementById("provisionPreview");
+        if (preview && val > 0) {
+            const commission = (val * 0.05);
+            const payout = (val - commission);
+            preview.textContent = ` — Bei ${val.toLocaleString("de-DE", {minimumFractionDigits: 2})} € erhältst du ${payout.toLocaleString("de-DE", {minimumFractionDigits: 2})} € (Provision: ${commission.toLocaleString("de-DE", {minimumFractionDigits: 2})} €).`;
+        } else if (preview) {
+            preview.textContent = '';
+        }
     });
 
     // ── Char count ──────────────────────────────────────────────────────

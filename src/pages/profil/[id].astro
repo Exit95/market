@@ -1,0 +1,268 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { prisma } from "../../lib/auth";
+
+const { id } = Astro.params;
+if (!id) return Astro.redirect('/');
+
+// ── Try DB ──
+let seller: any = null;
+let listings: any[] = [];
+
+try {
+    seller = await prisma.user.findUnique({
+        where: { id },
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            city: true,
+            createdAt: true,
+            idVerified: true,
+            emailVerified: true,
+            phoneVerified: true,
+            avatarUrl: true,
+            shadowBanned: true,
+            trustScore: { select: { score: true, level: true } },
+            _count: { select: { listings: true, sellerDeals: true } },
+        },
+    });
+
+    if (seller && !seller.shadowBanned) {
+        const dbListings = await prisma.listing.findMany({
+            where: { sellerId: id, status: 'ACTIVE' },
+            orderBy: { createdAt: 'desc' },
+            take: 12,
+            include: { images: { take: 1, orderBy: { position: 'asc' } } },
+        });
+        listings = dbListings.map((l: any) => ({
+            id: l.id,
+            title: l.title,
+            price: l.price / 100,
+            city: l.city,
+            image: l.images[0]?.url || null,
+            treuhand: l.treuhand,
+        }));
+    }
+} catch { /* DB not available */ }
+
+// ── Fallback: mock-seller IDs (from listing-fallback) ──
+if (!seller && id.startsWith('mock-seller-')) {
+    const mockId = id.replace('mock-seller-', '');
+    const { listings: mockListings } = await import('../../data/listings');
+    const listing = mockListings.find(l => l.id === mockId);
+    if (listing) {
+        const [firstName, ...rest] = listing.sellerName.split(' ');
+        seller = {
+            id,
+            firstName,
+            lastName: rest.join(' ') || null,
+            city: listing.location,
+            createdAt: new Date('2024-01-01'),
+            idVerified: listing.sellerKYC,
+            emailVerified: listing.sellerVerified,
+            phoneVerified: false,
+            avatarUrl: null,
+            trustScore: { score: listing.sellerKYC ? 92 : 68, level: listing.sellerKYC ? 'VERIFIED' : 'BASIC' },
+            _count: { listings: 3, sellerDeals: 5 },
+        };
+        listings = mockListings
+            .filter(l => l.sellerName === listing.sellerName)
+            .map(l => ({ id: l.id, title: l.title, price: l.price, city: l.location, image: l.image, treuhand: l.treuhandAvailable }));
+    }
+}
+
+if (!seller) return Astro.redirect('/');
+
+const isMock = id.startsWith('mock-seller-');
+const fullName = [seller.firstName, seller.lastName].filter(Boolean).join(' ') || 'Verkäufer';
+const initial = (seller.firstName || 'V')[0].toUpperCase();
+const trustScore = seller.trustScore?.score ?? 0;
+const memberSince = seller.createdAt.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+
+const mockReviews = [
+    { name: 'Max B.', initial: 'M', stars: 5, text: 'Sehr netter Kontakt, schneller Versand. Gerne wieder!', date: 'vor 2 Wochen' },
+    { name: 'Anna S.', initial: 'A', stars: 4, text: 'Ware wie beschrieben, alles top. Kommunikation könnte etwas schneller sein.', date: 'vor 1 Monat' },
+];
+---
+
+<BaseLayout title={`${fullName} – Ehren-Deal`}>
+    <Header />
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-20 bg-background min-h-screen">
+
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-2 text-text-muted mb-6 text-caption">
+            <a href="/" class="hover:text-primary transition-colors">Startseite</a>
+            <span class="text-border">›</span>
+            <span>Verkäufer</span>
+            <span class="text-border">›</span>
+            <span class="text-text-secondary">{fullName}</span>
+        </nav>
+
+        <!-- Profile Header -->
+        <div class="bg-surface border border-border rounded-lg p-5 sm:p-8 mb-10 shadow-card">
+            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6">
+                <!-- Avatar -->
+                <div class="w-20 h-20 sm:w-24 sm:h-24 bg-primary-light rounded-full flex items-center justify-center text-3xl sm:text-4xl font-bold text-primary flex-shrink-0">
+                    {seller.avatarUrl
+                        ? <img src={seller.avatarUrl} alt={fullName} class="w-full h-full rounded-full object-cover" />
+                        : initial
+                    }
+                </div>
+
+                <!-- Info -->
+                <div class="flex-grow min-w-0 text-center sm:text-left">
+                    <h1 class="text-h2 text-text mb-2">{fullName}</h1>
+
+                    <!-- Badges -->
+                    <div class="flex flex-wrap gap-2 mb-4 justify-center sm:justify-start">
+                        {seller.idVerified && (
+                            <span class="badge-verifiziert text-label">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                KYC verifiziert
+                            </span>
+                        )}
+                        {seller.emailVerified && (
+                            <span class="badge-verifiziert text-label">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="mr-1"><polyline points="20 6 9 17 4 12"/></svg>
+                                E-Mail bestätigt
+                            </span>
+                        )}
+                        {seller.phoneVerified && (
+                            <span class="badge-verifiziert text-label">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="mr-1"><polyline points="20 6 9 17 4 12"/></svg>
+                                Telefon bestätigt
+                            </span>
+                        )}
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-3 sm:gap-5 text-body-sm text-text-secondary">
+                        <span class="flex items-center gap-1.5 justify-center sm:justify-start">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            Seit {memberSince}
+                        </span>
+                        {seller.city && (
+                            <span class="flex items-center gap-1.5 justify-center sm:justify-start">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                {seller.city}
+                            </span>
+                        )}
+                        <span class="flex items-center gap-1.5 justify-center sm:justify-start">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                            {seller._count.listings} Anzeigen
+                        </span>
+                        <span class="flex items-center gap-1.5 justify-center sm:justify-start">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            {seller._count.sellerDeals} Deals
+                        </span>
+                    </div>
+
+                    <!-- Zuletzt aktiv -->
+                    <div class="flex items-center gap-2 mt-3 text-body-sm text-text-secondary justify-center sm:justify-start">
+                        <span class="relative flex h-2.5 w-2.5">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-success"></span>
+                        </span>
+                        <span class="text-caption">Zuletzt aktiv: {isMock ? 'Heute' : 'Heute'}</span>
+                    </div>
+                </div>
+
+                <!-- Trust Score + Contact -->
+                <div class="flex-shrink-0 flex flex-col gap-3 items-center">
+                    <div class="text-center bg-surface border border-border rounded-lg p-4 min-w-[110px] shadow-card">
+                        <div class="text-3xl font-bold text-success mb-1">{trustScore}</div>
+                        <div class="text-label text-text-muted mb-2">Trust Score</div>
+                        <div class="w-full bg-background h-1.5 rounded-full overflow-hidden">
+                            <div class="h-full bg-success rounded-full" style={`width:${trustScore}%`}></div>
+                        </div>
+                    </div>
+                    <a href="/nachrichten" class="btn-primary w-full gap-2 text-xs py-2.5">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        Kontaktieren
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Listings -->
+        {listings.length > 0 ? (
+            <section>
+                <h2 class="text-h3 text-text mb-6">
+                    Aktive Anzeigen
+                    <span class="text-text-muted text-base ml-1">({listings.length})</span>
+                </h2>
+                <div class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                    {listings.map((l) => (
+                        <a href={`/inserat/${l.id}`} class="group block bg-surface border border-border rounded-lg overflow-hidden hover:border-primary/30 hover:shadow-card-hover transition-all duration-300" style="text-decoration:none; color:inherit;">
+                            <div class="aspect-[4/3] bg-background relative overflow-hidden">
+                                {l.image
+                                    ? <img src={l.image} alt={l.title} class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500" loading="lazy" />
+                                    : <div class="w-full h-full flex items-center justify-center text-text-muted">
+                                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                      </div>
+                                }
+                                {l.treuhand && (
+                                    <span class="absolute top-2 right-2 badge-treuhand text-label px-1.5 py-0.5">Treuhand</span>
+                                )}
+                            </div>
+                            <div class="p-3 sm:p-4">
+                                <div class="text-base font-bold text-primary mb-0.5">
+                                    {l.price.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
+                                </div>
+                                <p class="text-body-sm text-text-secondary line-clamp-2 leading-snug">{l.title}</p>
+                                <p class="text-caption text-text-muted mt-2">{l.city}</p>
+                            </div>
+                        </a>
+                    ))}
+                </div>
+            </section>
+        ) : (
+            <div class="text-center py-16 border border-dashed border-border rounded-lg bg-surface">
+                <svg class="w-10 h-10 mx-auto mb-3 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                <p class="text-text-secondary text-body-sm">Dieser Verkäufer hat derzeit keine aktiven Anzeigen.</p>
+            </div>
+        )}
+
+        <!-- Bewertungen -->
+        <section class="mt-12">
+            <h2 class="text-h3 text-text mb-6">
+                Bewertungen
+                <span class="text-text-muted text-base ml-1">({isMock ? mockReviews.length : 0})</span>
+            </h2>
+
+            {isMock ? (
+                <div class="space-y-4">
+                    {mockReviews.map((review) => (
+                        <div class="bg-surface border border-border rounded-lg p-5 shadow-card">
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 bg-primary-light rounded-full flex items-center justify-center text-sm font-bold text-primary flex-shrink-0">
+                                    {review.initial}
+                                </div>
+                                <div class="flex-grow min-w-0">
+                                    <div class="flex items-center gap-2 mb-1.5">
+                                        <span class="font-semibold text-sm text-text">{review.name}</span>
+                                        <span class="text-accent text-sm">
+                                            {'★'.repeat(review.stars)}{'☆'.repeat(5 - review.stars)}
+                                        </span>
+                                    </div>
+                                    <p class="text-body-sm text-text-secondary leading-relaxed">{review.text}</p>
+                                    <span class="text-text-muted text-caption mt-2 block">{review.date}</span>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div class="text-center py-12 border border-dashed border-border rounded-lg bg-surface">
+                    <svg class="w-8 h-8 mx-auto mb-3 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <p class="text-text-secondary text-body-sm">Noch keine Bewertungen vorhanden.</p>
+                </div>
+            )}
+        </section>
+
+    </main>
+    <Footer />
+</BaseLayout>

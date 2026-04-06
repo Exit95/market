@@ -8,23 +8,30 @@ import { lucia, prisma } from "../lib/auth";
 const sessionId = Astro.cookies.get(lucia.sessionCookieName)?.value;
 if (!sessionId) return Astro.redirect("/anmelden?redirect=/profil");
 
-const { user: sessionUser } = await lucia.validateSession(sessionId);
+let sessionUser: { id: string } | null = null;
+try {
+    const result = await lucia.validateSession(sessionId);
+    sessionUser = result.user;
+} catch { /* DB not available */ }
 if (!sessionUser) return Astro.redirect("/anmelden?redirect=/profil");
 
 // Fetch full user from DB with relations
-const dbUser = await prisma.user.findUnique({
-    where: { id: sessionUser.id },
-    include: {
-        trustScore: true,
-        listings: {
-            where: { status: { in: ['ACTIVE', 'RESERVED', 'SOLD'] } },
-            orderBy: { createdAt: 'desc' },
-            take: 5,
-            include: { images: true },
+let dbUser: any = null;
+try {
+    dbUser = await prisma.user.findUnique({
+        where: { id: sessionUser.id },
+        include: {
+            trustScore: true,
+            listings: {
+                where: { status: { in: ['ACTIVE', 'RESERVED', 'SOLD'] } },
+                orderBy: { createdAt: 'desc' },
+                take: 5,
+                include: { images: true },
+            },
+            sellerDeals: { where: { status: 'COMPLETED' } },
         },
-        sellerDeals: { where: { status: 'COMPLETED' } },
-    },
-});
+    });
+} catch { /* DB not available */ }
 if (!dbUser) return Astro.redirect("/anmelden?redirect=/profil");
 
 // Computed values
@@ -37,6 +44,26 @@ const completedDeals = dbUser.sellerDeals.length;
 const memberSince = dbUser.createdAt.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
 const cityDisplay = dbUser.city || '';
 
+// Trust-Level Gamification
+const trustLevels = [
+    { name: 'NEW', label: 'Neu', threshold: 0 },
+    { name: 'BASIC', label: 'Basis', threshold: 20 },
+    { name: 'VERIFIED', label: 'Verifiziert', threshold: 40 },
+    { name: 'TRUSTED', label: 'Vertraut', threshold: 70 },
+    { name: 'ELITE', label: 'Elite', threshold: 90 },
+];
+const currentLevelIdx = trustLevels.findIndex(l => l.name === trustLevel);
+const currentLevelInfo = trustLevels[currentLevelIdx] ?? trustLevels[0];
+const nextLevelInfo = currentLevelIdx < trustLevels.length - 1 ? trustLevels[currentLevelIdx + 1] : null;
+const pointsToNext = nextLevelInfo ? nextLevelInfo.threshold - trustScore : 0;
+const progressPercent = nextLevelInfo
+    ? Math.min(100, Math.round(((trustScore - currentLevelInfo.threshold) / (nextLevelInfo.threshold - currentLevelInfo.threshold)) * 100))
+    : 100;
+
+// Profile completeness
+const verifiedFields = [dbUser.emailVerified, dbUser.phoneVerified, dbUser.idVerified].filter(Boolean).length;
+const profileCompleteness = Math.round((verifiedFields / 3) * 100);
+
 // Mask phone for display
 function maskPhone(phone: string | null): string {
     if (!phone) return '';
@@ -47,68 +74,63 @@ function maskPhone(phone: string | null): string {
 
 <BaseLayout title="Mein Profil – Ehren-Deal">
     <Header />
-    <main class="profile-main">
-        <div class="container">
+    <main class="min-h-screen bg-background pb-16">
+        <div class="max-w-7xl mx-auto">
             <!-- Profile Header -->
-            <div class="profile-banner">
-                <div class="banner-bg"></div>
-                <div class="profile-info">
-                    <div class="profile-avatar">
+            <div class="border-b border-border bg-surface">
+                <div class="flex flex-wrap items-center gap-6 py-10 px-6 sm:px-12 max-w-7xl mx-auto">
+                    <div class="w-24 h-24 bg-primary-light rounded-full flex items-center justify-center text-3xl font-semibold text-primary flex-shrink-0">
                         {dbUser.avatarUrl ? (
                             <img src={dbUser.avatarUrl} alt={fullName} class="w-full h-full object-cover rounded-full" />
                         ) : (
                             initials
                         )}
                     </div>
-                    <div class="profile-details">
-                        <div class="profile-name-row">
-                            <h1 class="profile-name">{fullName}</h1>
+                    <div class="flex-1">
+                        <div class="flex flex-wrap items-center gap-3 mb-2">
+                            <h1 class="text-h2 text-text m-0">{fullName}</h1>
                             {dbUser.idVerified && (
-                                <span class="trust-badge trust-kyc">KYC-verifiziert</span>
+                                <span class="badge-verifiziert">KYC-verifiziert</span>
                             )}
                             {dbUser.emailVerified && (
-                                <span class="trust-badge trust-verified">Bestätigt</span>
+                                <span class="badge-verifiziert">Bestätigt</span>
                             )}
                         </div>
-                        <p class="profile-since">
+                        <p class="text-body-sm text-text-secondary mb-5">
                             Mitglied seit {memberSince}{cityDisplay ? ` · ${cityDisplay}` : ''}
                         </p>
-                        <div class="profile-stats-row">
-                            <div class="pstat">
-                                <span class="pstat-val">{trustScore}</span><span
-                                    class="pstat-label">Trust Score</span>
+                        <div class="flex flex-wrap gap-8">
+                            <div class="flex flex-col gap-0.5">
+                                <span class="text-xl font-bold text-success">{trustScore}</span>
+                                <span class="text-label text-text-muted">Trust Score</span>
                             </div>
-                            <div class="pstat">
-                                <span class="pstat-val">{dbUser.listings.length}</span><span
-                                    class="pstat-label">Anzeigen</span>
+                            <div class="flex flex-col gap-0.5">
+                                <span class="text-xl font-bold text-text">{dbUser.listings.length}</span>
+                                <span class="text-label text-text-muted">Anzeigen</span>
                             </div>
-                            <div class="pstat">
-                                <span class="pstat-val">{completedDeals}</span><span
-                                    class="pstat-label">Verkäufe</span>
+                            <div class="flex flex-col gap-0.5">
+                                <span class="text-xl font-bold text-text">{completedDeals}</span>
+                                <span class="text-label text-text-muted">Verkäufe</span>
                             </div>
                         </div>
                     </div>
-                    <div class="profile-actions hide-mobile">
-                        <a href="/inserat-erstellen" class="btn btn-primary"
-                            >+ Anzeige aufgeben</a
-                        >
-                        <a href="/nachrichten" class="btn btn-secondary"
-                            >Nachrichten</a
-                        >
+                    <div class="profile-actions hide-mobile flex flex-col gap-3">
+                        <a href="/inserat-erstellen" class="btn-primary">+ Anzeige aufgeben</a>
+                        <a href="/nachrichten" class="btn-secondary">Nachrichten</a>
                     </div>
                 </div>
             </div>
 
-            <div class="profile-grid">
+            <div class="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8 mt-8 px-4 sm:px-6 lg:px-8">
                 <!-- Left: Verification + Settings -->
-                <div class="profile-left">
+                <div>
                     <!-- Verification Status -->
-                    <div class="card">
-                        <h3 class="card-section-title">Verifizierungsstatus</h3>
-                        <div class="verif-list">
+                    <div class="bg-surface border border-border rounded-lg p-6 shadow-card">
+                        <h3 class="text-label text-text-secondary mb-5">Verifizierungsstatus</h3>
+                        <div class="flex flex-col gap-3">
                             <!-- E-Mail -->
-                            <div class={`verif-item ${dbUser.emailVerified ? 'done' : 'pending'}`}>
-                                <div class={`verif-icon ${dbUser.emailVerified ? 'success' : 'warning'}`}>
+                            <div class={`flex items-center gap-4 p-4 rounded-lg transition-colors ${dbUser.emailVerified ? 'bg-success-light border border-success/20' : 'bg-background border border-border'}`}>
+                                <div class={`w-9 h-9 flex items-center justify-center rounded-lg flex-shrink-0 ${dbUser.emailVerified ? 'bg-success/10 text-success' : 'bg-accent-light text-accent'}`}>
                                     {dbUser.emailVerified ? (
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                     ) : (
@@ -116,18 +138,18 @@ function maskPhone(phone: string | null): string {
                                     )}
                                 </div>
                                 <div>
-                                    <div class="verif-name">E-Mail-Adresse</div>
-                                    <div class="verif-sub">{dbUser.email}</div>
+                                    <div class="text-sm font-medium text-text mb-0.5">E-Mail-Adresse</div>
+                                    <div class="text-caption text-text-secondary">{dbUser.email}</div>
                                 </div>
                                 {dbUser.emailVerified ? (
-                                    <span class="badge badge-success">Bestätigt</span>
+                                    <span class="ml-auto flex-shrink-0 inline-flex items-center px-2.5 py-1 bg-success-light text-success rounded-sm text-label font-semibold">Bestätigt</span>
                                 ) : (
-                                    <button id="resend-email-btn" class="btn btn-secondary btn-sm">→ Erneut senden</button>
+                                    <button id="resend-email-btn" class="ml-auto flex-shrink-0 btn-secondary text-xs px-3 py-1.5">Erneut senden</button>
                                 )}
                             </div>
                             <!-- Phone -->
-                            <div class={`verif-item ${dbUser.phoneVerified ? 'done' : 'pending'}`}>
-                                <div class={`verif-icon ${dbUser.phoneVerified ? 'success' : 'warning'}`}>
+                            <div class={`flex items-center gap-4 p-4 rounded-lg transition-colors ${dbUser.phoneVerified ? 'bg-success-light border border-success/20' : 'bg-background border border-border'}`}>
+                                <div class={`w-9 h-9 flex items-center justify-center rounded-lg flex-shrink-0 ${dbUser.phoneVerified ? 'bg-success/10 text-success' : 'bg-accent-light text-accent'}`}>
                                     {dbUser.phoneVerified ? (
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                     ) : (
@@ -135,18 +157,18 @@ function maskPhone(phone: string | null): string {
                                     )}
                                 </div>
                                 <div>
-                                    <div class="verif-name">Handynummer</div>
-                                    <div class="verif-sub">{dbUser.phone ? maskPhone(dbUser.phone) : 'Nicht hinterlegt'}</div>
+                                    <div class="text-sm font-medium text-text mb-0.5">Handynummer</div>
+                                    <div class="text-caption text-text-secondary">{dbUser.phone ? maskPhone(dbUser.phone) : 'Nicht hinterlegt'}</div>
                                 </div>
                                 {dbUser.phoneVerified ? (
-                                    <span class="badge badge-success">Bestätigt</span>
+                                    <span class="ml-auto flex-shrink-0 inline-flex items-center px-2.5 py-1 bg-success-light text-success rounded-sm text-label font-semibold">Bestätigt</span>
                                 ) : (
-                                    <button id="verify-phone-btn" class="btn btn-secondary btn-sm">→ Verifizieren</button>
+                                    <button id="verify-phone-btn" class="ml-auto flex-shrink-0 btn-secondary text-xs px-3 py-1.5">Verifizieren</button>
                                 )}
                             </div>
                             <!-- KYC -->
-                            <div class={`verif-item ${dbUser.idVerified ? 'done' : 'pending'}`}>
-                                <div class={`verif-icon ${dbUser.idVerified ? 'success' : 'warning'}`}>
+                            <div class={`flex items-center gap-4 p-4 rounded-lg transition-colors ${dbUser.idVerified ? 'bg-success-light border border-success/20' : 'bg-background border border-border'}`}>
+                                <div class={`w-9 h-9 flex items-center justify-center rounded-lg flex-shrink-0 ${dbUser.idVerified ? 'bg-success/10 text-success' : 'bg-accent-light text-accent'}`}>
                                     {dbUser.idVerified ? (
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                     ) : (
@@ -154,77 +176,84 @@ function maskPhone(phone: string | null): string {
                                     )}
                                 </div>
                                 <div>
-                                    <div class="verif-name">Personalausweis (KYC)</div>
-                                    <div class="verif-sub">{dbUser.idVerified ? 'Vollständig verifiziert' : 'Noch nicht verifiziert'}</div>
+                                    <div class="text-sm font-medium text-text mb-0.5">Personalausweis (KYC)</div>
+                                    <div class="text-caption text-text-secondary">{dbUser.idVerified ? 'Vollständig verifiziert' : 'Noch nicht verifiziert'}</div>
                                 </div>
                                 {dbUser.idVerified ? (
-                                    <span class="badge badge-success">KYC</span>
+                                    <span class="ml-auto flex-shrink-0 inline-flex items-center px-2.5 py-1 bg-success-light text-success rounded-sm text-label font-semibold">KYC</span>
                                 ) : (
-                                    <button id="start-kyc-btn" class="btn btn-secondary btn-sm">→ Jetzt</button>
+                                    <button id="start-kyc-btn" class="ml-auto flex-shrink-0 btn-secondary text-xs px-3 py-1.5">Jetzt starten</button>
                                 )}
                             </div>
                         </div>
-                        <div class="trust-score">
-                            <div class="trust-score-label">
+                        <!-- Trust Score Bar -->
+                        <div class="mt-6 pt-5 border-t border-border">
+                            <div class="flex justify-between text-label text-text-secondary mb-3">
                                 <span>Vertrauens-Score</span>
-                                <span style={`color:var(--color-success); font-weight:700;`}>{trustLabel}</span>
+                                <span class="text-success font-bold">{trustLabel}</span>
                             </div>
-                            <div class="trust-score-bar-wrap">
-                                <div class="trust-score-bar" style={`width:${trustScore}%`}></div>
+                            <div class="bg-background h-2 rounded-full overflow-hidden mb-1.5">
+                                <div class="h-full bg-success rounded-full transition-all duration-500" style={`width:${trustScore}%`}></div>
                             </div>
-                            <div style="display:flex; justify-content:space-between; font-size:var(--text-xs); color:var(--color-text-faint); margin-top:4px;">
+                            <div class="flex justify-between text-caption text-text-muted mt-1">
                                 <span>0</span>
-                                <span style="font-weight:700; color:var(--color-success);">{trustScore} / 100</span>
+                                <span class="font-bold text-success">{trustScore} / 100</span>
                                 <span>100</span>
+                            </div>
+
+                            <!-- Trust Level Progress -->
+                            <div class="mt-4 p-3 bg-background rounded-lg">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-label font-semibold text-text">Level: {currentLevelInfo.label}</span>
+                                    {nextLevelInfo ? (
+                                        <span class="text-caption text-primary font-medium">Nächstes: {nextLevelInfo.label}</span>
+                                    ) : (
+                                        <span class="text-caption text-success font-medium">Max. Level erreicht!</span>
+                                    )}
+                                </div>
+                                {nextLevelInfo && (
+                                    <div>
+                                        <div class="bg-border h-1.5 rounded-full overflow-hidden mb-2">
+                                            <div class="h-full bg-primary rounded-full transition-all duration-500" style={`width:${progressPercent}%`}></div>
+                                        </div>
+                                        <p class="text-caption text-text-muted">
+                                            Noch <strong class="text-primary">{pointsToNext} Punkte</strong> bis <strong>{nextLevelInfo.label}</strong>
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+
+                            <!-- Profile Completeness -->
+                            <div class="mt-3 p-3 bg-background rounded-lg">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-label font-semibold text-text">Profil-Vollständigkeit</span>
+                                    <span class={`text-caption font-bold ${profileCompleteness === 100 ? 'text-success' : 'text-accent'}`}>{profileCompleteness}%</span>
+                                </div>
+                                <div class="bg-border h-1.5 rounded-full overflow-hidden mb-2">
+                                    <div class={`h-full rounded-full transition-all duration-500 ${profileCompleteness === 100 ? 'bg-success' : 'bg-accent'}`} style={`width:${profileCompleteness}%`}></div>
+                                </div>
+                                <p class="text-caption text-text-muted">
+                                    {verifiedFields} von 3 Verifizierungen abgeschlossen
+                                    {profileCompleteness < 100 && <span> (E-Mail, Telefon, KYC)</span>}
+                                </p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Quick Links -->
-                    <div class="card" style="margin-top:var(--space-4);">
-                        <h3 class="card-section-title">Konto</h3>
-                        <div class="quick-links">
-                            <a href="/einstellungen" class="quick-link">
-                                <svg
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    ><circle cx="12" cy="12" r="3"
-                                    ></circle><path
-                                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
-                                    ></path></svg
-                                >
+                    <div class="bg-surface border border-border rounded-lg p-6 shadow-card mt-4">
+                        <h3 class="text-label text-text-secondary mb-5">Konto</h3>
+                        <div class="flex flex-col gap-1">
+                            <a href="/einstellungen" class="flex items-center gap-3 p-3 text-body-sm text-text-secondary rounded-lg transition-all hover:bg-background hover:text-text">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                                 Einstellungen
                             </a>
-                            <a href="/sicherheit" class="quick-link">
-                                <svg
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    ><path
-                                        d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
-                                    ></path></svg
-                                >
+                            <a href="/sicherheit" class="flex items-center gap-3 p-3 text-body-sm text-text-secondary rounded-lg transition-all hover:bg-background hover:text-text">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                                 Sicherheitscenter
                             </a>
-                            <a href="/nachrichten" class="quick-link">
-                                <svg
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    ><path
-                                        d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-                                    ></path></svg
-                                >
+                            <a href="/nachrichten" class="flex items-center gap-3 p-3 text-body-sm text-text-secondary rounded-lg transition-all hover:bg-background hover:text-text">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                                 Nachrichten
                             </a>
                         </div>
@@ -232,31 +261,31 @@ function maskPhone(phone: string | null): string {
                 </div>
 
                 <!-- Right: Listings + Reviews -->
-                <div class="profile-right">
+                <div>
                     <!-- My Listings -->
-                    <div class="card">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-5);">
-                            <h3 class="card-section-title" style="margin:0;">Meine Anzeigen</h3>
-                            <a href="/inserat-erstellen" class="btn btn-primary btn-sm">+ Neu</a>
+                    <div class="bg-surface border border-border rounded-lg p-6 shadow-card">
+                        <div class="flex justify-between items-center mb-5">
+                            <h3 class="text-label text-text-secondary m-0">Meine Anzeigen</h3>
+                            <a href="/inserat-erstellen" class="btn-primary text-xs px-4 py-2">+ Neu</a>
                         </div>
-                        <div class="my-listings-list">
+                        <div class="flex flex-col gap-4">
                             {dbUser.listings.length === 0 ? (
-                                <p class="text-sm text-foreground/60 font-light">Du hast noch keine Anzeigen erstellt.</p>
+                                <p class="text-body-sm text-text-muted">Du hast noch keine Anzeigen erstellt.</p>
                             ) : (
                                 dbUser.listings.map((l) => (
-                                    <a href={`/inserat/${l.id}`} class="my-listing-item" style="text-decoration:none; color:inherit;">
+                                    <a href={`/inserat/${l.id}`} class="flex items-center gap-4 p-3 border border-border rounded-lg transition-all hover:border-primary/30 hover:shadow-card no-underline text-inherit" style="text-decoration:none; color:inherit;">
                                         <img
                                             src={l.images[0]?.url || '/placeholder.jpg'}
                                             alt={l.title}
-                                            class="my-listing-img"
+                                            class="w-20 h-16 object-cover flex-shrink-0 bg-background rounded-lg"
                                         />
-                                        <div class="my-listing-info">
-                                            <div class="my-listing-title">{l.title}</div>
-                                            <div class="my-listing-price">{(l.price / 100).toLocaleString("de-DE")} €</div>
-                                            <div class="my-listing-meta">{l.city} · {l.createdAt.toLocaleDateString('de-DE')}</div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="text-sm font-medium text-text truncate mb-1">{l.title}</div>
+                                            <div class="text-base font-bold text-primary">{(l.price / 100).toLocaleString("de-DE")} €</div>
+                                            <div class="text-caption text-text-muted mt-1">{l.city} · {l.createdAt.toLocaleDateString('de-DE')}</div>
                                         </div>
-                                        <div class="my-listing-actions">
-                                            <span class={`badge ${l.status === 'ACTIVE' ? 'badge-success' : l.status === 'SOLD' ? 'badge-neutral' : 'badge-warning'}`} style="font-size:0.6rem;">
+                                        <div class="flex flex-col items-end gap-2 flex-shrink-0">
+                                            <span class={`inline-flex items-center px-2 py-0.5 rounded-sm text-label font-semibold ${l.status === 'ACTIVE' ? 'bg-success-light text-success' : l.status === 'SOLD' ? 'bg-background text-text-muted' : 'bg-accent-light text-accent'}`}>
                                                 {l.status === 'ACTIVE' ? 'Aktiv' : l.status === 'SOLD' ? 'Verkauft' : l.status === 'RESERVED' ? 'Reserviert' : l.status}
                                             </span>
                                         </div>
@@ -267,16 +296,16 @@ function maskPhone(phone: string | null): string {
                     </div>
 
                     <!-- Deals -->
-                    <div class="card" style="margin-top:var(--space-5);">
-                        <div style="display:flex; align-items:center; gap:var(--space-3); margin-bottom:var(--space-5);">
-                            <h3 class="card-section-title" style="margin:0;">Abgeschlossene Deals</h3>
+                    <div class="bg-surface border border-border rounded-lg p-6 shadow-card mt-5">
+                        <div class="flex items-center gap-3 mb-5">
+                            <h3 class="text-label text-text-secondary m-0">Abgeschlossene Deals</h3>
                         </div>
                         {completedDeals === 0 ? (
-                            <p class="text-sm text-foreground/60 font-light">Noch keine abgeschlossenen Deals.</p>
+                            <p class="text-body-sm text-text-muted">Noch keine abgeschlossenen Deals.</p>
                         ) : (
-                            <p class="text-sm text-foreground/80 font-light">
+                            <p class="text-body-sm text-text-secondary">
                                 Du hast <strong>{completedDeals}</strong> Deal{completedDeals !== 1 ? 's' : ''} erfolgreich abgeschlossen.
-                                <a href="/dashboard/deals" class="text-primary hover:underline ml-1">Alle anzeigen →</a>
+                                <a href="/dashboard/deals" class="text-primary hover:underline ml-1">Alle anzeigen</a>
                             </p>
                         )}
                     </div>
@@ -288,102 +317,21 @@ function maskPhone(phone: string | null): string {
 </BaseLayout>
 
 <style>
-    .profile-main { @apply pb-16 min-h-screen text-foreground font-body; }
-
-    .profile-banner { @apply border-b border-foreground/[.20] relative overflow-hidden; }
-    .banner-bg { @apply absolute inset-0 bg-secondary/40 opacity-50; }
-
-    .profile-info { @apply relative flex flex-wrap items-center gap-6 py-10 px-6 sm:px-12 max-w-7xl mx-auto z-10; }
-    .profile-avatar { @apply w-24 h-24 bg-secondary border border-foreground/[.22] flex items-center justify-center text-3xl font-headings font-light text-primary flex-shrink-0; }
-
-    .profile-details { @apply flex-1; }
-    .profile-name-row { @apply flex flex-wrap items-center gap-3 mb-2; }
-    .profile-name { @apply text-2xl font-headings font-light tracking-wide text-foreground m-0; }
-
-    .trust-badge { @apply text-[10px] font-condensed font-medium px-2.5 py-1 inline-flex items-center gap-1 uppercase tracking-[.1em] border; }
-    .trust-kyc { @apply bg-foreground/[.12] text-foreground/75 border-foreground/[.20]; }
-    .trust-verified { @apply bg-primary/[.04] text-primary/70 border-primary/10; }
-
-    .profile-since { @apply text-xs text-foreground/80 mb-5 font-condensed tracking-wider; }
-
-    .profile-stats-row { @apply flex flex-wrap gap-8; }
-    .pstat { @apply flex flex-col gap-0.5; }
-    .pstat-val { @apply text-xl font-headings font-light text-foreground; }
-    .pstat-label { @apply text-[10px] font-condensed uppercase tracking-[.12em] text-foreground/80; }
-
-    .profile-actions { @apply flex flex-col gap-3; }
-
-    /* Profile Grid */
-    .profile-grid { @apply grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8 mt-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
-
-    .card { @apply bg-secondary/40 border border-foreground/[.20] p-6; }
-    .card-section-title { @apply text-[10px] font-condensed uppercase tracking-[.15em] text-foreground/80 mb-5 m-0; }
-
-    /* Verification */
-    .verif-list { @apply flex flex-col gap-3; }
-    .verif-item { @apply flex items-center gap-4 p-4 bg-foreground/[.12] border border-foreground/[.22] transition-colors; }
-    .verif-item.done { @apply bg-success/[.03] border-success/10; }
-    .verif-item.pending { @apply bg-warning/[.03] border-warning/10; }
-
-    .verif-icon { @apply w-9 h-9 flex items-center justify-center flex-shrink-0; }
-    .verif-icon.success { @apply bg-success/[.08] text-success; }
-    .verif-icon.warning { @apply bg-warning/[.08] text-warning; }
-
-    .verif-name { @apply text-sm font-medium text-foreground/80 mb-0.5; }
-    .verif-sub { @apply text-xs text-foreground/80; }
-    .verif-item > :last-child { @apply ml-auto flex-shrink-0; }
-
-    .trust-score { @apply mt-6 pt-5 border-t border-foreground/[.20]; }
-    .trust-score-label { @apply flex justify-between text-xs font-condensed uppercase tracking-wider text-foreground/80 mb-3; }
-    .trust-score-bar-wrap { @apply bg-foreground/[.12] h-1.5 overflow-hidden mb-1.5; }
-    .trust-score-bar { @apply h-full bg-success/60; }
-
-    /* Quick Links */
-    .quick-links { @apply flex flex-col gap-1; }
-    .quick-link { @apply flex items-center gap-3 p-3 text-xs font-condensed uppercase tracking-wider text-foreground/80 transition-all hover:bg-foreground/[.12] hover:text-foreground/80; }
-
-    /* My Listings */
-    .my-listings-list { @apply flex flex-col gap-4; }
-    .my-listing-item { @apply flex items-center gap-4 p-3 border border-foreground/[.22] transition-all hover:border-primary/30 hover:bg-foreground/[.12]; }
-    .my-listing-img { @apply w-20 h-16 object-cover flex-shrink-0 bg-secondary; }
-    .my-listing-info { @apply flex-1 min-w-0; }
-    .my-listing-title { @apply text-sm font-medium text-foreground/80 truncate mb-1; }
-    .my-listing-price { @apply text-base font-headings font-light text-primary; }
-    .my-listing-meta { @apply text-[10px] text-foreground/80 mt-1 font-condensed tracking-wider; }
-    .my-listing-actions { @apply flex flex-col items-end gap-2 flex-shrink-0; }
-
-    /* Reviews */
-    .review-summary { @apply flex items-center gap-2; }
-    .stars { color: var(--gold); }
-    .reviews-list { @apply flex flex-col gap-5; }
-    .review-item { @apply p-5 bg-foreground/[.12] border border-foreground/[.22]; }
-    .review-header { @apply flex items-center gap-3 mb-4; }
-    .reviewer-avatar { @apply w-9 h-9 bg-secondary border border-foreground/[.22] flex items-center justify-center text-xs font-condensed text-foreground/75 flex-shrink-0; }
-    .reviewer-name { @apply text-sm font-medium text-foreground/75 mb-0.5; }
-    .review-date { @apply ml-auto text-[10px] text-foreground/80 font-condensed tracking-wider; }
-    .review-text { @apply text-sm text-foreground/80 font-light leading-relaxed mb-3; }
-
-    @media (max-width: 1024px) {
-        .profile-info { @apply px-6; }
-    }
     @media (max-width: 600px) {
-        .profile-info { @apply flex-col text-center; }
-        .profile-stats-row, .profile-name-row { @apply justify-center; }
-        .hide-mobile { @apply w-full; }
-        .profile-actions { @apply w-full; }
+        .profile-actions.hide-mobile { @apply w-full; }
     }
 
     /* Modal */
     .modal-overlay { @apply fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4; display:none; }
     .modal-overlay.open { display:flex; }
-    .modal-box { @apply bg-background border border-foreground/20 p-8 max-w-md w-full; }
-    .modal-title { @apply text-lg font-headings font-light text-foreground mb-4; }
-    .modal-input { @apply w-full p-3 bg-secondary/40 border border-foreground/20 text-foreground text-sm mb-4 outline-none; }
-    .modal-input:focus { @apply border-primary/50; }
+    .modal-box { @apply bg-surface border border-border rounded-lg p-8 max-w-md w-full shadow-card-hover; }
+    .modal-title { @apply text-h3 text-text mb-4; }
+    .modal-input { @apply w-full px-4 py-3 bg-background border border-border rounded-DEFAULT text-text text-sm mb-4 outline-none transition-colors; }
+    .modal-input:focus { @apply border-primary ring-2 ring-primary/20; }
     .modal-actions { @apply flex gap-3 justify-end; }
-    .modal-msg { @apply text-xs text-foreground/60 mb-3; }
-    .modal-msg.error { @apply text-red-400; }
-    .modal-msg.success { @apply text-green-400; }
+    .modal-msg { @apply text-caption text-text-muted mb-3; }
+    .modal-msg.error { @apply text-danger; }
+    .modal-msg.success { @apply text-success; }
 </style>
 
 <!-- Phone Verification Modal -->
@@ -396,12 +344,12 @@ function maskPhone(phone: string | null): string {
                 <input id="phone-input" type="tel" class="modal-input" placeholder="+49 151 12345678" />
             )}
             {dbUser.phone && (
-                <p class="text-sm text-foreground/80 mb-4">Nummer: {maskPhone(dbUser.phone)}</p>
+                <p class="text-sm text-text-secondary mb-4">Nummer: {maskPhone(dbUser.phone)}</p>
             )}
             <div id="phone-msg-1" class="modal-msg"></div>
             <div class="modal-actions">
-                <button id="phone-cancel" class="btn btn-ghost btn-sm">Abbrechen</button>
-                <button id="phone-send-btn" class="btn btn-primary btn-sm">Code senden</button>
+                <button id="phone-cancel" class="btn-ghost text-sm px-4 py-2">Abbrechen</button>
+                <button id="phone-send-btn" class="btn-primary text-sm px-4 py-2">Code senden</button>
             </div>
         </div>
         <div id="phone-step-2" style="display:none;">
@@ -409,8 +357,8 @@ function maskPhone(phone: string | null): string {
             <input id="phone-code-input" type="text" class="modal-input" placeholder="123456" maxlength="6" inputmode="numeric" pattern="[0-9]*" />
             <div id="phone-msg-2" class="modal-msg"></div>
             <div class="modal-actions">
-                <button id="phone-back" class="btn btn-ghost btn-sm">Zurück</button>
-                <button id="phone-verify-btn" class="btn btn-primary btn-sm">Bestätigen</button>
+                <button id="phone-back" class="btn-ghost text-sm px-4 py-2">Zurück</button>
+                <button id="phone-verify-btn" class="btn-primary text-sm px-4 py-2">Bestätigen</button>
             </div>
         </div>
     </div>

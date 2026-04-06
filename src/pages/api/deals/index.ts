@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { requireAuth, isAuthContext } from '../../../lib/auth-middleware';
-import { calcFee } from '../../../lib/stripe';
+import { calcBuyerFee, calcSellerCommission } from '../../../lib/stripe';
 import { prisma } from '../../../lib/auth';
 
 /**
@@ -63,7 +63,8 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
     });
     if (existing) return json({ deal: existing }, 200);
 
-    const feeCents = calcFee(listing.price);
+    const buyerFeeCents = calcBuyerFee();                    // 0,50 € Servicegebühr
+    const sellerCommissionCents = calcSellerCommission(listing.price); // 5 % Provision
     const deal = await prisma.deal.create({
         data: {
             listingId,
@@ -71,7 +72,7 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
             sellerId: listing.sellerId,
             status: 'PENDING',
             totalAmount: listing.price,
-            feeCents,
+            feeCents: buyerFeeCents + sellerCommissionCents, // Gesamt-Plattformgebühr
         },
     });
 

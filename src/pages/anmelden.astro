@@ -12,7 +12,23 @@ import Footer from "../components/Footer.astro";
             <div class="auth-form-side">
                 <div class="auth-inner">
                     <div class="auth-logo">
-                        <span class="text-primary">Ehren‑Deal</span>
+                        <span class="text-primary">Ehren-Deal</span>
+                    </div>
+
+                    <!-- Mobile Trust Stats (visible on mobile only) -->
+                    <div class="flex md:hidden items-center justify-between gap-3 mb-6 px-1">
+                        <div class="flex items-center gap-1.5">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            <span class="text-[.65rem] text-text-secondary">100% Treuhand</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <span class="text-[.65rem] text-text-secondary">Verifizierte Nutzer</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            <span class="text-[.65rem] text-text-secondary">Sichere Deals</span>
+                        </div>
                     </div>
 
                     <!-- Tab Switch -->
@@ -47,15 +63,15 @@ import Footer from "../components/Footer.astro";
                                 <input
                                     type="email"
                                     id="loginEmail"
+                                    name="email"
+                                    autocomplete="email"
                                     class="input input-with-icon"
                                     placeholder="name@beispiel.de"
                                 />
                             </div>
                         </div>
                         <div class="form-group">
-                            <div
-                                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-2);"
-                            >
+                            <div class="flex justify-between items-center mb-2">
                                 <label
                                     class="label"
                                     for="loginPw"
@@ -63,7 +79,7 @@ import Footer from "../components/Footer.astro";
                                 >
                                 <a
                                     href="/passwort-vergessen"
-                                    style="font-size:var(--text-xs); color:var(--color-primary);"
+                                    class="text-body-sm text-primary hover:underline"
                                     >Vergessen?</a
                                 >
                             </div>
@@ -88,6 +104,8 @@ import Footer from "../components/Footer.astro";
                                 <input
                                     type="password"
                                     id="loginPw"
+                                    name="password"
+                                    autocomplete="current-password"
                                     class="input input-with-icon"
                                     placeholder="Dein Passwort"
                                 />
@@ -128,35 +146,15 @@ import Footer from "../components/Footer.astro";
                             2-Faktor-Authentifizierung schützt deinen Account
                         </div>
 
-                        <div id="loginError" class="auth-error" style="display:none; color:#ef4444; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); padding:0.75rem 1rem; border-radius:4px; margin-bottom:1rem; font-size:0.875rem;"></div>
+                        <div id="loginError" class="auth-error" style="display:none; color:#DC2626; background:#FEE2E2; border:1px solid rgba(220,38,38,0.3); padding:0.75rem 1rem; border-radius:10px; margin-bottom:1rem; font-size:0.875rem;"></div>
 
                         <button
                             type="submit"
-                            class="btn btn-primary w-full btn-lg"
+                            class="btn-primary w-full btn-lg"
                             id="loginBtn"
-                            >Anmelden</button
+                            ><svg class="animate-spin -ml-1 mr-2 h-4 w-4 hidden" id="loginSpinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg><span id="loginBtnText">Anmelden</span></button
                         >
 
-                        <div class="or-divider"><span>oder</span></div>
-
-                        <button type="button" class="btn btn-secondary w-full">
-                            <svg width="18" height="18" viewBox="0 0 24 24"
-                                ><path
-                                    fill="#4285F4"
-                                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                                ></path><path
-                                    fill="#34A853"
-                                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                                ></path><path
-                                    fill="#FBBC05"
-                                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                                ></path><path
-                                    fill="#EA4335"
-                                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                                ></path></svg
-                            >
-                            Mit Google anmelden
-                        </button>
                     </form>
 
                     <!-- Register Form -->
@@ -169,6 +167,8 @@ import Footer from "../components/Footer.astro";
                                 <input
                                     type="text"
                                     id="firstName"
+                                    name="firstName"
+                                    autocomplete="given-name"
                                     class="input"
                                     placeholder="Max"
                                 />
@@ -180,6 +180,8 @@ import Footer from "../components/Footer.astro";
                                 <input
                                     type="text"
                                     id="lastName"
+                                    name="lastName"
+                                    autocomplete="family-name"
                                     class="input"
                                     placeholder="Mustermann"
                                 />
@@ -192,6 +194,8 @@ import Footer from "../components/Footer.astro";
                             <input
                                 type="email"
                                 id="regEmail"
+                                name="email"
+                                autocomplete="email"
                                 class="input"
                                 placeholder="name@beispiel.de"
                             />
@@ -209,6 +213,8 @@ import Footer from "../components/Footer.astro";
                                 <input
                                     type="tel"
                                     id="phone"
+                                    name="phone"
+                                    autocomplete="tel"
                                     class="input"
                                     placeholder="0151 123 456 78"
                                 />
@@ -219,6 +225,8 @@ import Footer from "../components/Footer.astro";
                             <input
                                 type="password"
                                 id="regPw"
+                                name="password"
+                                autocomplete="new-password"
                                 class="input"
                                 placeholder="Mindestens 8 Zeichen"
                             />
@@ -264,33 +272,32 @@ import Footer from "../components/Footer.astro";
 
                         <label
                             class="checklist-item"
-                            style="margin-bottom:var(--space-4);"
+                            style="margin-bottom:1rem;"
                         >
                             <input
                                 type="checkbox"
                                 id="regAgb"
-                                style="width:18px;height:18px;accent-color:var(--color-primary);"
+                                style="width:18px;height:18px;accent-color:#1B65A6;"
                             />
-                            <span
-                                style="font-size:var(--text-sm); color:var(--color-text-muted);"
+                            <span class="text-body-sm text-text-secondary"
                                 >Ich akzeptiere die <a
                                     href="/agb"
-                                    style="color:var(--color-primary);">AGB</a
+                                    class="text-primary hover:underline">AGB</a
                                 > und die <a
                                     href="/datenschutz"
-                                    style="color:var(--color-primary);"
+                                    class="text-primary hover:underline"
                                     >Datenschutzerklärung</a
                                 ></span
                             >
                         </label>
 
-                        <div id="registerError" class="auth-error" style="display:none; color:#ef4444; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); padding:0.75rem 1rem; border-radius:4px; margin-bottom:1rem; font-size:0.875rem;"></div>
+                        <div id="registerError" class="auth-error" style="display:none; color:#DC2626; background:#FEE2E2; border:1px solid rgba(220,38,38,0.3); padding:0.75rem 1rem; border-radius:10px; margin-bottom:1rem; font-size:0.875rem;"></div>
 
                         <button
                             type="submit"
-                            class="btn btn-primary w-full btn-lg"
+                            class="btn-primary w-full btn-lg"
                             id="registerBtn"
-                            >Kostenlos registrieren</button
+                            ><svg class="animate-spin -ml-1 mr-2 h-4 w-4 hidden" id="registerSpinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg><span id="registerBtnText">Kostenlos registrieren</span></button
                         >
                     </form>
                 </div>
@@ -299,11 +306,11 @@ import Footer from "../components/Footer.astro";
             <!-- Right: Benefits -->
             <div class="auth-benefits-side">
                 <div class="auth-benefits-inner">
-                    <h2 class="benefits-title">Warum Ehren‑Deal?</h2>
+                    <h2 class="benefits-title">Warum Ehren-Deal?</h2>
                     <div class="benefits-list">
                         <div class="benefit-item">
                             <div class="benefit-icon">
-                                <svg class="w-5 h-5 text-primary/60" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                             </div>
                             <div>
                                 <strong>Maximaler Schutz</strong>
@@ -312,7 +319,7 @@ import Footer from "../components/Footer.astro";
                         </div>
                         <div class="benefit-item">
                             <div class="benefit-icon">
-                                <svg class="w-5 h-5 text-primary/60" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                             </div>
                             <div>
                                 <strong>Bewertungssystem</strong>
@@ -321,31 +328,35 @@ import Footer from "../components/Footer.astro";
                         </div>
                         <div class="benefit-item">
                             <div class="benefit-icon">
-                                <svg class="w-5 h-5 text-primary/60" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                             </div>
                             <div>
                                 <strong>Sicherer Chat</strong>
-                                <p>Nachrichten werden auf Betrugsmuster analysiert – mit automatischen Warnungen.</p>
+                                <p>Nachrichten werden auf Betrugsmuster analysiert -- mit automatischen Warnungen.</p>
                             </div>
                         </div>
                         <div class="benefit-item">
                             <div class="benefit-icon">
-                                <svg class="w-5 h-5 text-primary/60" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg>
                             </div>
                             <div>
                                 <strong>Kostenlos inserieren</strong>
-                                <p>Anzeigen sind kostenlos. Nur der optionale Treuhand-Service ist kostenpflichtig.</p>
+                                <p>Anzeigen erstellen ist kostenlos. Bei Verkauf: 0,50 Servicegebuehr (Käufer) + 5 % Provision (Verkäufer).</p>
                             </div>
                         </div>
                     </div>
                     <div class="stat-row">
                         <div class="auth-stat">
-                            <span class="stat-num">250k+</span>
-                            <span class="stat-label">Verifizierte Nutzer</span>
+                            <span class="stat-num stat-num--blue">100%</span>
+                            <span class="stat-label">Treuhand-Schutz</span>
                         </div>
                         <div class="auth-stat">
-                            <span class="stat-num">98,3%</span>
-                            <span class="stat-label">Sichere Deals</span>
+                            <span class="stat-num stat-num--green">KYC</span>
+                            <span class="stat-label">Identitätsprüfung</span>
+                        </div>
+                        <div class="auth-stat">
+                            <span class="stat-num stat-num--accent">0 EUR</span>
+                            <span class="stat-label">Für Anzeigen</span>
                         </div>
                     </div>
                 </div>
@@ -356,73 +367,82 @@ import Footer from "../components/Footer.astro";
 </BaseLayout>
 
 <style>
-    .auth-main { @apply min-h-[calc(100vh-70px)] flex items-center; }
+    .auth-main { @apply min-h-[calc(100vh-70px)] flex items-center bg-background; }
     .auth-container { @apply grid grid-cols-1 md:grid-cols-2 min-h-[calc(100vh-70px)] w-full; }
 
-    .auth-form-side { @apply flex items-center justify-center p-8 md:p-12; }
+    .auth-form-side { @apply flex items-center justify-center p-8 md:p-12 bg-surface; }
     .auth-inner { @apply w-full max-w-[420px]; }
 
-    .auth-logo { @apply text-xl font-headings font-light flex items-center gap-3 mb-10 text-foreground tracking-wide; }
+    .auth-logo { @apply text-xl font-semibold flex items-center gap-3 mb-10 text-text; }
 
-    .auth-tabs { @apply flex bg-foreground/[.12] p-1 mb-8; }
-    .auth-tab { @apply flex-1 py-3 px-4 text-xs font-condensed font-medium uppercase tracking-[.1em] text-foreground/75 cursor-pointer transition-all duration-300 outline-none; border: none; background: transparent; }
-    .auth-tab:hover:not(.active) { @apply text-foreground/75; }
-    .auth-tab.active { @apply bg-secondary text-foreground border border-foreground/[.20]; }
+    .auth-tabs { @apply flex bg-background p-1 mb-8 rounded-DEFAULT border border-border; }
+    .auth-tab { @apply flex-1 py-3 px-4 text-sm font-medium text-text-secondary cursor-pointer transition-all duration-300 outline-none rounded-DEFAULT; border: none; background: transparent; }
+    .auth-tab:hover:not(.active) { @apply text-text; }
+    .auth-tab.active { @apply bg-surface text-primary border border-border shadow-card; }
 
     .auth-form { @apply flex flex-col gap-5; }
     .form-group { @apply flex flex-col gap-2; }
 
     .input-icon-wrap { @apply relative flex items-center; }
-    .input-icon-wrap > svg { @apply absolute left-4 text-foreground/75 pointer-events-none; }
+    .input-icon-wrap > svg { @apply absolute left-4 text-text-muted pointer-events-none; }
     .input-with-icon { @apply pl-12; }
 
-    .pw-toggle { @apply absolute right-3 p-2 bg-transparent border-none text-foreground/80 cursor-pointer transition-colors hover:text-foreground; }
+    .pw-toggle { @apply absolute right-3 p-2 bg-transparent border-none text-text-muted cursor-pointer transition-colors hover:text-text; }
 
-    .twofa-info { @apply flex items-center gap-2 text-xs text-primary/70 bg-primary/[.04] border border-primary/10 py-2.5 px-3 mb-4 font-condensed tracking-wider uppercase; }
+    .twofa-info { @apply flex items-center gap-2 text-body-sm text-primary bg-primary-light/50 border border-primary/10 py-2.5 px-3 mb-4 rounded-DEFAULT; }
 
-    .or-divider { @apply flex items-center gap-4 my-6 text-xs text-foreground/75 font-condensed uppercase tracking-[.15em]; }
-    .or-divider::before, .or-divider::after { @apply content-[''] flex-1 h-[1px] bg-foreground/[.12]; }
+    .or-divider { @apply flex items-center gap-4 my-6 text-body-sm text-text-muted; }
+    .or-divider::before, .or-divider::after { @apply content-[''] flex-1 h-[1px] bg-border; }
 
     .phone-wrap { @apply flex gap-3; }
     .phone-prefix { @apply w-[90px] flex-shrink-0; }
 
-    .pw-strength-wrap { @apply h-1 bg-foreground/[.12] mt-2 overflow-hidden; }
-    .pw-strength-bar { @apply h-full transition-all duration-300 w-0; }
-    .pw-strength-label { @apply text-xs mt-1.5 font-condensed; }
+    .pw-strength-wrap { @apply h-1 bg-border mt-2 overflow-hidden rounded-full; }
+    .pw-strength-bar { @apply h-full transition-all duration-300 w-0 rounded-full; }
+    .pw-strength-label { @apply text-caption mt-1.5; }
 
-    .kyc-info-box { @apply bg-primary/[.03] border border-primary/10 p-5 my-3; }
-    .kyc-info-header { @apply flex items-center gap-2 text-primary/80 font-condensed font-medium text-xs tracking-[.1em] uppercase mb-3; }
-    .kyc-info-box p { @apply text-xs text-foreground/80 font-light leading-relaxed mb-4; }
+    .kyc-info-box { @apply bg-primary-light/50 border border-primary/10 p-5 my-3 rounded-DEFAULT; }
+    .kyc-info-header { @apply flex items-center gap-2 text-primary font-semibold text-body-sm mb-3; }
+    .kyc-info-box p { @apply text-body-sm text-text-secondary leading-relaxed mb-4; }
 
     .kyc-steps { @apply flex flex-wrap items-center gap-2; }
-    .kyc-step { @apply text-[10px] font-condensed uppercase tracking-wider bg-foreground/[.12] px-2.5 py-1 text-foreground/75 border border-foreground/[.22]; }
-    .kyc-arrow { @apply text-foreground/75 text-xs; }
+    .kyc-step { @apply text-caption bg-background px-3 py-1.5 text-text-secondary border border-border rounded-sm; }
+    .kyc-arrow { @apply text-text-muted text-caption; }
 
     .checklist-item { @apply flex items-start gap-3 cursor-pointer; }
 
     .hidden { display: none !important; }
     .form-row { @apply flex flex-col sm:flex-row gap-4; }
 
-    /* Benefits Side */
-    .auth-benefits-side { @apply relative hidden md:flex items-center justify-center p-12 bg-secondary/60 border-l border-foreground/[.20] overflow-hidden; }
+    /* Benefits Side — navy bg with white text */
+    .auth-benefits-side { @apply relative flex items-center justify-center p-6 md:p-12 bg-navy overflow-hidden; }
     .auth-benefits-side::before {
         content: "";
-        @apply absolute -top-1/2 -right-[30%] w-[600px] h-[600px] opacity-10 pointer-events-none;
-        background: radial-gradient(circle, var(--gold) 0%, transparent 70%);
+        @apply absolute -top-1/2 -right-[30%] w-[600px] h-[600px] opacity-[0.06] pointer-events-none;
+        background: radial-gradient(circle, #1B65A6 0%, transparent 70%);
     }
     .auth-benefits-inner { @apply w-full max-w-[420px] relative z-10; }
 
-    .benefits-title { @apply text-2xl font-headings font-light mb-10 text-foreground; }
+    .benefits-title { @apply text-h2 text-white mb-10; }
     .benefits-list { @apply flex flex-col gap-8 mb-12; }
     .benefit-item { @apply flex items-start gap-5; }
-    .benefit-icon { @apply flex-shrink-0 w-10 h-10 flex items-center justify-center border border-foreground/[.22] bg-foreground/[.12]; }
-    .benefit-item strong { @apply block font-medium text-foreground mb-1 text-sm; }
-    .benefit-item p { @apply text-xs text-foreground/80 font-light leading-relaxed; }
+    .benefit-icon { @apply flex-shrink-0 w-10 h-10 flex items-center justify-center border border-white/20 bg-white/10 text-white rounded-DEFAULT; }
+    .benefit-item strong { @apply block font-semibold text-white mb-1 text-sm; }
+    .benefit-item p { @apply text-body-sm text-white/70 leading-relaxed; }
 
-    .stat-row { @apply flex flex-wrap gap-8 p-6 border border-foreground/[.22] bg-foreground/[.12]; }
+    .stat-row { @apply flex flex-wrap gap-8 p-6 border border-white/15 bg-white/[.06] rounded-DEFAULT; }
     .auth-stat { @apply flex flex-col gap-1; }
-    .stat-num { @apply text-2xl font-headings font-light text-primary tracking-tight; }
-    .stat-label { @apply text-[10px] font-condensed uppercase tracking-[.12em] text-foreground/80; }
+    .stat-num { @apply text-2xl font-semibold tracking-tight; }
+    .stat-num--blue { @apply text-primary-light; }
+    .stat-num--green { color: #6EE7B7; }
+    .stat-num--accent { color: #FCD34D; }
+    .stat-label { @apply text-caption text-white/60; }
+
+    /* Form elements */
+    .label { @apply block text-label font-semibold text-text-secondary mb-2; }
+    .input { @apply w-full px-4 py-3 rounded-DEFAULT border border-border bg-surface text-text placeholder-text-muted focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-sm; }
+    .btn-lg { @apply py-3.5 text-sm; }
+    .w-full { width: 100%; }
 </style>
 
 <script>
@@ -506,8 +526,11 @@ import Footer from "../components/Footer.astro";
             return;
         }
 
+        const btnText = document.getElementById("loginBtnText")!;
+        const spinner = document.getElementById("loginSpinner")!;
         btn.disabled = true;
-        btn.textContent = "Wird angemeldet...";
+        btnText.textContent = "Wird angemeldet...";
+        spinner.classList.remove("hidden");
 
         try {
             const res = await fetch("/api/auth/login", {
@@ -521,7 +544,8 @@ import Footer from "../components/Footer.astro";
                 errEl.textContent = data.error || "Anmeldung fehlgeschlagen.";
                 errEl.style.display = "block";
                 btn.disabled = false;
-                btn.textContent = "Anmelden";
+                btnText.textContent = "Anmelden";
+                spinner.classList.add("hidden");
                 return;
             }
 
@@ -539,7 +563,8 @@ import Footer from "../components/Footer.astro";
             errEl.textContent = "Netzwerkfehler. Bitte erneut versuchen.";
             errEl.style.display = "block";
             btn.disabled = false;
-            btn.textContent = "Anmelden";
+            btnText.textContent = "Anmelden";
+            spinner.classList.add("hidden");
         }
     });
 
@@ -576,8 +601,11 @@ import Footer from "../components/Footer.astro";
             return;
         }
 
+        const btnText = document.getElementById("registerBtnText")!;
+        const spinner = document.getElementById("registerSpinner")!;
         btn.disabled = true;
-        btn.textContent = "Wird registriert...";
+        btnText.textContent = "Wird registriert...";
+        spinner.classList.remove("hidden");
 
         try {
             const res = await fetch("/api/auth/register", {
@@ -591,7 +619,8 @@ import Footer from "../components/Footer.astro";
                 errEl.textContent = data.error || "Registrierung fehlgeschlagen.";
                 errEl.style.display = "block";
                 btn.disabled = false;
-                btn.textContent = "Kostenlos registrieren";
+                btnText.textContent = "Kostenlos registrieren";
+                spinner.classList.add("hidden");
                 return;
             }
 
@@ -603,7 +632,8 @@ import Footer from "../components/Footer.astro";
             errEl.textContent = "Netzwerkfehler. Bitte erneut versuchen.";
             errEl.style.display = "block";
             btn.disabled = false;
-            btn.textContent = "Kostenlos registrieren";
+            btnText.textContent = "Kostenlos registrieren";
+            spinner.classList.add("hidden");
         }
     });
 </script>

@@ -35,6 +35,17 @@ const STATUS_LABEL: Record<string, string> = {
     SHIPPED: "Versendet", DELIVERED: "Geliefert", COMPLETED: "Abgeschlossen",
     CANCELLED: "Storniert", REFUNDED: "Erstattet", DISPUTED: "Strittig",
 };
+const STATUS_COLOR: Record<string, string> = {
+    PENDING: "bg-accent-light text-accent",
+    PAYMENT_PENDING: "bg-accent-light text-accent",
+    PAID: "bg-primary-light text-primary",
+    SHIPPED: "bg-primary-light text-primary",
+    DELIVERED: "bg-success-light text-success",
+    COMPLETED: "bg-success-light text-success",
+    CANCELLED: "bg-background text-text-muted",
+    REFUNDED: "bg-background text-text-muted",
+    DISPUTED: "bg-danger-light text-danger",
+};
 const fmt = (c: number) => (c / 100).toLocaleString("de-DE", { style: "currency", currency: "EUR" });
 const paymentSuccess = Astro.url.searchParams.get("payment") === "success";
 const img = deal.listing?.images?.[0]?.url;
@@ -42,30 +53,31 @@ const img = deal.listing?.images?.[0]?.url;
 
 <BaseLayout title={`Deal – ${deal.listing?.title} – Ehren-Deal`}>
     <Header />
-    <main class="min-h-screen py-10 pb-24">
+    <main class="min-h-screen py-10 pb-24 bg-background">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <a href="/dashboard/deals" class="text-xs text-foreground/50 hover:text-foreground mb-4 inline-block">&larr; Zurück zu meinen Deals</a>
+            <a href="/dashboard/deals" class="text-xs text-text-muted hover:text-text transition-colors mb-4 inline-block">&larr; Zurück zu meinen Deals</a>
 
             {paymentSuccess && (
-                <div class="bg-green-50 border border-green-200 text-green-800 rounded-lg p-4 mb-6 text-sm font-medium">
-                    ✅ Zahlung erfolgreich! Das Geld wird treuhänderisch verwahrt, bis die Ware bestätigt wird.
+                <div class="info-box flex items-center gap-2 p-4 mb-6 bg-success-light border-success/20 text-success text-sm font-medium rounded">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+                    Zahlung erfolgreich! Das Geld wird treuhänderisch verwahrt, bis die Ware bestätigt wird.
                 </div>
             )}
 
             <!-- Deal Header -->
-            <div class="bg-secondary/30 border border-foreground/10 rounded-xl p-6 mb-6">
+            <div class="card p-6 mb-6">
                 <div class="flex gap-4 items-start">
-                    {img && <img src={img} alt={deal.listing?.title} class="w-24 h-24 rounded-lg object-cover shrink-0" />}
+                    {img && <img src={img} alt={deal.listing?.title} class="w-24 h-24 rounded-lg object-cover shrink-0 border border-border" />}
                     <div class="flex-1 min-w-0">
-                        <h1 class="text-xl font-headings font-semibold mb-1">{deal.listing?.title}</h1>
+                        <h1 class="text-h3 text-text font-semibold mb-1">{deal.listing?.title}</h1>
                         <div class="flex flex-wrap gap-2 items-center mb-2">
-                            <span class="text-xs px-2 py-0.5 rounded-full bg-[var(--ehren-primary)]/10 text-[var(--ehren-primary)] font-semibold">
+                            <span class={`text-xs px-2.5 py-0.5 rounded-full font-medium ${STATUS_COLOR[deal.status] ?? "bg-background text-text-muted"}`}>
                                 {STATUS_LABEL[deal.status] ?? deal.status}
                             </span>
-                            <span class="text-xs text-foreground/50">{isBuyer ? "Du kaufst" : "Du verkaufst"}</span>
+                            <span class="text-xs text-text-muted">{isBuyer ? "Du kaufst" : "Du verkaufst"}</span>
                         </div>
-                        <div class="text-lg font-bold text-[var(--ehren-primary)]">{fmt(deal.totalAmount)}</div>
-                        <div class="text-xs text-foreground/50 mt-1">
+                        <div class="text-lg font-bold text-primary">{fmt(deal.totalAmount)}</div>
+                        <div class="text-xs text-text-muted mt-1">
                             {isBuyer ? "Verkäufer" : "Käufer"}: {otherUser.firstName} {otherUser.lastName?.[0]}.
                         </div>
                     </div>
@@ -73,30 +85,30 @@ const img = deal.listing?.images?.[0]?.url;
             </div>
 
             <!-- Actions -->
-            <div class="bg-secondary/30 border border-foreground/10 rounded-xl p-6 mb-6" id="actions-section">
-                <h2 class="text-sm font-headings font-semibold uppercase tracking-wider text-foreground/60 mb-4">Aktionen</h2>
+            <div class="card p-6 mb-6" id="actions-section">
+                <h2 class="text-label text-text-secondary mb-4">Aktionen</h2>
 
                 {/* Buyer: Pay */}
                 {isBuyer && deal.status === "PENDING" && (
-                    <a href={`/checkout/${deal.listing.id}`} class="btn btn-primary w-full text-center block mb-3">Jetzt bezahlen</a>
+                    <a href={`/checkout/${deal.listing.id}`} class="btn-primary w-full text-center block mb-3">Jetzt bezahlen</a>
                 )}
 
                 {/* Seller: Mark shipped */}
                 {isSeller && deal.status === "PAID" && (
                     <div>
-                        <button id="btn-ship" class="btn btn-primary w-full mb-2">Als versendet markieren</button>
-                        <input id="tracking-input" type="text" placeholder="Tracking-Nummer (optional)" class="w-full px-3 py-2 text-sm border border-foreground/15 rounded-lg bg-background" />
+                        <button id="btn-ship" class="btn-primary w-full mb-2">Als versendet markieren</button>
+                        <input id="tracking-input" type="text" placeholder="Tracking-Nummer (optional)" class="input-field w-full" />
                     </div>
                 )}
 
                 {/* Buyer: Confirm delivery */}
                 {isBuyer && deal.status === "SHIPPED" && (
-                    <button id="btn-confirm" class="btn btn-primary w-full">Empfang bestätigen</button>
+                    <button id="btn-confirm" class="btn-primary w-full">Empfang bestätigen</button>
                 )}
 
                 {/* Buyer: Open dispute */}
                 {isBuyer && ["PAID", "SHIPPED", "DELIVERED"].includes(deal.status) && !deal.dispute && (
-                    <button id="btn-dispute" class="btn btn-danger w-full mt-3">Problem melden</button>
+                    <button id="btn-dispute" class="btn-danger w-full mt-3">Problem melden</button>
                 )}
 
                 {/* Handshake for local deals */}
@@ -107,11 +119,14 @@ const img = deal.listing?.images?.[0]?.url;
                 )}
 
                 {deal.status === "COMPLETED" && (
-                    <p class="text-green-600 font-semibold text-center">✅ Dieser Deal ist abgeschlossen.</p>
+                    <div class="flex items-center justify-center gap-2 text-success font-semibold">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+                        Dieser Deal ist abgeschlossen.
+                    </div>
                 )}
                 {deal.dispute && (
-                    <div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-3 mt-3 text-sm">
-                        ⚠️ Dispute offen: {deal.dispute.reason ?? "Keine Angabe"} (Status: {deal.dispute.status})
+                    <div class="bg-danger-light border border-danger/20 text-danger rounded-lg p-3 mt-3 text-sm">
+                        <strong>Dispute offen:</strong> {deal.dispute.reason ?? "Keine Angabe"} (Status: {deal.dispute.status})
                     </div>
                 )}
             </div>
@@ -154,4 +169,3 @@ const img = deal.listing?.images?.[0]?.url;
         else alert('Fehler: ' + ((await res.json().catch(function() { return {}; })).error || 'Unbekannter Fehler'));
     });
 </script>
-

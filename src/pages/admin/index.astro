@@ -40,7 +40,7 @@ function formatCents(cents: number) {
         <aside class="adm-sidebar" id="sidebar">
             <div class="sidebar-head">
                 <div class="sidebar-logo">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#c8973a" stroke-width="1.5" class="w-6 h-6"><path d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#1B65A6" stroke-width="1.5" class="w-6 h-6"><path d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"/></svg>
                     <span class="sidebar-title">Admin Panel</span>
                 </div>
                 <span class="sidebar-user">{auth.user.email}</span>
@@ -326,34 +326,34 @@ function formatCents(cents: number) {
 
 <style>
     /* ── Layout ── */
-    .adm-page { display: flex; min-height: 100vh; }
+    .adm-page { display: flex; min-height: 100vh; background: #F8FAFB; }
     .adm-sidebar {
-        width: 240px; min-height: 100vh; background: #0d0d0e; border-right: 1px solid rgba(200,151,58,.15);
+        width: 240px; min-height: 100vh; background: #FFFFFF; border-right: 1px solid #E5E7EB;
         display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 100;
         transform: translateX(0);
     }
     .adm-content { flex: 1; margin-left: 240px; padding: 1.5rem 2rem 3rem; min-height: 100vh; }
-    .sidebar-head { padding: 1.25rem 1rem .75rem; border-bottom: 1px solid rgba(200,151,58,.1); }
+    .sidebar-head { padding: 1.25rem 1rem .75rem; border-bottom: 1px solid #E5E7EB; }
     .sidebar-logo { display: flex; align-items: center; gap: .5rem; margin-bottom: .25rem; }
-    .sidebar-title { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: #c8973a; font-weight: 500; }
-    .sidebar-user { font-size: .7rem; color: #6b6b6b; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sidebar-title { font-family: 'Inter', system-ui, sans-serif; font-size: 1.1rem; color: #1B65A6; font-weight: 600; }
+    .sidebar-user { font-size: .7rem; color: #64748B; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .sidebar-nav { flex: 1; padding: .75rem .5rem; display: flex; flex-direction: column; gap: 2px; }
     .nav-item {
         display: flex; align-items: center; gap: .6rem; padding: .55rem .75rem; border-radius: 4px;
-        font-size: .82rem; color: #9a9a9a; background: transparent; border: none; cursor: pointer;
-        font-family: 'Barlow Condensed', sans-serif; text-decoration: none; width: 100%; text-align: left;
+        font-size: .82rem; color: #64748B; background: transparent; border: none; cursor: pointer;
+        font-family: 'Inter', system-ui, sans-serif; text-decoration: none; width: 100%; text-align: left;
         transition: all .15s;
     }
-    .nav-item:hover { background: rgba(200,151,58,.08); color: #e8e4de; }
-    .nav-item.active { background: rgba(200,151,58,.12); color: #c8973a; font-weight: 600; }
+    .nav-item:hover { background: rgba(27,101,166,.06); color: #1A2332; }
+    .nav-item.active { background: rgba(27,101,166,.1); color: #1B65A6; font-weight: 600; }
     .nav-icon { width: 18px; height: 18px; flex-shrink: 0; }
     .nav-badge {
-        margin-left: auto; background: #ef4444; color: #fff; font-size: .65rem; font-weight: 700;
+        margin-left: auto; background: #DC2626; color: #fff; font-size: .65rem; font-weight: 700;
         padding: 1px 6px; border-radius: 10px;
     }
-    .sidebar-footer { padding: .75rem .5rem; border-top: 1px solid rgba(200,151,58,.1); }
+    .sidebar-footer { padding: .75rem .5rem; border-top: 1px solid #E5E7EB; }
     .mobile-bar { display: none; }
-    .menu-btn { background: none; border: none; color: #e8e4de; cursor: pointer; padding: .25rem; }
+    .menu-btn { background: none; border: none; color: #1A2332; cursor: pointer; padding: .25rem; }
 
     /* ── Tabs ── */
     .tab-panel { display: none; }
@@ -361,14 +361,14 @@ function formatCents(cents: number) {
 
     /* ── Panel Header ── */
     .panel-header { margin-bottom: 1.5rem; }
-    .panel-title { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 500; color: #e8e4de; margin: 0; }
-    .panel-subtitle { font-size: .78rem; color: #6b6b6b; }
+    .panel-title { font-family: 'Inter', system-ui, sans-serif; font-size: 1.6rem; font-weight: 600; color: #1A2332; margin: 0; }
+    .panel-subtitle { font-size: .78rem; color: #64748B; }
     .panel-actions { display: flex; gap: .5rem; margin-top: .75rem; flex-wrap: wrap; }
 
     /* ── Stats Grid ── */
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
     .stat-card {
-        background: #111112; border: 1px solid rgba(200,151,58,.12); border-radius: 4px;
+        background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 4px;
         padding: 1.25rem; display: flex; align-items: center; gap: 1rem;
     }
     .stat-icon {
@@ -377,132 +377,132 @@ function formatCents(cents: number) {
     }
     .stat-icon svg { width: 22px; height: 22px; }
     .users-icon { background: rgba(99,102,241,.12); color: #818cf8; }
-    .listings-icon { background: rgba(200,151,58,.12); color: #c8973a; }
-    .deals-icon { background: rgba(82,183,136,.12); color: #52b788; }
-    .revenue-icon { background: rgba(200,151,58,.18); color: #dbb568; }
-    .stat-val { font-size: 1.5rem; font-weight: 700; color: #e8e4de; line-height: 1.1; }
-    .stat-label { font-size: .72rem; color: #6b6b6b; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif; letter-spacing: .04em; }
-    .stat-sub { font-size: .7rem; color: #555; }
+    .listings-icon { background: rgba(27,101,166,.1); color: #1B65A6; }
+    .deals-icon { background: rgba(34,160,107,.1); color: #22A06B; }
+    .revenue-icon { background: rgba(27,101,166,.1); color: #1B65A6; }
+    .stat-val { font-size: 1.5rem; font-weight: 700; color: #1A2332; line-height: 1.1; }
+    .stat-label { font-size: .72rem; color: #64748B; text-transform: uppercase; font-family: 'Inter', system-ui, sans-serif; letter-spacing: .04em; }
+    .stat-sub { font-size: .7rem; color: #94A3B8; }
 
     /* ── Metrics Row ── */
     .metrics-row { display: flex; gap: .6rem; flex-wrap: wrap; margin-bottom: 2rem; }
     .metric-pill {
         display: flex; align-items: center; gap: .4rem; padding: .4rem .8rem; border-radius: 4px;
-        font-size: .75rem; font-family: 'Barlow Condensed', sans-serif;
+        font-size: .75rem; font-family: 'Inter', system-ui, sans-serif;
     }
     .metric-num { font-weight: 700; }
-    .metric-lbl { color: #888; }
-    .metric-pill.danger { background: rgba(239,68,68,.1); color: #ef4444; border: 1px solid rgba(239,68,68,.2); }
-    .metric-pill.warning { background: rgba(234,179,8,.1); color: #eab308; border: 1px solid rgba(234,179,8,.2); }
-    .metric-pill.info { background: rgba(99,102,241,.1); color: #818cf8; border: 1px solid rgba(99,102,241,.2); }
-    .metric-pill.gold { background: rgba(200,151,58,.1); color: #c8973a; border: 1px solid rgba(200,151,58,.2); }
-    .metric-pill.neutral { background: rgba(107,107,107,.1); color: #9a9a9a; border: 1px solid rgba(107,107,107,.2); }
+    .metric-lbl { color: #64748B; }
+    .metric-pill.danger { background: rgba(220,38,38,.08); color: #DC2626; border: 1px solid rgba(220,38,38,.2); }
+    .metric-pill.warning { background: rgba(234,179,8,.08); color: #eab308; border: 1px solid rgba(234,179,8,.2); }
+    .metric-pill.info { background: rgba(99,102,241,.08); color: #818cf8; border: 1px solid rgba(99,102,241,.2); }
+    .metric-pill.gold { background: rgba(27,101,166,.08); color: #1B65A6; border: 1px solid rgba(27,101,166,.2); }
+    .metric-pill.neutral { background: rgba(100,116,139,.08); color: #64748B; border: 1px solid rgba(100,116,139,.2); }
 
     /* ── Section ── */
     .panel-section { margin-top: 1.5rem; }
-    .section-title { font-family: 'Barlow Condensed', sans-serif; font-size: .95rem; font-weight: 600; color: #c8973a; text-transform: uppercase; letter-spacing: .06em; margin-bottom: .75rem; }
+    .section-title { font-family: 'Inter', system-ui, sans-serif; font-size: .95rem; font-weight: 600; color: #1B65A6; text-transform: uppercase; letter-spacing: .06em; margin-bottom: .75rem; }
 
     /* ── Tables ── */
     .log-table-wrap { overflow-x: auto; }
     .log-table { width: 100%; border-collapse: collapse; font-size: .78rem; }
-    .log-table th { text-align: left; padding: .5rem .75rem; color: #6b6b6b; font-weight: 600; font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid rgba(200,151,58,.1); }
-    .log-table td { padding: .5rem .75rem; border-bottom: 1px solid rgba(255,255,255,.04); }
-    .cell-muted { color: #6b6b6b; }
+    .log-table th { text-align: left; padding: .5rem .75rem; color: #64748B; font-weight: 600; font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid #E5E7EB; }
+    .log-table td { padding: .5rem .75rem; border-bottom: 1px solid #F1F5F9; }
+    .cell-muted { color: #64748B; }
     .cell-nowrap { white-space: nowrap; }
     .cell-truncate { max-width: 350px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .action-code { background: rgba(200,151,58,.08); color: #c8973a; padding: 1px 6px; border-radius: 3px; font-size: .72rem; }
-    .empty-msg { color: #555; padding: 1.5rem; text-align: center; font-size: .85rem; }
-    .loading-msg { color: #6b6b6b; padding: 2rem; text-align: center; }
+    .action-code { background: rgba(27,101,166,.08); color: #1B65A6; padding: 1px 6px; border-radius: 3px; font-size: .72rem; }
+    .empty-msg { color: #94A3B8; padding: 1.5rem; text-align: center; font-size: .85rem; }
+    .loading-msg { color: #64748B; padding: 2rem; text-align: center; }
 
     /* ── Search & Filter ── */
     .search-input {
-        background: #111112; border: 1px solid rgba(200,151,58,.15); border-radius: 4px; color: #e8e4de;
-        padding: .45rem .75rem; font-size: .8rem; min-width: 240px; font-family: 'Barlow', sans-serif;
+        background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 4px; color: #1A2332;
+        padding: .45rem .75rem; font-size: .8rem; min-width: 240px; font-family: 'Inter', system-ui, sans-serif;
     }
-    .search-input:focus { outline: none; border-color: rgba(200,151,58,.4); }
-    .search-input::placeholder { color: #555; }
+    .search-input:focus { outline: none; border-color: rgba(27,101,166,.4); box-shadow: 0 0 0 2px rgba(27,101,166,.1); }
+    .search-input::placeholder { color: #94A3B8; }
     .filter-select {
-        background: #111112; border: 1px solid rgba(200,151,58,.15); border-radius: 4px; color: #e8e4de;
-        padding: .45rem .6rem; font-size: .8rem; font-family: 'Barlow', sans-serif; cursor: pointer;
+        background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 4px; color: #1A2332;
+        padding: .45rem .6rem; font-size: .8rem; font-family: 'Inter', system-ui, sans-serif; cursor: pointer;
     }
-    .filter-select:focus { outline: none; border-color: rgba(200,151,58,.4); }
+    .filter-select:focus { outline: none; border-color: rgba(27,101,166,.4); }
 
     /* ── Data Container ── */
     .data-container { min-height: 200px; }
     .data-card {
-        background: #111112; border: 1px solid rgba(255,255,255,.06); border-radius: 4px;
+        background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 4px;
         padding: .85rem 1rem; margin-bottom: .5rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
     }
-    .data-card:hover { border-color: rgba(200,151,58,.2); }
+    .data-card:hover { border-color: rgba(27,101,166,.3); }
 
     /* ── Fraud ── */
     .fraud-stats { display: flex; gap: .75rem; margin-bottom: 1.5rem; }
     .fraud-stat {
         padding: .75rem 1.25rem; border-radius: 4px; text-align: center; min-width: 100px;
     }
-    .fraud-stat.crit { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25); }
-    .fraud-stat.high { background: rgba(249,115,22,.1); border: 1px solid rgba(249,115,22,.25); }
-    .fraud-stat.med { background: rgba(234,179,8,.08); border: 1px solid rgba(234,179,8,.2); }
+    .fraud-stat.crit { background: rgba(220,38,38,.06); border: 1px solid rgba(220,38,38,.2); }
+    .fraud-stat.high { background: rgba(249,115,22,.06); border: 1px solid rgba(249,115,22,.2); }
+    .fraud-stat.med { background: rgba(234,179,8,.06); border: 1px solid rgba(234,179,8,.2); }
     .fs-num { display: block; font-size: 1.5rem; font-weight: 800; }
-    .fraud-stat.crit .fs-num { color: #ef4444; }
+    .fraud-stat.crit .fs-num { color: #DC2626; }
     .fraud-stat.high .fs-num { color: #f97316; }
     .fraud-stat.med .fs-num { color: #eab308; }
-    .fs-lbl { font-size: .65rem; color: #888; text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+    .fs-lbl { font-size: .65rem; color: #64748B; text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
 
     .fraud-card {
-        background: #111112; border: 1px solid rgba(255,255,255,.06); border-radius: 4px;
+        background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 4px;
         padding: 1rem 1.25rem; margin-bottom: .6rem;
     }
     .fc-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem; margin-bottom: .6rem; }
     .fc-user { display: flex; align-items: center; gap: .5rem; }
-    .fc-name { font-weight: 600; font-size: .85rem; color: #e8e4de; }
-    .fc-email { font-size: .72rem; color: #6b6b6b; }
+    .fc-name { font-weight: 600; font-size: .85rem; color: #1A2332; }
+    .fc-email { font-size: .72rem; color: #64748B; }
     .fc-badges { display: flex; gap: .3rem; }
     .badge-sm {
         font-size: .6rem; padding: 2px 6px; border-radius: 3px; font-weight: 700;
         text-transform: uppercase; letter-spacing: .04em;
     }
-    .badge-sm.danger { background: rgba(239,68,68,.15); color: #ef4444; }
-    .badge-sm.warning { background: rgba(234,179,8,.15); color: #eab308; }
-    .badge-sm.gold { background: rgba(200,151,58,.12); color: #c8973a; }
+    .badge-sm.danger { background: rgba(220,38,38,.1); color: #DC2626; }
+    .badge-sm.warning { background: rgba(234,179,8,.1); color: #eab308; }
+    .badge-sm.gold { background: rgba(27,101,166,.1); color: #1B65A6; }
     .fc-signals { display: flex; flex-direction: column; gap: .3rem; margin-bottom: .6rem; }
     .signal-row {
         display: flex; align-items: center; gap: .6rem; padding: .35rem .65rem;
-        background: rgba(255,255,255,.02); border-radius: 4px; flex-wrap: wrap;
+        background: #F8FAFB; border-radius: 4px; flex-wrap: wrap;
     }
-    .sig-type { font-weight: 700; font-size: .72rem; color: #e8e4de; }
+    .sig-type { font-weight: 700; font-size: .72rem; color: #1A2332; }
     .sig-sev { font-size: .7rem; font-weight: 700; }
-    .sig-meta { font-size: .62rem; color: #555; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sig-meta { font-size: .62rem; color: #94A3B8; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .fc-actions { display: flex; gap: .4rem; flex-wrap: wrap; }
 
     /* ── Action Buttons ── */
     .action-btn {
         padding: .3rem .65rem; border-radius: 4px; font-size: .72rem; font-weight: 600; cursor: pointer;
-        border: 1px solid transparent; font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase;
+        border: 1px solid transparent; font-family: 'Inter', system-ui, sans-serif; text-transform: uppercase;
         letter-spacing: .04em; transition: all .15s;
     }
-    .action-btn.danger { background: rgba(239,68,68,.12); color: #ef4444; border-color: rgba(239,68,68,.25); }
-    .action-btn.danger:hover { background: #ef4444; color: #fff; }
-    .action-btn.warning { background: rgba(234,179,8,.12); color: #eab308; border-color: rgba(234,179,8,.25); }
+    .action-btn.danger { background: rgba(220,38,38,.08); color: #DC2626; border-color: rgba(220,38,38,.2); }
+    .action-btn.danger:hover { background: #DC2626; color: #fff; }
+    .action-btn.warning { background: rgba(234,179,8,.08); color: #eab308; border-color: rgba(234,179,8,.2); }
     .action-btn.warning:hover { background: #eab308; color: #000; }
-    .action-btn.gold { background: rgba(200,151,58,.12); color: #c8973a; border-color: rgba(200,151,58,.25); }
-    .action-btn.gold:hover { background: #c8973a; color: #0a0a0b; }
-    .action-btn.ghost { background: transparent; color: #6b6b6b; border-color: rgba(255,255,255,.08); }
-    .action-btn.ghost:hover { color: #e8e4de; border-color: rgba(255,255,255,.15); }
-    .action-btn.outline { background: transparent; color: #9a9a9a; border-color: rgba(255,255,255,.12); }
-    .action-btn.outline:hover { color: #e8e4de; border-color: rgba(255,255,255,.25); }
+    .action-btn.gold { background: rgba(27,101,166,.08); color: #1B65A6; border-color: rgba(27,101,166,.2); }
+    .action-btn.gold:hover { background: #1B65A6; color: #fff; }
+    .action-btn.ghost { background: transparent; color: #64748B; border-color: #E5E7EB; }
+    .action-btn.ghost:hover { color: #1A2332; border-color: #CBD5E1; }
+    .action-btn.outline { background: transparent; color: #64748B; border-color: #E5E7EB; }
+    .action-btn.outline:hover { color: #1A2332; border-color: #CBD5E1; }
 
     /* ── Pagination ── */
     .pagination-bar { display: flex; align-items: center; gap: .4rem; margin-top: 1rem; justify-content: center; }
     .page-btn {
         padding: .3rem .6rem; border-radius: 4px; font-size: .75rem; cursor: pointer;
-        background: #111112; border: 1px solid rgba(255,255,255,.08); color: #9a9a9a;
-        font-family: 'Barlow Condensed', sans-serif;
+        background: #FFFFFF; border: 1px solid #E5E7EB; color: #64748B;
+        font-family: 'Inter', system-ui, sans-serif;
     }
-    .page-btn:hover { border-color: rgba(200,151,58,.3); color: #c8973a; }
-    .page-btn.active { background: rgba(200,151,58,.15); color: #c8973a; border-color: rgba(200,151,58,.3); }
+    .page-btn:hover { border-color: rgba(27,101,166,.3); color: #1B65A6; }
+    .page-btn.active { background: rgba(27,101,166,.08); color: #1B65A6; border-color: rgba(27,101,166,.3); }
     .page-btn:disabled { opacity: .3; cursor: default; }
-    .page-info { font-size: .72rem; color: #6b6b6b; margin: 0 .5rem; }
+    .page-info { font-size: .72rem; color: #64748B; margin: 0 .5rem; }
 
     /* ── Responsive ── */
     @media (max-width: 768px) {
@@ -511,9 +511,9 @@ function formatCents(cents: number) {
         .adm-content { margin-left: 0; padding: 1rem; }
         .mobile-bar {
             display: flex; align-items: center; gap: .75rem; padding: .5rem 0; margin-bottom: 1rem;
-            border-bottom: 1px solid rgba(200,151,58,.1);
+            border-bottom: 1px solid #E5E7EB;
         }
-        .mobile-title { font-family: 'Cormorant Garamond', serif; color: #c8973a; font-size: 1.1rem; }
+        .mobile-title { font-family: 'Inter', system-ui, sans-serif; color: #1B65A6; font-size: 1.1rem; }
         .stats-grid { grid-template-columns: 1fr 1fr; }
         .search-input { min-width: 100%; }
     }
@@ -567,13 +567,13 @@ function formatCents(cents: number) {
             container.innerHTML = data.users.map((u: any) => `
                 <div class="data-card">
                     <div style="flex:1;min-width:200px">
-                        <div style="font-weight:600;font-size:.85rem;color:#e8e4de">${esc(u.firstName || '')} ${esc(u.lastName || '')}</div>
-                        <div style="font-size:.72rem;color:#6b6b6b">${esc(u.email)} &middot; ${fmtDate(u.createdAt)}</div>
+                        <div style="font-weight:600;font-size:.85rem;color:#1A2332">${esc(u.firstName || '')} ${esc(u.lastName || '')}</div>
+                        <div style="font-size:.72rem;color:#64748B">${esc(u.email)} &middot; ${fmtDate(u.createdAt)}</div>
                     </div>
                     <div style="display:flex;gap:.3rem;flex-wrap:wrap;align-items:center">
                         ${u.role === 'ADMIN' ? '<span class="badge-sm gold">ADMIN</span>' : ''}
                         ${u.bannedAt ? '<span class="badge-sm danger">GESPERRT</span>' : ''}
-                        ${u.emailVerified ? '<span class="badge-sm" style="background:rgba(82,183,136,.12);color:#52b788">VERIFIZIERT</span>' : '<span class="badge-sm" style="background:rgba(107,107,107,.12);color:#6b6b6b">UNVERIFIZIERT</span>'}
+                        ${u.emailVerified ? '<span class="badge-sm" style="background:rgba(34,160,107,.1);color:#22A06B">VERIFIZIERT</span>' : '<span class="badge-sm" style="background:rgba(100,116,139,.1);color:#64748B">UNVERIFIZIERT</span>'}
                         ${u.idVerified ? '<span class="badge-sm gold">ID ✓</span>' : ''}
                     </div>
                     <div style="display:flex;gap:.3rem">
@@ -595,14 +595,14 @@ function formatCents(cents: number) {
             const res = await fetch(`/api/admin/listings?page=${page}&limit=20&q=${encodeURIComponent(q)}&status=${f}`);
             const data = await res.json();
             if (!data.listings?.length) { container.innerHTML = '<p class="empty-msg">Keine Inserate gefunden.</p>'; return; }
-            const statusColor: Record<string,string> = { ACTIVE: '#52b788', DRAFT: '#6b6b6b', SOLD: '#c8973a', REMOVED: '#ef4444' };
+            const statusColor: Record<string,string> = { ACTIVE: '#22A06B', DRAFT: '#64748B', SOLD: '#1B65A6', REMOVED: '#DC2626' };
             container.innerHTML = data.listings.map((l: any) => `
                 <div class="data-card">
                     <div style="flex:1;min-width:200px">
-                        <div style="font-weight:600;font-size:.85rem;color:#e8e4de">${esc(l.title)}</div>
-                        <div style="font-size:.72rem;color:#6b6b6b">${esc(l.seller?.firstName || '?')} ${esc(l.seller?.lastName || '')} &middot; ${fmtDate(l.createdAt)}</div>
+                        <div style="font-weight:600;font-size:.85rem;color:#1A2332">${esc(l.title)}</div>
+                        <div style="font-size:.72rem;color:#64748B">${esc(l.seller?.firstName || '?')} ${esc(l.seller?.lastName || '')} &middot; ${fmtDate(l.createdAt)}</div>
                     </div>
-                    <div style="font-weight:700;color:#c8973a;font-size:.9rem">${fmtCents(l.price)}</div>
+                    <div style="font-weight:700;color:#1B65A6;font-size:.9rem">${fmtCents(l.price)}</div>
                     <span class="badge-sm" style="background:${statusColor[l.status] || '#555'}22;color:${statusColor[l.status] || '#555'}">${l.status}</span>
                 </div>
             `).join('');
@@ -619,14 +619,14 @@ function formatCents(cents: number) {
             const res = await fetch(`/api/admin/deals?page=${page}&limit=20&status=${f}`);
             const data = await res.json();
             if (!data.deals?.length) { container.innerHTML = '<p class="empty-msg">Keine Deals gefunden.</p>'; return; }
-            const stColor: Record<string,string> = { PENDING: '#eab308', PAID: '#818cf8', COMPLETED: '#52b788', DISPUTED: '#ef4444', CANCELLED: '#6b6b6b' };
+            const stColor: Record<string,string> = { PENDING: '#eab308', PAID: '#818cf8', COMPLETED: '#22A06B', DISPUTED: '#DC2626', CANCELLED: '#64748B' };
             container.innerHTML = data.deals.map((d: any) => `
                 <div class="data-card">
                     <div style="flex:1;min-width:180px">
-                        <div style="font-weight:600;font-size:.82rem;color:#e8e4de">${esc(d.listing?.title || 'Deal #' + d.id.slice(0,8))}</div>
-                        <div style="font-size:.7rem;color:#6b6b6b">Käufer: ${esc(d.buyer?.firstName || '?')} &middot; ${fmtDate(d.createdAt)}</div>
+                        <div style="font-weight:600;font-size:.82rem;color:#1A2332">${esc(d.listing?.title || 'Deal #' + d.id.slice(0,8))}</div>
+                        <div style="font-size:.7rem;color:#64748B">Käufer: ${esc(d.buyer?.firstName || '?')} &middot; ${fmtDate(d.createdAt)}</div>
                     </div>
-                    <div style="font-weight:700;color:#c8973a;font-size:.9rem">${fmtCents(d.totalAmount)}</div>
+                    <div style="font-weight:700;color:#1B65A6;font-size:.9rem">${fmtCents(d.totalAmount)}</div>
                     <span class="badge-sm" style="background:${stColor[d.status] || '#555'}22;color:${stColor[d.status] || '#555'}">${d.status}</span>
                 </div>
             `).join('');

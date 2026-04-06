@@ -1,0 +1,86 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import ServiceHero from '../../components/leistungstausch/ServiceHero.astro';
+import ServiceCategoryBar from '../../components/leistungstausch/ServiceCategoryBar.astro';
+import ServiceFilters from '../../components/leistungstausch/ServiceFilters.astro';
+import ServiceCard from '../../components/leistungstausch/ServiceCard.astro';
+
+const currentParams: Record<string, string> = {};
+for (const [k, v] of Astro.url.searchParams) {
+  if (['query', 'offeredCategory', 'soughtCategory', 'city', 'locationType', 'effort', 'sortBy', 'page'].includes(k)) {
+    currentParams[k] = v;
+  }
+}
+
+const internalOrigin = import.meta.env.PROD ? `http://localhost:${import.meta.env.PORT || 3000}` : Astro.url.origin;
+const url = new URL('/api/leistungstausch/listings', internalOrigin);
+url.searchParams.set('pageSize', '21');
+for (const [k, v] of Object.entries(currentParams)) {
+  if (v) url.searchParams.set(k, v);
+}
+
+const res = await fetch(url.toString());
+const data = res.ok
+  ? await res.json()
+  : { listings: [], pagination: { total: 0, totalPages: 1, page: 1 } };
+const { listings, pagination } = data;
+const currentPage = pagination?.page ?? 1;
+const totalPages = pagination?.totalPages ?? 1;
+---
+
+<BaseLayout
+  title="Leistungstausch — Dienstleistung gegen Dienstleistung | Ehren-Deal"
+  description="Tausche deine Fähigkeiten: Biete eine Dienstleistung an und erhalte eine zurück. Ohne Geld, ohne Waren. Nur auf Ehren-Deal."
+>
+  <Header />
+  <main id="main-content" class="min-h-screen">
+    <ServiceHero currentQuery={currentParams.query} />
+    <ServiceCategoryBar activeSlug={currentParams.offeredCategory} />
+    <ServiceFilters currentParams={currentParams} />
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+      <div class="lt-info-banner flex items-center gap-2">
+        <svg class="w-4 h-4 text-teal-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+        <span>Leistungstausch — Dienstleistung gegen Dienstleistung. Ohne Geld, ohne Waren.</span>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {listings.length > 0 ? (
+        <>
+          <p class="text-sm text-text-secondary mb-6">
+            {pagination.total} {pagination.total === 1 ? 'Angebot' : 'Angebote'} gefunden
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {listings.map((listing: any) => (
+              <ServiceCard listing={listing} />
+            ))}
+          </div>
+          {totalPages > 1 && (
+            <nav class="flex justify-center gap-2 mt-10" aria-label="Seitennavigation">
+              {currentPage > 1 && (
+                <a href={`/leistungstausch?${new URLSearchParams({ ...currentParams, page: String(currentPage - 1) })}`} class="btn-teal-outline py-2 px-4 text-sm">Zurück</a>
+              )}
+              <span class="flex items-center px-4 text-sm text-text-secondary">Seite {currentPage} von {totalPages}</span>
+              {currentPage < totalPages && (
+                <a href={`/leistungstausch?${new URLSearchParams({ ...currentParams, page: String(currentPage + 1) })}`} class="btn-teal-outline py-2 px-4 text-sm">Weiter</a>
+              )}
+            </nav>
+          )}
+        </>
+      ) : (
+        <div class="text-center py-20">
+          <div class="w-16 h-16 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+          </div>
+          <h2 class="text-xl font-semibold text-text mb-2">Noch keine Angebote</h2>
+          <p class="text-text-secondary mb-6">Sei der Erste und erstelle ein Leistungstausch-Angebot!</p>
+          <a href="/leistungstausch/erstellen" class="btn-teal">Angebot erstellen</a>
+        </div>
+      )}
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
