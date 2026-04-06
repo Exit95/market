@@ -28,6 +28,19 @@ if (sessionId) {
   } catch {}
 }
 
+let matches: any[] = [];
+if (isOwner) {
+  try {
+    const matchRes = await fetch(`${internalOrigin}/api/leistungstausch/matches?listingId=${id}`, {
+      headers: { Cookie: `${lucia.sessionCookieName}=${sessionId}` },
+    });
+    if (matchRes.ok) {
+      const matchData = await matchRes.json();
+      matches = matchData.matches ?? [];
+    }
+  } catch {}
+}
+
 const catRes = await fetch(`${internalOrigin}/api/leistungstausch/categories`);
 const { categories: allCategories } = catRes.ok ? await catRes.json() : { categories: [] };
 
@@ -68,6 +81,39 @@ const pageDesc = listing.offeredDescription.slice(0, 160);
               isOwner={isOwner}
             />
           </div>
+
+          {/* Matches Section (only for owner) */}
+          {isOwner && matches.length > 0 && (
+            <div class="bg-surface border border-teal-200 rounded-DEFAULT p-6 sm:p-8 mt-6">
+              <div class="flex items-center gap-2 mb-4">
+                <span class="w-8 h-8 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+                </span>
+                <h3 class="text-lg font-semibold text-text">Passende Angebote ({matches.length})</h3>
+              </div>
+              <p class="text-sm text-text-secondary mb-4">Diese Nutzer bieten an was du suchst — und suchen was du anbietest!</p>
+              <div class="space-y-3">
+                {matches.map((match: any) => {
+                  const matchName = [match.user.firstName, match.user.lastName].filter(Boolean).join(' ') || 'Nutzer';
+                  const matchInitial = (match.user.firstName?.[0] || 'N').toUpperCase();
+                  return (
+                    <a href={`/leistungstausch/angebot/${match.id}`} class="flex items-center gap-3 p-3 rounded-DEFAULT border border-border hover:border-teal-300 hover:bg-teal-50/50 transition-colors group">
+                      <div class="w-10 h-10 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                        {matchInitial}
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-text group-hover:text-teal-700 transition-colors truncate">{match.title}</p>
+                        <p class="text-xs text-text-secondary">von {matchName} · {match.offeredCategory.name}</p>
+                      </div>
+                      <div class="flex items-center gap-1.5 flex-shrink-0">
+                        <span class="text-xs font-medium text-teal-700 bg-teal-100 px-2 py-0.5 rounded-full">{match.matchScore}%</span>
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
         <div class="lg:col-span-1">
           <div class="sticky top-20">
