@@ -3,6 +3,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/Header.astro';
 import Footer from '../../../components/Footer.astro';
 import ServiceDealStatus from '../../../components/leistungstausch/ServiceDealStatus';
+import ServiceReviewModal from '../../../components/leistungstausch/ServiceReviewModal';
 import { lucia } from '../../../lib/auth';
 
 const { id } = Astro.params;
@@ -28,6 +29,12 @@ if (!res.ok) return Astro.redirect('/leistungstausch/deals');
 
 const { deal } = await res.json();
 const listingTitle = deal.proposal?.serviceListing?.title ?? 'Deal';
+const isPartyA = deal.partyA?.id === authUserId;
+const other = isPartyA ? deal.partyB : deal.partyA;
+const otherName = [other?.firstName, other?.lastName].filter(Boolean).join(' ') || 'Partner';
+
+const hasReviewed = deal.reviews?.some((r: any) => r.reviewerId === authUserId) ?? false;
+const showReviewPrompt = deal.status === 'COMPLETED' && !hasReviewed;
 ---
 
 <BaseLayout title={`Deal: ${listingTitle} | Ehren-Deal`}>
@@ -51,7 +58,45 @@ const listingTitle = deal.proposal?.serviceListing?.title ?? 'Deal';
       <div class="bg-surface border border-border rounded-DEFAULT p-6 sm:p-8">
         <ServiceDealStatus client:load deal={deal} currentUserId={authUserId} />
       </div>
+
+      {/* Review Prompt */}
+      {showReviewPrompt && (
+        <div class="bg-teal-50 border border-teal-200 rounded-DEFAULT p-6 mt-6 text-center">
+          <h3 class="text-lg font-semibold text-text mb-2">Wie war dein Deal?</h3>
+          <p class="text-sm text-text-secondary mb-4">Bewerte deinen Leistungstausch mit {otherName}.</p>
+          <button id="openReviewBtn" class="btn-teal">Jetzt bewerten</button>
+        </div>
+      )}
+
+      {/* Dispute Button for active deals */}
+      {deal.status === 'ACTIVE' && !deal.dispute && (
+        <div class="mt-6 text-center">
+          <button id="openDisputeBtn" class="text-sm text-text-muted hover:text-danger transition-colors">
+            Problem melden
+          </button>
+        </div>
+      )}
     </div>
   </main>
   <Footer />
+
+  {/* Review Modal */}
+  {showReviewPrompt && (
+    <div id="reviewModalMount" style="display:none">
+      <ServiceReviewModal
+        client:load
+        dealId={deal.id}
+        otherName={otherName}
+        onClose={() => {}}
+      />
+    </div>
+  )}
+
+  <script>
+    const reviewBtn = document.getElementById('openReviewBtn');
+    const reviewMount = document.getElementById('reviewModalMount');
+    if (reviewBtn && reviewMount) {
+      reviewBtn.addEventListener('click', () => reviewMount.style.display = 'block');
+    }
+  </script>
 </BaseLayout>

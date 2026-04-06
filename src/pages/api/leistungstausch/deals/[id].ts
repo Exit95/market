@@ -31,6 +31,8 @@ export const GET: APIRoute = async ({ params, request, cookies }) => {
         },
         partyA: { select: { id: true, firstName: true, lastName: true, avatarUrl: true, emailVerified: true, phoneVerified: true } },
         partyB: { select: { id: true, firstName: true, lastName: true, avatarUrl: true, emailVerified: true, phoneVerified: true } },
+        reviews: { select: { id: true, reviewerId: true, rating: true, createdAt: true } },
+        dispute: { select: { id: true, status: true, reason: true } },
       },
     });
 
