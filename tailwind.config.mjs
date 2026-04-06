@@ -42,7 +42,7 @@ export default {
         text: {
           DEFAULT: '#1A2332',
           secondary: '#64748B',
-          muted: '#94A3B8',
+          muted: '#6B7280',
         },
         border: {
           DEFAULT: '#E5E7EB',
@@ -50,6 +50,22 @@ export default {
         },
         foreground: '#1A2332',
         secondary: '#F8FAFB',
+        teal: {
+          DEFAULT: '#0D9488',
+          50: '#F0FDFA',
+          100: '#CCFBF1',
+          200: '#99F6E4',
+          300: '#5EEAD4',
+          400: '#2DD4BF',
+          500: '#14B8A6',
+          600: '#0D9488',
+          700: '#0F766E',
+          800: '#115E59',
+          900: '#134E4A',
+          light: '#CCFBF1',
+          dark: '#0F766E',
+          foreground: '#FFFFFF',
+        },
         muted: '#64748B',
         destructive: {
           DEFAULT: '#DC2626',
