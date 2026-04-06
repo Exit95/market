@@ -1,0 +1,60 @@
+---
+import { serviceCategories, effortLabels } from '../../data/service-categories';
+
+interface Props {
+  currentParams: Record<string, string>;
+}
+const { currentParams } = Astro.props;
+---
+
+<div class="bg-surface border-b border-border">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <form method="GET" action="/leistungstausch" class="flex flex-wrap items-end gap-3">
+      <div class="flex flex-col gap-1">
+        <label for="filter-offered" class="text-label text-text-secondary uppercase">Bietet an</label>
+        <select id="filter-offered" name="offeredCategory" class="select-field text-sm py-2 min-w-[160px]">
+          <option value="">Alle Kategorien</option>
+          {serviceCategories.map(c => (
+            <option value={c.slug} selected={currentParams.offeredCategory === c.slug}>{c.name}</option>
+          ))}
+        </select>
+      </div>
+      <div class="flex flex-col gap-1">
+        <label for="filter-sought" class="text-label text-text-secondary uppercase">Sucht</label>
+        <select id="filter-sought" name="soughtCategory" class="select-field text-sm py-2 min-w-[160px]">
+          <option value="">Alle Kategorien</option>
+          {serviceCategories.map(c => (
+            <option value={c.slug} selected={currentParams.soughtCategory === c.slug}>{c.name}</option>
+          ))}
+        </select>
+      </div>
+      <div class="flex flex-col gap-1">
+        <label for="filter-city" class="text-label text-text-secondary uppercase">Ort</label>
+        <input id="filter-city" name="city" value={currentParams.city ?? ''} placeholder="Stadt oder PLZ" class="input-field text-sm py-2 w-36" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label for="filter-location" class="text-label text-text-secondary uppercase">Durchführung</label>
+        <select id="filter-location" name="locationType" class="select-field text-sm py-2">
+          <option value="">Egal</option>
+          <option value="VOR_ORT" selected={currentParams.locationType === 'VOR_ORT'}>Vor Ort</option>
+          <option value="REMOTE" selected={currentParams.locationType === 'REMOTE'}>Remote</option>
+          <option value="BEIDES" selected={currentParams.locationType === 'BEIDES'}>Beides</option>
+        </select>
+      </div>
+      <div class="flex flex-col gap-1">
+        <label for="filter-effort" class="text-label text-text-secondary uppercase">Aufwand</label>
+        <select id="filter-effort" name="effort" class="select-field text-sm py-2">
+          <option value="">Egal</option>
+          {Object.entries(effortLabels).map(([key, label]) => (
+            <option value={key} selected={currentParams.effort === key}>{label}</option>
+          ))}
+        </select>
+      </div>
+      <button type="submit" class="btn-teal py-2 px-6 text-sm">Filtern</button>
+      {Object.values(currentParams).some(v => v) && (
+        <a href="/leistungstausch" class="btn-teal-ghost py-2 px-3 text-sm">Zurücksetzen</a>
+      )}
+      {currentParams.query && <input type="hidden" name="query" value={currentParams.query} />}
+    </form>
+  </div>
+</div>
