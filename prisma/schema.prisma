@@ -161,6 +161,9 @@ model ServiceCategory {
   listingCount Int      @default(0)
   createdAt    DateTime @default(now())
 
+  offeredListings ServiceListing[]               @relation("OfferedCategory")
+  soughtListings  ServiceListingSoughtCategory[]
+
   @@index([slug])
   @@map("service_categories")
 }
@@ -215,6 +218,10 @@ model User {
   listingReports       ListingReport[]
   reviewsGiven         Review[]        @relation("ReviewsGiven")
   reviewsReceived      Review[]        @relation("ReviewsReceived")
+
+  // Leistungstausch
+  serviceListings       ServiceListing[]       @relation("UserServiceListings")
+  serviceListingReports ServiceListingReport[] @relation("UserServiceListingReports")
 
   @@index([email])
   @@index([role])
@@ -573,4 +580,87 @@ model Review {
   @@index([revieweeId])
   @@index([createdAt(sort: Desc)])
   @@map("reviews")
+}
+
+// ─── Service Listing (Leistungstausch) ───────────────────────────────────────
+
+model ServiceListing {
+  id                 String                  @id @default(cuid())
+  title              String
+  offeredDescription String                  @db.Text
+  soughtDescription  String                  @db.Text
+  effort             ServiceEffort
+  locationType       ServiceLocationType
+  city               String?
+  postalCode         String?
+  latitude           Float?
+  longitude          Float?
+  availability       String?                 @db.Text // JSON array: ["WERKTAGS","ABENDS"]
+  experienceLevel    ServiceExperienceLevel?
+  requirements       String?                 @db.Text
+  expiresAt          DateTime
+  status             ServiceListingStatus    @default(ACTIVE)
+  viewCount          Int                     @default(0)
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+
+  userId            String
+  user              User                           @relation("UserServiceListings", fields: [userId], references: [id])
+  offeredCategoryId String
+  offeredCategory   ServiceCategory                @relation("OfferedCategory", fields: [offeredCategoryId], references: [id])
+  soughtCategories  ServiceListingSoughtCategory[]
+  images            ServiceListingImage[]
+  reports           ServiceListingReport[]
+
+  @@index([userId])
+  @@index([offeredCategoryId])
+  @@index([status, createdAt])
+  @@index([latitude, longitude])
+  @@map("service_listings")
+}
+
+// ─── Service Listing ↔ Sought Category (M:N) ────────────────────────────────
+
+model ServiceListingSoughtCategory {
+  id               String          @id @default(cuid())
+  serviceListingId String
+  serviceListing   ServiceListing  @relation(fields: [serviceListingId], references: [id], onDelete: Cascade)
+  categoryId       String
+  category         ServiceCategory @relation(fields: [categoryId], references: [id])
+
+  @@unique([serviceListingId, categoryId])
+  @@index([categoryId])
+  @@map("service_listing_sought_categories")
+}
+
+// ─── Service Listing Image ───────────────────────────────────────────────────
+
+model ServiceListingImage {
+  id               String         @id @default(cuid())
+  serviceListingId String
+  serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [id], onDelete: Cascade)
+  url              String
+  position         Int            @default(0)
+  createdAt        DateTime       @default(now())
+
+  @@index([serviceListingId])
+  @@map("service_listing_images")
+}
+
+// ─── Service Listing Report ──────────────────────────────────────────────────
+
+model ServiceListingReport {
+  id               String              @id @default(cuid())
+  serviceListingId String
+  serviceListing   ServiceListing      @relation(fields: [serviceListingId], references: [id])
+  reporterId       String
+  reporter         User                @relation("UserServiceListingReports", fields: [reporterId], references: [id])
+  reason           ServiceReportReason
+  description      String?             @db.Text
+  status           String              @default("OPEN")
+  createdAt        DateTime            @default(now())
+
+  @@unique([serviceListingId, reporterId])
+  @@index([serviceListingId])
+  @@map("service_listing_reports")
 }
