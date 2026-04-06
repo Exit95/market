@@ -4,7 +4,8 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { categories } from "../data/listings";
 
-const url = new URL("/api/listings", Astro.url.origin);
+const internalOrigin = import.meta.env.PROD ? `http://localhost:${import.meta.env.PORT || 3000}` : Astro.url.origin;
+const url = new URL("/api/listings", internalOrigin);
 url.searchParams.set("pageSize", "20");
 url.searchParams.set("page", "1");
 
@@ -35,7 +36,7 @@ const currentTreuhand = Astro.url.searchParams.get("treuhand") === "true";
     <main id="main-content" class="min-h-screen">
 
         <!-- Hero -->
-        <section class="bg-gradient-to-br from-navy to-[#1B3A5C] text-white py-16 sm:py-24">
+        <section class="bg-gradient-to-br from-navy to-primary-dark text-white py-16 sm:py-24">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="max-w-2xl">
                     <p class="text-sm font-semibold text-success mb-3 tracking-wide">Käuferschutz bei jedem Deal</p>
@@ -55,7 +56,7 @@ const currentTreuhand = Astro.url.searchParams.get("treuhand") === "true";
                             placeholder="Was suchst du?"
                             class="flex-grow px-4 py-3.5 rounded-DEFAULT bg-white text-text placeholder-text-muted text-base focus:outline-none focus:ring-2 focus:ring-primary/40"
                         />
-                        <button type="submit" class="bg-primary hover:bg-primary-dark text-white px-8 py-3.5 rounded-DEFAULT font-semibold transition-colors">
+                        <button type="submit" class="btn-primary px-8">
                             Suchen
                         </button>
                     </form>
@@ -65,6 +66,27 @@ const currentTreuhand = Astro.url.searchParams.get("treuhand") === "true";
                         <span>Verifizierte Nutzer</span>
                         <span>Digitaler Handschlag</span>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Leistungstausch Teaser -->
+        <section class="bg-gradient-to-r from-teal-600 to-teal-500 py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-white">NEU: Leistungstausch</h2>
+                            <p class="text-sm text-white/80">Tausche deine Fähigkeiten — ohne Geld, ohne Waren.</p>
+                        </div>
+                    </div>
+                    <a href="/leistungstausch" class="inline-flex items-center gap-2 px-6 py-2.5 bg-white text-teal-700 rounded-DEFAULT text-sm font-semibold hover:bg-teal-50 transition-colors flex-shrink-0">
+                        Jetzt entdecken
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -303,45 +325,34 @@ const currentTreuhand = Astro.url.searchParams.get("treuhand") === "true";
             </div>
         </section>
 
-        <!-- Testimonials -->
+        <!-- Warum Ehren-Deal -->
         <section class="py-16 bg-surface">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-10">
-                    <h2 class="text-h2 mb-2">Was unsere Nutzer sagen</h2>
+                    <h2 class="text-h2 mb-2">Warum Ehren-Deal?</h2>
+                    <p class="text-text-secondary text-sm">Das unterscheidet uns von anderen Marktplätzen.</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                    <div class="card p-6">
-                        <div class="text-sm text-accent mb-3">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                        <p class="text-sm text-text-secondary leading-relaxed mb-5">"Endlich eine Plattform, der man vertrauen kann. Der Treuhand-Schutz gibt mir als Käuferin ein gutes Gefühl."</p>
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-primary-light text-primary flex items-center justify-center text-sm font-bold">S</div>
-                            <div>
-                                <div class="text-sm font-semibold text-text">Sarah M.</div>
-                                <div class="text-caption text-text-secondary">Berlin</div>
-                            </div>
+                    <div class="card p-6 text-center">
+                        <div class="w-12 h-12 rounded-full bg-success-light text-success flex items-center justify-center mx-auto mb-4">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                         </div>
+                        <h3 class="text-sm font-semibold text-text mb-2">Echtes Treuhandkonto</h3>
+                        <p class="text-sm text-text-secondary leading-relaxed">Dein Geld liegt sicher auf einem Treuhandkonto. Erst nach deiner Bestätigung wird es freigegeben.</p>
                     </div>
-                    <div class="card p-6">
-                        <div class="text-sm text-accent mb-3">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                        <p class="text-sm text-text-secondary leading-relaxed mb-5">"Schnell, seriös und fair. Meine Inserate werden schnell gefunden und die Kommunikation ist top."</p>
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-primary-light text-primary flex items-center justify-center text-sm font-bold">T</div>
-                            <div>
-                                <div class="text-sm font-semibold text-text">Thomas K.</div>
-                                <div class="text-caption text-text-secondary">München</div>
-                            </div>
+                    <div class="card p-6 text-center">
+                        <div class="w-12 h-12 rounded-full bg-primary-light text-primary flex items-center justify-center mx-auto mb-4">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                         </div>
+                        <h3 class="text-sm font-semibold text-text mb-2">Verifizierte Identitäten</h3>
+                        <p class="text-sm text-text-secondary leading-relaxed">Verkäufer werden per KYC-Verfahren geprüft. Du weißt, mit wem du handelst.</p>
                     </div>
-                    <div class="card p-6">
-                        <div class="text-sm text-accent mb-3">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
-                        <p class="text-sm text-text-secondary leading-relaxed mb-5">"Die Verifizierung der Verkäufer macht den Unterschied. Hier fühle ich mich sicher beim Kauf."</p>
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-primary-light text-primary flex items-center justify-center text-sm font-bold">L</div>
-                            <div>
-                                <div class="text-sm font-semibold text-text">Lisa R.</div>
-                                <div class="text-caption text-text-secondary">Hamburg</div>
-                            </div>
+                    <div class="card p-6 text-center">
+                        <div class="w-12 h-12 rounded-full bg-accent-light text-accent flex items-center justify-center mx-auto mb-4">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                         </div>
+                        <h3 class="text-sm font-semibold text-text mb-2">Transparenter Trust-Score</h3>
+                        <p class="text-sm text-text-secondary leading-relaxed">Jeder Nutzer hat einen öffentlichen Trust-Score. Keine manipulierten Bewertungen.</p>
                     </div>
                 </div>
             </div>
@@ -395,13 +406,13 @@ const currentTreuhand = Astro.url.searchParams.get("treuhand") === "true";
         </section>
 
         <!-- Final CTA -->
-        <section class="bg-gradient-to-br from-navy to-[#1B3A5C] text-white py-16">
+        <section class="bg-gradient-to-br from-navy to-primary-dark text-white py-16">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3">Bereit für sichere Deals?</h2>
                 <p class="text-white/70 mb-8 max-w-md mx-auto">Kostenlos registrieren. Keine versteckten Gebühren.</p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="/anmelden" class="bg-primary hover:bg-primary-dark text-white px-8 py-3.5 rounded-DEFAULT font-semibold transition-colors">Jetzt registrieren</a>
-                    <a href="/sicherheit" class="border border-white/30 text-white px-8 py-3.5 rounded-DEFAULT font-semibold hover:bg-white/10 transition-colors">Mehr erfahren</a>
+                    <a href="/anmelden" class="btn-primary px-8">Jetzt registrieren</a>
+                    <a href="/sicherheit" class="btn-outline border-white/30 text-white hover:bg-white/10 px-8">Mehr erfahren</a>
                 </div>
             </div>
         </section>
