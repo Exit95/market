@@ -82,3 +82,52 @@ export async function sendCounterProposalEmail(opts: {
   `);
   return sendMail({ to: opts.to, subject: `Gegenvorschlag für "${opts.listingTitle}"`, html });
 }
+
+export async function sendDealCreatedEmail(opts: {
+  to: string;
+  otherName: string;
+  listingTitle: string;
+  dealUrl: string;
+}) {
+  const html = wrapTemplate(`
+    <h2 style="color:${NAVY};font-size:20px;margin:0 0 12px">Deal aktiv!</h2>
+    <p style="color:#64748B;font-size:14px;line-height:1.6;margin:0 0 20px">
+      Der Leistungstausch <strong>"${opts.listingTitle}"</strong> mit <strong>${opts.otherName}</strong> ist jetzt aktiv. Ihr könnt eure Leistungen erbringen.
+    </p>
+    ${ctaButton(opts.dealUrl, 'Deal ansehen')}
+    <p style="color:#94A3B8;font-size:13px;line-height:1.5">Markiere deine Leistung als erledigt, sobald du sie erbracht hast.</p>
+  `);
+  return sendMail({ to: opts.to, subject: `Deal aktiv: "${opts.listingTitle}"`, html });
+}
+
+export async function sendPartyCompletedEmail(opts: {
+  to: string;
+  otherName: string;
+  listingTitle: string;
+  dealUrl: string;
+}) {
+  const html = wrapTemplate(`
+    <h2 style="color:${NAVY};font-size:20px;margin:0 0 12px">Leistung als erledigt markiert</h2>
+    <p style="color:#64748B;font-size:14px;line-height:1.6;margin:0 0 20px">
+      <strong>${opts.otherName}</strong> hat seine Leistung im Deal <strong>"${opts.listingTitle}"</strong> als erledigt markiert.
+    </p>
+    ${ctaButton(opts.dealUrl, 'Deal ansehen')}
+    <p style="color:#94A3B8;font-size:13px;line-height:1.5">Hast du die Leistung erhalten? Markiere auch deine Seite als erledigt.</p>
+  `);
+  return sendMail({ to: opts.to, subject: `Leistung erledigt: "${opts.listingTitle}"`, html });
+}
+
+export async function sendDealCompletedEmail(opts: {
+  to: string;
+  otherName: string;
+  listingTitle: string;
+}) {
+  const html = wrapTemplate(`
+    <h2 style="color:${NAVY};font-size:20px;margin:0 0 12px">Deal abgeschlossen!</h2>
+    <p style="color:#64748B;font-size:14px;line-height:1.6;margin:0 0 20px">
+      Der Leistungstausch <strong>"${opts.listingTitle}"</strong> mit <strong>${opts.otherName}</strong> wurde erfolgreich abgeschlossen. Beide Seiten haben ihre Leistungen bestätigt.
+    </p>
+    <p style="color:#94A3B8;font-size:13px;line-height:1.5">Vielen Dank für deine Teilnahme am Leistungstausch!</p>
+  `);
+  return sendMail({ to: opts.to, subject: `Deal abgeschlossen: "${opts.listingTitle}"`, html });
+}
