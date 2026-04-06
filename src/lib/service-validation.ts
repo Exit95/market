@@ -109,3 +109,21 @@ export const ServiceDealCompleteSchema = z.object({
 export const ServiceDealCancelSchema = z.object({
   reason: z.string().max(500).optional(),
 });
+
+export const ServiceReviewCreateSchema = z.object({
+  dealId: z.string().min(1, 'Deal-ID ist erforderlich.'),
+  rating: z.number().int().min(1, 'Bewertung muss mindestens 1 sein.').max(5, 'Bewertung darf maximal 5 sein.'),
+  comment: z.string().max(2000).optional(),
+  qualityRating: z.number().int().min(1).max(5).optional(),
+  reliabilityRating: z.number().int().min(1).max(5).optional(),
+  communicationRating: z.number().int().min(1).max(5).optional(),
+});
+
+export const ServiceDisputeCreateSchema = z.object({
+  dealId: z.string().min(1, 'Deal-ID ist erforderlich.'),
+  reason: z.enum([
+    'NICHT_ERSCHIENEN', 'LEISTUNG_MANGELHAFT', 'ANDERE_LEISTUNG',
+    'KEINE_LEISTUNG', 'KOMMUNIKATION', 'SONSTIGES',
+  ], { message: 'Ungültiger Grund.' }),
+  description: z.string().min(20, 'Beschreibe das Problem mit mindestens 20 Zeichen.').max(2000),
+});
