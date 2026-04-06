@@ -261,6 +261,7 @@ model User {
   serviceReviewsGiven      ServiceReview[]        @relation("ServiceReviewsGiven")
   serviceReviewsReceived   ServiceReview[]        @relation("ServiceReviewsReceived")
   serviceDisputesOpened    ServiceDispute[]       @relation("ServiceDisputesOpened")
+  serviceProfile           ServiceProfile?        @relation("UserServiceProfile")
 
   @@index([email])
   @@index([role])
@@ -810,4 +811,20 @@ model ServiceDispute {
   updatedAt   DateTime             @updatedAt
 
   @@map("service_disputes")
+}
+
+// ─── Service Profile (Leistungstausch) ──────────────────────────────────────
+
+model ServiceProfile {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation("UserServiceProfile", fields: [userId], references: [id])
+  bio          String?  @db.Text
+  skills       String?  @db.Text // JSON array: ["Webdesign","Fotografie"]
+  availability String?  @db.Text // JSON array: ["WERKTAGS","WOCHENENDE"]
+  responseTime String? // "Antwortet meist innerhalb 2 Stunden"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("service_profiles")
 }
