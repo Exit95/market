@@ -2,71 +2,98 @@
 
 ## Projekt-Info
 - **Domain:** ehren-deal.de, www.ehren-deal.de
-- **Framework:** Astro
+- **Framework:** Astro 5 SSR (Node.js Adapter)
 - **Port:** 3000
-- **Image:** `10.1.9.0:5000/ehren-deal-de:latest`
-- **K8s:** Deployment `ehren-deal-de` in docker-compose.yml
+- **Image:** `localhost:5000/ehren-deal-de:latest`
+- **Container:** `ehren-deal-de` via docker-compose
 
 ## Architektur
-- Astro (statisch generiert)
-- Marktplatz-/Deal-Plattform
-- Keine Datenbank, kein S3 (aktuell), kein Admin-Dashboard
-- Hinweis: S3-Code vorhanden (`s3.ts` mit `S3_PUBLIC_BASE_URL`-Support), aber derzeit nicht aktiv genutzt
+- Astro 5 SSR mit Node.js-Adapter
+- React 19 für interaktive Komponenten
+- Prisma 6 ORM mit MySQL (MariaDB)
+- Marktplatz-Plattform + Leistungstausch (Dienstleistung gegen Dienstleistung)
+- Lucia Auth v3 (Session-basiert)
+- Ably für Echtzeit-Chat
+- Stripe + Mangopay (Zahlungen/Escrow)
+- Algolia (Volltextsuche)
+- S3/MinIO (Datei-Uploads)
+- Nodemailer (E-Mail)
 
 ## Persistente Daten
-- Keine
+- **MySQL/MariaDB:** Container `mariadb-ehren` auf 10.1.9.100
+- **Datenbank:** `ehren_deal`
 
 ## Secrets
-- Keine Secrets erforderlich (aktuell)
+- `DATABASE_URL` — MySQL-Verbindung
+- `SMTP_*` — Mailserver (rejectUnauthorized muss false bleiben, interner Mailserver)
+- Weitere in `.env` (Stripe, Ably, Algolia, S3, IDnow)
 
 ## Deploy
 ```bash
-# Lokal bauen und deployen
+# Automatisch bauen und deployen
 ./deploy.sh
 
 # Oder manuell:
-docker build -t 10.1.9.0:5000/ehren-deal-de:latest .
-docker push 10.1.9.0:5000/ehren-deal-de:latest
-ssh -i ~/.ssh/danapfel root@10.1.9.100 "cd /srv/docker/apps && docker compose pull/ehren-deal-de -n websites"
+tar czf /tmp/ehren-deal-src.tar.gz --exclude=node_modules --exclude=dist --exclude=.git --exclude=.env .
+scp /tmp/ehren-deal-src.tar.gz DanapfelPVE:/tmp/
+ssh DanapfelPVE "scp -i /root/.ssh/danapfel /tmp/ehren-deal-src.tar.gz root@10.1.9.100:/tmp/"
+ssh DanapfelPVE "ssh -i /root/.ssh/danapfel root@10.1.9.100 '
+    rm -rf /tmp/ehren-deal-build && mkdir -p /tmp/ehren-deal-build && cd /tmp/ehren-deal-build
+    tar xzf /tmp/ehren-deal-src.tar.gz
+    docker build -t localhost:5000/ehren-deal-de:latest .
+    docker push localhost:5000/ehren-deal-de:latest
+    rm -rf /tmp/ehren-deal-build /tmp/ehren-deal-src.tar.gz'"
+ssh DanapfelPVE "ssh -i /root/.ssh/danapfel root@10.1.9.100 '
+    cd /srv/docker/apps && docker compose pull ehren-deal-de && docker compose up -d ehren-deal-de'"
 ```
 
-## Auf den Server gelangen
+## Nach dem Deploy (DB-Migrationen)
 ```bash
-# Build muss auf der Registry-VM (10.1.9.0) erfolgen, da lokaler PC keinen Zugriff auf Registry hat
-# Option 1: deploy.sh nutzt SSH-Tunnel
-./deploy.sh
+# Schema synchronisieren (Prisma 6 explizit, da Container Prisma 7 hat)
+ssh DanapfelPVE "ssh -i /root/.ssh/danapfel root@10.1.9.100 '
+    docker exec ehren-deal-de npx prisma@6 db push --accept-data-loss'"
 
-# Option 2: Source-Code zum Server kopieren und dort bauen
-tar czf /tmp/ehren-deal-src.tar.gz --exclude=node_modules --exclude=dist --exclude=.git .
-scp /tmp/ehren-deal-src.tar.gz DanapfelPVE:/tmp/
-ssh DanapfelPVE "scp -i /root/.ssh/danapfel /tmp/ehren-deal-src.tar.gz root@10.1.9.0:/tmp/"
-ssh DanapfelPVE "ssh -i /root/.ssh/danapfel root@10.1.9.0 'mkdir -p /tmp/build && cd /tmp/build && tar xzf /tmp/ehren-deal-src.tar.gz && docker build -t 10.1.9.0:5000/ehren-deal-de:latest . && docker push 10.1.9.0:5000/ehren-deal-de:latest && rm -rf /tmp/build'"
-ssh DanapfelPVE "ssh -i /root/.ssh/danapfel root@10.1.9.100 'cd /srv/docker/apps && docker compose pull/ehren-deal-de -n websites'"
+# Kategorien seeden (bei Erstinstallation)
+ssh DanapfelPVE "ssh -i /root/.ssh/danapfel root@10.1.9.100 '
+    docker exec ehren-deal-de npx tsx prisma/seed-service-categories.ts'"
 ```
 
 ## Rollback
 ```bash
-ssh -i ~/.ssh/danapfel root@10.1.9.100 "kubectl rollout undo deployment/ehren-deal-de -n websites"
+ssh DanapfelPVE "ssh -i /root/.ssh/danapfel root@10.1.9.100 '
+    cd /srv/docker/apps && docker compose up -d ehren-deal-de'"
 ```
 
-## Logs pruefen
+## Logs prüfen
 ```bash
-ssh -i ~/.ssh/danapfel root@10.1.9.100 "kubectl logs -n websites -l app=ehren-deal-de --tail=50"
+ssh DanapfelPVE "ssh -i /root/.ssh/danapfel root@10.1.9.100 '
+    docker logs ehren-deal-de --tail=50'"
 ```
 
 ## Debugging
 ```bash
-# Pod-Status
-ssh -i ~/.ssh/danapfel root@10.1.9.100 "kubectl get pods -n websites -l app=ehren-deal-de"
+# Container-Status
+ssh DanapfelPVE "ssh -i /root/.ssh/danapfel root@10.1.9.100 '
+    docker ps -f name=ehren-deal-de'"
 
-# Shell im Pod
-ssh -i ~/.ssh/danapfel root@10.1.9.100 "kubectl exec -it -n websites deployment/ehren-deal-de -- sh"
+# Shell im Container
+ssh DanapfelPVE "ssh -i /root/.ssh/danapfel root@10.1.9.100 '
+    docker exec -it ehren-deal-de sh'"
 ```
 
 ## Infrastruktur
 - **Server:** 148.251.51.53 (Hetzner, Proxmox VE)
-- **Docker Cluster:** 3 Nodes (10.1.9.100, .101, .102)
-- **Registry:** 10.1.9.0:5000 (VM 1900)
-- **TLS:** cert-manager + Let's Encrypt (automatisch)
-- **Ingress:** Traefik (Namespace traefik)
+- **Docker-Server:** 10.1.9.100 (VM 2000 `docker-server`)
+- **Registry:** localhost:5000 (Container auf 10.1.9.100)
+- **MariaDB:** Container `mariadb-ehren` auf 10.1.9.100
+- **TLS:** Let's Encrypt (automatisch via Traefik)
+- **Reverse Proxy:** Traefik (Container auf 10.1.9.100)
 - **Monitoring:** Grafana unter grafana.danapfel-digital.de
+
+## Leistungstausch-Feature
+- **URL:** `/leistungstausch/`
+- **Akzentfarbe:** Teal (#0D9488) — visuell getrennt vom Marktplatz (Blau #1B65A6)
+- **Prisma-Modelle:** ServiceCategory, ServiceListing, ServiceProposal, ServiceDeal, ServiceReview, ServiceDispute, ServiceProfile
+- **API:** Alle Endpunkte unter `/api/leistungstausch/`
+- **Content-Filter:** Anti-Diskriminierung + Geld/Waren-Erkennung (`src/lib/service-content-filter.ts`)
+- **Spec:** `docs/superpowers/specs/2026-04-06-leistungstausch-design.md`
