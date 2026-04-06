@@ -101,3 +101,11 @@ export const ServiceProposalCreateSchema = z.object({
 export const ServiceProposalActionSchema = z.object({
   action: z.enum(['accept', 'decline', 'withdraw'], { message: 'Ungültige Aktion.' }),
 });
+
+export const ServiceDealCompleteSchema = z.object({
+  side: z.enum(['partyA', 'partyB'], { message: 'Ungültige Seite.' }),
+});
+
+export const ServiceDealCancelSchema = z.object({
+  reason: z.string().max(500).optional(),
+});
