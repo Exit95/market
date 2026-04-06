@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import ServiceCreateWizard from '../../components/leistungstausch/ServiceCreateWizard';
+import { lucia } from '../../lib/auth';
+
+const sessionId = Astro.cookies.get(lucia.sessionCookieName)?.value;
+if (!sessionId) return Astro.redirect('/anmelden?redirect=/leistungstausch/erstellen');
+
+try {
+  const { user } = await lucia.validateSession(sessionId);
+  if (!user) return Astro.redirect('/anmelden?redirect=/leistungstausch/erstellen');
+} catch {
+  return Astro.redirect('/anmelden?redirect=/leistungstausch/erstellen');
+}
+
+const internalOrigin = import.meta.env.PROD ? `http://localhost:${import.meta.env.PORT || 3000}` : Astro.url.origin;
+const catRes = await fetch(`${internalOrigin}/api/leistungstausch/categories`);
+const { categories } = catRes.ok ? await catRes.json() : { categories: [] };
+---
+
+<BaseLayout title="Angebot erstellen — Leistungstausch | Ehren-Deal">
+  <Header />
+  <main id="main-content" class="min-h-screen bg-background">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <ServiceCreateWizard client:load categories={categories} />
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
