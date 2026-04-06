@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { prisma } from '../../../../lib/auth';
 import { requireAuth, isAuthContext } from '../../../../lib/auth-middleware';
 import { ServiceProposalActionSchema } from '../../../../lib/service-validation';
-import { sendProposalAcceptedEmail } from '../../../../lib/service-notifications';
+import { sendProposalAcceptedEmail, sendDealCreatedEmail } from '../../../../lib/service-notifications';
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } });
@@ -93,6 +93,15 @@ export const PUT: APIRoute = async ({ params, request, cookies }) => {
         data: { status: 'MATCHED' },
       });
 
+      // Create ServiceDeal
+      const deal = await prisma.serviceDeal.create({
+        data: {
+          proposalId: id,
+          partyAId: proposal.receiverId,  // listing owner
+          partyBId: proposal.proposerId,   // proposer
+        },
+      });
+
       await prisma.serviceProposal.updateMany({
         where: {
           serviceListingId: proposal.serviceListingId,
@@ -103,19 +112,29 @@ export const PUT: APIRoute = async ({ params, request, cookies }) => {
       });
 
       const receiverName = [proposal.receiver.firstName, proposal.receiver.lastName].filter(Boolean).join(' ') || 'Ein Nutzer';
+      const proposerName = [proposal.proposer.firstName, proposal.proposer.lastName].filter(Boolean).join(' ') || 'Ein Nutzer';
       const siteUrl = 'https://ehren-deal.de';
+      const dealUrl = `${siteUrl}/leistungstausch/deals/${deal.id}`;
       try {
-        await sendProposalAcceptedEmail({
-          to: proposal.proposer.email,
-          otherName: receiverName,
-          listingTitle: proposal.serviceListing.title,
-          dealUrl: `${siteUrl}/leistungstausch/angebot/${proposal.serviceListingId}`,
-        });
+        await Promise.all([
+          sendProposalAcceptedEmail({
+            to: proposal.proposer.email,
+            otherName: receiverName,
+            listingTitle: proposal.serviceListing.title,
+            dealUrl,
+          }),
+          sendDealCreatedEmail({
+            to: proposal.receiver.email,
+            otherName: proposerName,
+            listingTitle: proposal.serviceListing.title,
+            dealUrl,
+          }),
+        ]);
       } catch (emailErr) {
-        console.error('[API] Accept email error (non-blocking):', emailErr);
+        console.error('[API] Deal creation email error (non-blocking):', emailErr);
       }
 
-      return json({ success: true, status: 'ACCEPTED', message: 'Vorschlag angenommen. Der Deal ist jetzt aktiv!' });
+      return json({ success: true, status: 'ACCEPTED', dealId: deal.id, message: 'Vorschlag angenommen. Der Deal ist jetzt aktiv!' });
 
     } else if (action === 'decline') {
       await prisma.serviceProposal.update({
