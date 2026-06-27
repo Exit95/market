@@ -74,7 +74,7 @@ function maskPhone(phone: string | null): string {
 
 <BaseLayout title="Mein Profil – Ehren-Deal">
     <Header />
-    <main class="min-h-screen bg-background pb-16">
+    <main id="main-content" class="min-h-screen bg-background pb-16">
         <div class="max-w-7xl mx-auto">
             <!-- Profile Header -->
             <div class="border-b border-border bg-surface">
@@ -368,7 +368,7 @@ function maskPhone(phone: string | null): string {
 function fetchWithTimeout(url: string, opts: RequestInit = {}, timeoutMs = 15000): Promise<Response> {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), timeoutMs);
-    return fetch(url, { ...opts, signal: ctrl.signal }).finally(() => clearTimeout(timer));
+    return fetch(url, { ...opts, credentials: 'same-origin', signal: ctrl.signal }).finally(() => clearTimeout(timer));
 }
 
 // Email resend

@@ -12,5 +12,36 @@
       "Bash(npx prisma:*)",
       "Bash(curl -s http://localhost:4321/profil/mock-seller-1)"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "if": "Bash(git push:*)",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Der User will git push ausfuehren. Pruefe: Wurde in dieser Session ein Build-Test durchgefuehrt? Falls nicht, empfehle vor dem Push einen Build-Test. Falls ja, erlaube den Push.",
+            "statusMessage": "Build-Check vor Push..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "git diff --stat --quiet 2>/dev/null || echo \"{\\\"systemMessage\\\": \\\"Hinweis: Es gibt noch uncommitted changes im Repo.\\\"}\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  },
+  "worktree": {
+    "symlinkDirectories": [
+      "node_modules"
+    ]
   }
 }

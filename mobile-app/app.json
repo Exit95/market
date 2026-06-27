@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "Ehren-Deal",
+    "slug": "ehren-deal",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#1A2332"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "de.ehren-deal.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#1A2332"
+      },
+      "package": "de.ehrendeal.app"
+    },
+    "web": {
+      "bundler": "metro",
+      "favicon": "../public/favicon.png"
+    },
+    "plugins": [
+      "expo-font"
+    ]
+  }
+}

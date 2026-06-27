@@ -167,7 +167,7 @@ if (sellerTrustScore >= 50) securityScore += 5;
 if (sellerTrustScore >= 80) securityScore += 5;
 securityScore = Math.min(100, securityScore);
 const securityLabel = securityScore >= 80 ? 'Niedrig' : securityScore >= 50 ? 'Mittel' : 'Hoch';
-const securityColor = securityScore >= 80 ? '#52b788' : securityScore >= 50 ? '#d4a843' : '#c45c5c';
+const securityColor = securityScore >= 80 ? '#22A06B' : securityScore >= 50 ? '#D97706' : '#DC2626';
 
 // ── Related Listings ──
 let relatedListings: any[] = [];
@@ -198,7 +198,7 @@ if (relatedListings.length < 3) {
     <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />
     <Header />
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20">
+    <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20">
 
         <!-- 1. Breadcrumb -->
         <nav class="flex items-center gap-2 text-body-sm text-text-muted mb-8 flex-wrap">

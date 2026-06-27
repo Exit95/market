@@ -51,7 +51,8 @@ const expiresDate = new Date(listing.expiresAt).toLocaleDateString('de-DE');
     </div>
     {!isOwner && (
       <div class="space-y-2">
-        <a href={`/nachrichten?to=${user.id}&context=service:${listing.id}`} class="btn-teal w-full text-center">Nachricht senden</a>
+        <button id="openProposalBtn" class="btn-teal w-full text-center cursor-pointer">Vorschlag senden</button>
+        <a href={`/nachrichten?to=${user.id}&context=service:${listing.id}`} class="btn-teal-outline w-full text-center block">Nachricht senden</a>
       </div>
     )}
   </div>

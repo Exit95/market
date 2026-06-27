@@ -1,0 +1,254 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+
+const title = "Betrug erkennen und vermeiden — So sch\u00fctzt du dich";
+const description = "Erfahre, wie du die h\u00e4ufigsten Betrugsmaschen auf Online-Marktpl\u00e4tzen erkennst: Vorkasse-Betrug, Fake-Inserate und Phishing. Mit konkreten Schutzma\u00dfnahmen.";
+const publishDate = "2026-03-22";
+const readingTime = "6 Min.";
+const siteUrl = "https://ehren-deal.de";
+
+const relatedArticles = [
+  { slug: "sicher-online-kaufen", title: "Sicher online kaufen — 10 Tipps", excerpt: "Die wichtigsten Regeln f\u00fcr sicheres Einkaufen auf gebrauchten Marktpl\u00e4tzen." },
+  { slug: "treuhand-erklaert", title: "Treuhand-Zahlung erkl\u00e4rt", excerpt: "Wie der Zahlungsschutz bei Ehren-Deal funktioniert und warum er sicherer ist." },
+  { slug: "tipps-fuer-verkaeufer", title: "Erfolgreich verkaufen", excerpt: "Bessere Fotos, faire Preise und mehr Verk\u00e4ufe — unsere besten Tipps." },
+];
+
+const tocItems = [
+  { id: "vorkasse-betrug", label: "Vorkasse-Betrug" },
+  { id: "fake-inserate", label: "Fake-Inserate" },
+  { id: "phishing", label: "Phishing-Nachrichten" },
+  { id: "dreiecksbetrug", label: "Dreiecksbetrug" },
+  { id: "ehren-deal-schutz", label: "Wie Ehren-Deal dich sch\u00fctzt" },
+  { id: "betrug-passiert", label: "Was tun bei Betrug?" },
+];
+---
+
+<BaseLayout
+  title={`${title} | Ehren-Deal Ratgeber`}
+  description={description}
+  canonicalPath="/ratgeber/betrug-erkennen"
+>
+  <Header />
+  <main id="main-content" class="min-h-screen">
+
+    <!-- Article Header -->
+    <section class="bg-gradient-to-br from-danger to-accent text-white py-14 sm:py-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="text-sm text-white/50 mb-6" aria-label="Breadcrumb">
+          <ol class="flex items-center gap-1.5 flex-wrap">
+            <li><a href="/" class="hover:text-white/80 transition-colors">Startseite</a></li>
+            <li>/</li>
+            <li><a href="/ratgeber" class="hover:text-white/80 transition-colors">Ratgeber</a></li>
+            <li>/</li>
+            <li class="text-white/80">Betrug erkennen</li>
+          </ol>
+        </nav>
+        <div class="max-w-3xl">
+          <span class="text-xs font-semibold bg-white/20 text-white px-3 py-1 rounded-full mb-4 inline-block">Sicherheit</span>
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight mb-4">
+            {title}
+          </h1>
+          <div class="flex flex-wrap items-center gap-4 text-sm text-white/60">
+            <span>Ehren-Deal Redaktion</span>
+            <span>&middot;</span>
+            <time datetime={publishDate}>
+              {new Date(publishDate).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}
+            </time>
+            <span>&middot;</span>
+            <span>{readingTime} Lesezeit</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Article Content -->
+    <section class="py-10 sm:py-14">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col lg:flex-row gap-10">
+
+          <!-- Sidebar TOC -->
+          <aside class="lg:w-72 flex-shrink-0 order-2 lg:order-1">
+            <div class="lg:sticky lg:top-8">
+              <nav class="card p-5" aria-label="Inhaltsverzeichnis">
+                <h2 class="text-sm font-semibold text-text mb-3 uppercase tracking-wide">Inhaltsverzeichnis</h2>
+                <ol class="flex flex-col gap-2">
+                  {tocItems.map((item) => (
+                    <li>
+                      <a href={`#${item.id}`} class="text-sm text-text-secondary hover:text-primary transition-colors leading-snug block">
+                        {item.label}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+
+              <!-- Share -->
+              <div class="card p-5 mt-4">
+                <h2 class="text-sm font-semibold text-text mb-3 uppercase tracking-wide">Teilen</h2>
+                <div class="flex gap-2">
+                  <a href={`https://www.facebook.com/sharer/sharer.php?u=${siteUrl}/ratgeber/betrug-erkennen`} target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary transition-colors" aria-label="Auf Facebook teilen">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                  </a>
+                  <a href={`https://twitter.com/intent/tweet?url=${siteUrl}/ratgeber/betrug-erkennen&text=${encodeURIComponent(title)}`} target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary transition-colors" aria-label="Auf X teilen">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 01-3.14 1.53A4.48 4.48 0 0012 7.5v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5 0-.28-.03-.56-.08-.83A7.72 7.72 0 0023 3z"/></svg>
+                  </a>
+                  <a href={`mailto:?subject=${encodeURIComponent(title)}&body=${siteUrl}/ratgeber/betrug-erkennen`} class="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary transition-colors" aria-label="Per E-Mail teilen">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <!-- Main Article -->
+          <article class="flex-grow order-1 lg:order-2 max-w-3xl">
+            <div class="prose-custom">
+
+              <p class="text-lg text-text-secondary leading-relaxed mb-6">
+                Betrug auf Online-Marktpl\u00e4tzen ist \u00e4rgerlich, aber vermeidbar. Wer die g\u00e4ngigen Maschen kennt, f\u00e4llt deutlich seltener darauf herein. In diesem Artikel erf\u00e4hrst du, welche Betrugsarten am h\u00e4ufigsten vorkommen und wie du dich effektiv sch\u00fctzt.
+              </p>
+
+              <h2 id="vorkasse-betrug" class="text-xl font-bold text-text mt-10 mb-3">Vorkasse-Betrug: Die h\u00e4ufigste Masche</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Der Klassiker unter den Betrugsmaschen: Du \u00fcberweist Geld direkt an den Verk\u00e4ufer, doch die Ware kommt nie an. Der Verk\u00e4ufer verschwindet, der Account wird gel\u00f6scht, und dein Geld ist weg. Besonders t\u00fcckisch: Betr\u00fcger geben sich oft als vertrauensw\u00fcrdig aus, haben ein professionell wirkendes Profil und reagieren freundlich und schnell.
+              </p>
+              <div class="bg-danger/5 border border-danger/20 rounded-lg p-4 mb-4">
+                <p class="text-sm text-text font-medium">
+                  <strong>Warnsignal:</strong> Der Verk\u00e4ufer besteht auf direkte Bank\u00fcberweisung oder will die Zahlung au\u00dferhalb der Plattform abwickeln.
+                </p>
+              </div>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                <strong class="text-text">Schutz:</strong> Nutze ausschlie\u00dflich die Treuhand-Zahlung von Ehren-Deal. So wird dein Geld erst freigegeben, wenn du die Ware erhalten und gepr\u00fcft hast. Eine direkte \u00dcberweisung an Unbekannte ist immer ein Risiko.
+              </p>
+
+              <h2 id="fake-inserate" class="text-xl font-bold text-text mt-10 mb-3">Fake-Inserate: Zu sch\u00f6n, um wahr zu sein</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Fake-Inserate locken mit unrealistisch niedrigen Preisen f\u00fcr begehrte Artikel. Die Fotos stammen oft aus dem Internet oder von anderen Inseraten. Das Ziel: Dich zur schnellen Zahlung zu bewegen, bevor du merkst, dass der Artikel gar nicht existiert.
+              </p>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                <strong class="text-text">So erkennst du Fake-Inserate:</strong>
+              </p>
+              <ul class="list-disc pl-5 text-text-secondary leading-relaxed mb-4 flex flex-col gap-1.5">
+                <li>Der Preis liegt deutlich unter dem Marktwert (z.\u00a0B. ein 800-Euro-Smartphone f\u00fcr 150 Euro).</li>
+                <li>Die Fotos wirken zu professionell oder sind offensichtlich aus dem Netz kopiert.</li>
+                <li>Die Beschreibung ist vage, enth\u00e4lt Rechtschreibfehler oder passt nicht zu den Bildern.</li>
+                <li>Der Verk\u00e4ufer hat kein oder ein sehr neues Profil ohne Bewertungen.</li>
+                <li>Es wird Dringlichkeit suggeriert: &bdquo;Nur heute zu diesem Preis!&ldquo;</li>
+              </ul>
+
+              <h2 id="phishing" class="text-xl font-bold text-text mt-10 mb-3">Phishing-Nachrichten: Datenklau per Link</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Phishing funktioniert \u00fcber gef\u00e4lschte Nachrichten, die aussehen, als k\u00e4men sie von der Plattform. Du wirst aufgefordert, auf einen Link zu klicken — etwa um eine &bdquo;Zahlung zu best\u00e4tigen&ldquo; oder dein &bdquo;Konto zu verifizieren&ldquo;. Der Link f\u00fchrt auf eine nachgebaute Website, die deine Zugangsdaten abgreift.
+              </p>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                <strong class="text-text">Schutz:</strong> Ehren-Deal fordert dich niemals per Nachricht auf, dein Passwort einzugeben oder auf einen externen Link zu klicken. Logge dich immer direkt \u00fcber ehren-deal.de ein. Pr\u00fcfe die URL in der Adresszeile, bevor du Daten eingibst. Im Zweifel kontaktiere unseren Support.
+              </p>
+
+              <h2 id="dreiecksbetrug" class="text-xl font-bold text-text mt-10 mb-3">Dreiecksbetrug: Die raffinierte Variante</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Beim Dreiecksbetrug schaltet sich ein Betr\u00fcger zwischen K\u00e4ufer und Verk\u00e4ufer. Er bietet einen Artikel an, den er selbst nicht besitzt. Kaufst du, gibt der Betr\u00fcger deine Adresse an den echten Verk\u00e4ufer weiter und zahlt dort mit gestohlenen Zahlungsdaten. Du erh\u00e4ltst zwar die Ware, doch sp\u00e4ter wird die Zahlung r\u00fcckg\u00e4ngig gemacht — und du stehst als Empf\u00e4nger da.
+              </p>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                <strong class="text-text">Schutz:</strong> Kaufe nur direkt \u00fcber die Ehren-Deal-Plattform. Unser Treuhand-System stellt sicher, dass Geld und Ware \u00fcber einen sicheren, kontrollierten Prozess den Besitzer wechseln.
+              </p>
+
+              <h2 id="ehren-deal-schutz" class="text-xl font-bold text-text mt-10 mb-3">Wie Ehren-Deal dich sch\u00fctzt</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Sicherheit ist kein Zusatzfeature, sondern das Fundament von Ehren-Deal. Folgende Ma\u00dfnahmen sch\u00fctzen dich bei jedem Deal:
+              </p>
+              <ul class="list-disc pl-5 text-text-secondary leading-relaxed mb-4 flex flex-col gap-1.5">
+                <li><strong class="text-text">Treuhand-Zahlung:</strong> Dein Geld wird auf einem gesch\u00fctzten Konto verwahrt, bis du die Ware gepr\u00fcft und den Erhalt best\u00e4tigt hast.</li>
+                <li><strong class="text-text">KYC-Verifizierung:</strong> Verk\u00e4ufer k\u00f6nnen ihre Identit\u00e4t per Ausweis verifizieren lassen. Verifizierte Profile sind mit einem Badge gekennzeichnet.</li>
+                <li><strong class="text-text">Trust-Score:</strong> Ein transparentes Bewertungssystem zeigt dir auf einen Blick, wie vertrauensw\u00fcrdig ein Nutzer ist.</li>
+                <li><strong class="text-text">Melde-Funktion:</strong> Verd\u00e4chtige Inserate oder Nutzer kannst du direkt melden. Unser Team pr\u00fcft jede Meldung.</li>
+                <li><strong class="text-text">Streitfall-L\u00f6sung:</strong> Bei Problemen vermittelt unser Support-Team zwischen K\u00e4ufer und Verk\u00e4ufer.</li>
+              </ul>
+
+              <h2 id="betrug-passiert" class="text-xl font-bold text-text mt-10 mb-3">Was tun, wenn du betrogen wurdest?</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Falls du trotz aller Vorsicht Opfer eines Betrugs geworden bist, handle schnell:
+              </p>
+              <ol class="list-decimal pl-5 text-text-secondary leading-relaxed mb-4 flex flex-col gap-2">
+                <li><strong class="text-text">Kontaktiere den Ehren-Deal Support:</strong> Wir k\u00f6nnen bei Treuhand-K\u00e4ufen die Zahlung zur\u00fcckhalten und den Fall pr\u00fcfen.</li>
+                <li><strong class="text-text">Sichere Beweise:</strong> Mache Screenshots von Nachrichten, dem Inserat und Zahlungsbelegen.</li>
+                <li><strong class="text-text">Erstatte Anzeige:</strong> Betrug ist eine Straftat. Erstatte Anzeige bei der Polizei — das geht in vielen Bundesl\u00e4ndern auch online.</li>
+                <li><strong class="text-text">Informiere deine Bank:</strong> Bei Kreditkartenzahlungen oder Lastschriften ist unter Umst\u00e4nden eine R\u00fcckbuchung m\u00f6glich.</li>
+              </ol>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Wer \u00fcber die Treuhand-Zahlung von Ehren-Deal gekauft hat, ist deutlich besser gesch\u00fctzt. Da das Geld erst nach Best\u00e4tigung freigegeben wird, ist eine R\u00fcckerstattung in den meisten F\u00e4llen problemlos m\u00f6glich.
+              </p>
+
+            </div>
+
+            <!-- Author -->
+            <div class="flex items-center gap-4 mt-10 pt-8 border-t border-border">
+              <div class="w-12 h-12 rounded-full bg-primary-light text-primary flex items-center justify-center text-lg font-bold flex-shrink-0">E</div>
+              <div>
+                <div class="font-semibold text-text">Ehren-Deal Redaktion</div>
+                <div class="text-sm text-text-secondary">Unser Redaktionsteam schreibt \u00fcber sicheres Handeln, Verbraucherschutz und alles rund um den digitalen Marktplatz.</div>
+              </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="bg-gradient-to-br from-navy to-primary-dark rounded-lg p-6 sm:p-8 mt-10 text-center">
+              <h2 class="text-xl font-bold text-white mb-2">Sicher handeln auf Ehren-Deal</h2>
+              <p class="text-white/70 mb-5 max-w-md mx-auto text-sm">Mit Treuhand-Schutz, Verifizierung und Support — damit du dich auf das Wesentliche konzentrieren kannst: gute Deals.</p>
+              <a href="/anmelden" class="btn-primary px-8">Jetzt registrieren</a>
+            </div>
+
+            <!-- Related Articles -->
+            <div class="mt-12">
+              <h2 class="text-h3 mb-6">Weitere Artikel</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {relatedArticles.map((article) => (
+                  <a href={`/ratgeber/${article.slug}`} class="card p-5 hover:border-primary transition-colors group">
+                    <h3 class="font-semibold text-text text-sm mb-2 group-hover:text-primary transition-colors">{article.title}</h3>
+                    <p class="text-caption text-text-secondary leading-relaxed">{article.excerpt}</p>
+                  </a>
+                ))}
+              </div>
+            </div>
+
+          </article>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  <Footer />
+
+  <!-- JSON-LD Article -->
+  <script is:inline type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": title,
+    "description": description,
+    "datePublished": publishDate,
+    "dateModified": publishDate,
+    "author": {
+      "@type": "Organization",
+      "name": "Ehren-Deal Redaktion",
+      "url": siteUrl
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Ehren-Deal",
+      "url": siteUrl,
+      "logo": { "@type": "ImageObject", "url": `${siteUrl}/logo.png` }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `${siteUrl}/ratgeber/betrug-erkennen`
+    },
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Startseite", "item": siteUrl },
+        { "@type": "ListItem", "position": 2, "name": "Ratgeber", "item": `${siteUrl}/ratgeber` },
+        { "@type": "ListItem", "position": 3, "name": "Betrug erkennen" }
+      ]
+    }
+  })} />
+</BaseLayout>

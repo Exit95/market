@@ -1,0 +1,220 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+---
+
+<BaseLayout title="Zahlung & Treuhand – Hilfe-Center – Ehren-Deal" description="Alles zu Zahlungsmethoden, Treuhand-Service, Gebuehren und Rueckerstattungen auf Ehren-Deal." canonicalPath="/hilfe/zahlung">
+    <Header />
+    <main id="main-content" class="min-h-screen pt-12 pb-24 bg-background">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <!-- Breadcrumb -->
+            <nav aria-label="Breadcrumb" class="mb-8">
+                <ol class="flex items-center gap-2 text-sm text-text-secondary">
+                    <li><a href="/" class="hover:text-primary transition-colors">Startseite</a></li>
+                    <li class="flex items-center gap-2">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <a href="/hilfe" class="hover:text-primary transition-colors">Hilfe-Center</a>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <span class="text-text font-medium">Zahlung & Treuhand</span>
+                    </li>
+                </ol>
+            </nav>
+
+            <!-- Header -->
+            <div class="mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold text-primary mb-3">Zahlung & Treuhand</h1>
+                <p class="text-text-secondary text-lg max-w-2xl">
+                    Erfahre alles ueber Zahlungsmethoden, den Treuhand-Service, Gebuehren und was passiert, wenn du eine Rueckerstattung benoeligst.
+                </p>
+            </div>
+
+            <!-- Fee Overview -->
+            <div class="card p-6 md:p-8 mb-10">
+                <h2 class="text-lg font-semibold text-text mb-4">Gebuehren auf einen Blick</h2>
+                <div class="grid sm:grid-cols-2 gap-6">
+                    <div class="p-4 border border-border rounded-lg">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center">
+                                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                            </div>
+                            <h3 class="text-sm font-semibold text-text">Fuer Kaeufer</h3>
+                        </div>
+                        <p class="text-2xl font-bold text-primary mb-1">0,50 Euro</p>
+                        <p class="text-sm text-text-secondary">Kaeuferschutzgebuehr pro Transaktion. Pauschale unabhaengig vom Kaufpreis.</p>
+                    </div>
+                    <div class="p-4 border border-border rounded-lg">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center">
+                                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            </div>
+                            <h3 class="text-sm font-semibold text-text">Fuer Verkaeufer</h3>
+                        </div>
+                        <p class="text-2xl font-bold text-primary mb-1">5%</p>
+                        <p class="text-sm text-text-secondary">Servicegebuehr vom Verkaufspreis. Wird automatisch bei Auszahlung abgezogen.</p>
+                    </div>
+                </div>
+                <p class="text-xs text-text-muted mt-4">Inserate erstellen ist kostenlos. Gebuehren fallen erst bei einem erfolgreichen Deal an.</p>
+            </div>
+
+            <!-- FAQ Accordion -->
+            <div class="space-y-4" id="faq-accordion">
+
+                <!-- FAQ 1 -->
+                <div class="card overflow-hidden">
+                    <button class="faq-toggle w-full flex items-center justify-between p-5 text-left" aria-expanded="false">
+                        <span class="text-sm font-semibold text-text pr-4">Welche Zahlungsmethoden gibt es?</span>
+                        <svg class="faq-chevron w-5 h-5 text-text-muted flex-shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <div class="text-sm text-text-secondary leading-relaxed space-y-3 border-t border-border pt-4">
+                            <p>Ehren-Deal bietet dir sichere Zahlungsmethoden ueber unseren Zahlungspartner Mangopay:</p>
+                            <ul class="list-disc list-inside space-y-2 pl-1">
+                                <li><strong>Bankueberweisung (SEPA):</strong> Ueberweise den Betrag direkt von deinem Bankkonto. Die Gutschrift dauert in der Regel 1-2 Werktage.</li>
+                                <li><strong>Kreditkarte / Debitkarte:</strong> Zahle sofort mit Visa oder Mastercard. Die Zahlung wird direkt verarbeitet.</li>
+                            </ul>
+                            <p>Alle Zahlungen werden ueber das sichere Treuhandkonto abgewickelt. Es finden keine direkten Zahlungen zwischen Kaeufer und Verkaeufer statt.</p>
+                            <p><strong>Wichtig:</strong> Ueberweise niemals Geld direkt an einen Verkaeufer ausserhalb der Plattform. Nur Zahlungen ueber Ehren-Deal sind durch den Treuhand-Schutz abgesichert.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 2 -->
+                <div class="card overflow-hidden">
+                    <button class="faq-toggle w-full flex items-center justify-between p-5 text-left" aria-expanded="false">
+                        <span class="text-sm font-semibold text-text pr-4">Wie funktioniert der Treuhand-Service im Detail?</span>
+                        <svg class="faq-chevron w-5 h-5 text-text-muted flex-shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <div class="text-sm text-text-secondary leading-relaxed space-y-3 border-t border-border pt-4">
+                            <p>Der Treuhand-Service ist das Sicherheitsnetz fuer jeden Deal auf Ehren-Deal. So funktioniert der Prozess im Detail:</p>
+                            <div class="space-y-4 mt-2">
+                                <div class="flex gap-3">
+                                    <div class="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <span class="text-xs font-bold text-primary">1</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-text">Deal-Vereinbarung</p>
+                                        <p>Kaeufer und Verkaeufer einigen sich auf Artikel und Preis. Der Kaeufer startet den Kaufprozess.</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3">
+                                    <div class="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <span class="text-xs font-bold text-primary">2</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-text">Sichere Zahlung</p>
+                                        <p>Der Kaufpreis (plus 0,50 Euro Kaeuferschutz) wird auf das Treuhandkonto ueberwiesen. Der Verkaeufer wird benachrichtigt.</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3">
+                                    <div class="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <span class="text-xs font-bold text-primary">3</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-text">Versand</p>
+                                        <p>Der Verkaeufer versendet die Ware und hinterlegt die Sendungsnummer. Der Kaeufer kann den Versand verfolgen.</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3">
+                                    <div class="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <span class="text-xs font-bold text-primary">4</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-text">Pruefung & Bestaetigung</p>
+                                        <p>Der Kaeufer erhaelt die Ware, prueft sie und bestaetigt den Erhalt ueber den Ehren-Handschlag.</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3">
+                                    <div class="w-6 h-6 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <svg class="w-3 h-3 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-text">Auszahlung</p>
+                                        <p>Der Verkaufspreis (abzueglich 5% Servicegebuehr) wird auf das Wallet des Verkaeufers ausgezahlt.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 3 -->
+                <div class="card overflow-hidden">
+                    <button class="faq-toggle w-full flex items-center justify-between p-5 text-left" aria-expanded="false">
+                        <span class="text-sm font-semibold text-text pr-4">Was kostet der Service?</span>
+                        <svg class="faq-chevron w-5 h-5 text-text-muted flex-shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <div class="text-sm text-text-secondary leading-relaxed space-y-3 border-t border-border pt-4">
+                            <p>Ehren-Deal ist so aufgebaut, dass du nur dann zahlst, wenn ein Deal tatsaechlich zustande kommt:</p>
+                            <ul class="list-disc list-inside space-y-2 pl-1">
+                                <li><strong>Registrierung:</strong> Kostenlos</li>
+                                <li><strong>Inserate erstellen:</strong> Kostenlos und unbegrenzt</li>
+                                <li><strong>Nachrichten senden:</strong> Kostenlos</li>
+                                <li><strong>Kaeuferschutzgebuehr:</strong> 0,50 Euro pro Transaktion (pauschal, fuer den Kaeufer)</li>
+                                <li><strong>Verkaeufergebuehr:</strong> 5% vom Verkaufspreis (wird bei Auszahlung abgezogen)</li>
+                            </ul>
+                            <p><strong>Beispielrechnung:</strong> Bei einem Artikel fuer 100 Euro zahlt der Kaeufer 100,50 Euro (inkl. Schutzgebuehr). Der Verkaeufer erhaelt 95 Euro (100 Euro minus 5% Servicegebuehr).</p>
+                            <p>Es gibt keine versteckten Kosten, keine Premium-Mitgliedschaften und keine Gebuehren fuer das Einstellen von Inseraten.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 4 -->
+                <div class="card overflow-hidden">
+                    <button class="faq-toggle w-full flex items-center justify-between p-5 text-left" aria-expanded="false">
+                        <span class="text-sm font-semibold text-text pr-4">Wie funktionieren Rueckerstattungen?</span>
+                        <svg class="faq-chevron w-5 h-5 text-text-muted flex-shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <div class="text-sm text-text-secondary leading-relaxed space-y-3 border-t border-border pt-4">
+                            <p>Der Treuhand-Schutz sichert dein Geld ab. Eine Rueckerstattung ist in folgenden Faellen moeglich:</p>
+                            <ul class="list-disc list-inside space-y-2 pl-1">
+                                <li><strong>Ware nicht erhalten:</strong> Wenn die Ware nicht beim Kaeufer ankommt, wird der volle Betrag zurueckerstattet.</li>
+                                <li><strong>Ware nicht wie beschrieben:</strong> Wenn der Artikel wesentlich von der Beschreibung im Inserat abweicht.</li>
+                                <li><strong>Verkaeufer storniert:</strong> Wenn der Verkaeufer den Deal vor dem Versand abbricht.</li>
+                            </ul>
+                            <p><strong>So beantragst du eine Rueckerstattung:</strong></p>
+                            <ol class="list-decimal list-inside space-y-2 pl-1">
+                                <li>Oeffne den betreffenden Deal in deinem <a href="/dashboard/deals" class="text-primary hover:underline">Dashboard</a>.</li>
+                                <li>Klicke auf "Problem melden" und beschreibe das Anliegen.</li>
+                                <li>Fuege Fotos oder Belege bei, falls vorhanden.</li>
+                                <li>Unser Support-Team prueft den Fall innerhalb von 24-48 Stunden.</li>
+                            </ol>
+                            <p>Bei einer genehmigten Rueckerstattung erhaeltst du den vollen Kaufpreis inklusive der Kaeuferschutzgebuehr zurueck. Die Rueckerstattung erfolgt auf dem gleichen Zahlungsweg.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Back to Hilfe-Center -->
+            <div class="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+                <a href="/hilfe" class="text-sm text-primary hover:underline flex items-center gap-2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    Zurueck zum Hilfe-Center
+                </a>
+                <a href="/kontakt" class="btn btn-outline text-sm px-5">Kontakt aufnehmen</a>
+            </div>
+
+        </div>
+    </main>
+    <Footer />
+</BaseLayout>
+
+<script>
+    document.querySelectorAll('.faq-toggle').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            btn.setAttribute('aria-expanded', String(!expanded));
+            const content = btn.nextElementSibling as HTMLElement | null;
+            const chevron = btn.querySelector('.faq-chevron') as HTMLElement | null;
+            if (content) content.classList.toggle('hidden', expanded);
+            if (chevron) chevron.style.transform = expanded ? '' : 'rotate(180deg)';
+        });
+    });
+</script>

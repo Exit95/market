@@ -1,0 +1,305 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+
+const title = "Treuhand-Zahlung erkl\u00e4rt — Warum dein Geld sicher ist";
+const description = "Erfahre Schritt f\u00fcr Schritt, wie die Treuhand-Zahlung bei Ehren-Deal funktioniert, warum sie sicherer als Direkt\u00fcberweisung ist und welche Vorteile sie bietet.";
+const publishDate = "2026-03-10";
+const readingTime = "4 Min.";
+const siteUrl = "https://ehren-deal.de";
+
+const relatedArticles = [
+  { slug: "sicher-online-kaufen", title: "Sicher online kaufen — 10 Tipps", excerpt: "Die wichtigsten Regeln f\u00fcr sicheres Einkaufen auf gebrauchten Marktpl\u00e4tzen." },
+  { slug: "betrug-erkennen", title: "Betrug erkennen und vermeiden", excerpt: "Vorkasse-Betrug, Fake-Inserate und Phishing — so erkennst du die h\u00e4ufigsten Maschen." },
+  { slug: "tipps-fuer-verkaeufer", title: "Erfolgreich verkaufen", excerpt: "Bessere Fotos, faire Preise und mehr Verk\u00e4ufe — unsere besten Tipps." },
+];
+
+const tocItems = [
+  { id: "was-ist-treuhand", label: "Was ist Treuhand?" },
+  { id: "so-funktioniert-es", label: "So funktioniert es" },
+  { id: "vergleich", label: "Treuhand vs. Direkt\u00fcberweisung" },
+  { id: "faq", label: "H\u00e4ufige Fragen" },
+];
+---
+
+<BaseLayout
+  title={`${title} | Ehren-Deal Ratgeber`}
+  description={description}
+  canonicalPath="/ratgeber/treuhand-erklaert"
+>
+  <Header />
+  <main id="main-content" class="min-h-screen">
+
+    <!-- Article Header -->
+    <section class="bg-gradient-to-br from-accent to-success text-white py-14 sm:py-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="text-sm text-white/50 mb-6" aria-label="Breadcrumb">
+          <ol class="flex items-center gap-1.5 flex-wrap">
+            <li><a href="/" class="hover:text-white/80 transition-colors">Startseite</a></li>
+            <li>/</li>
+            <li><a href="/ratgeber" class="hover:text-white/80 transition-colors">Ratgeber</a></li>
+            <li>/</li>
+            <li class="text-white/80">Treuhand erkl\u00e4rt</li>
+          </ol>
+        </nav>
+        <div class="max-w-3xl">
+          <span class="text-xs font-semibold bg-white/20 text-white px-3 py-1 rounded-full mb-4 inline-block">Neuigkeiten</span>
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight mb-4">
+            {title}
+          </h1>
+          <div class="flex flex-wrap items-center gap-4 text-sm text-white/60">
+            <span>Ehren-Deal Redaktion</span>
+            <span>&middot;</span>
+            <time datetime={publishDate}>
+              {new Date(publishDate).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}
+            </time>
+            <span>&middot;</span>
+            <span>{readingTime} Lesezeit</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Article Content -->
+    <section class="py-10 sm:py-14">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col lg:flex-row gap-10">
+
+          <!-- Sidebar TOC -->
+          <aside class="lg:w-72 flex-shrink-0 order-2 lg:order-1">
+            <div class="lg:sticky lg:top-8">
+              <nav class="card p-5" aria-label="Inhaltsverzeichnis">
+                <h2 class="text-sm font-semibold text-text mb-3 uppercase tracking-wide">Inhaltsverzeichnis</h2>
+                <ol class="flex flex-col gap-2">
+                  {tocItems.map((item) => (
+                    <li>
+                      <a href={`#${item.id}`} class="text-sm text-text-secondary hover:text-primary transition-colors leading-snug block">
+                        {item.label}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+
+              <!-- Share -->
+              <div class="card p-5 mt-4">
+                <h2 class="text-sm font-semibold text-text mb-3 uppercase tracking-wide">Teilen</h2>
+                <div class="flex gap-2">
+                  <a href={`https://www.facebook.com/sharer/sharer.php?u=${siteUrl}/ratgeber/treuhand-erklaert`} target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary transition-colors" aria-label="Auf Facebook teilen">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                  </a>
+                  <a href={`https://twitter.com/intent/tweet?url=${siteUrl}/ratgeber/treuhand-erklaert&text=${encodeURIComponent(title)}`} target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary transition-colors" aria-label="Auf X teilen">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 01-3.14 1.53A4.48 4.48 0 0012 7.5v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5 0-.28-.03-.56-.08-.83A7.72 7.72 0 0023 3z"/></svg>
+                  </a>
+                  <a href={`mailto:?subject=${encodeURIComponent(title)}&body=${siteUrl}/ratgeber/treuhand-erklaert`} class="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary transition-colors" aria-label="Per E-Mail teilen">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <!-- Main Article -->
+          <article class="flex-grow order-1 lg:order-2 max-w-3xl">
+            <div class="prose-custom">
+
+              <p class="text-lg text-text-secondary leading-relaxed mb-6">
+                Die Treuhand-Zahlung ist das Herzst\u00fcck von Ehren-Deal und der Grund, warum du hier sicherer handelst als auf anderen Marktpl\u00e4tzen. Aber wie funktioniert sie genau? Und warum ist sie so viel besser als eine direkte \u00dcberweisung? Dieser Artikel erkl\u00e4rt alles, was du wissen musst.
+              </p>
+
+              <h2 id="was-ist-treuhand" class="text-xl font-bold text-text mt-10 mb-3">Was ist eine Treuhand-Zahlung?</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Bei einer Treuhand-Zahlung (englisch: Escrow) wird ein neutraler Dritter — in diesem Fall Ehren-Deal — zwischen K\u00e4ufer und Verk\u00e4ufer geschaltet. Der K\u00e4ufer zahlt den Kaufpreis nicht direkt an den Verk\u00e4ufer, sondern auf ein gesch\u00fctztes Treuhandkonto. Das Geld wird dort sicher verwahrt und erst an den Verk\u00e4ufer freigegeben, wenn der K\u00e4ufer den Erhalt und den Zustand der Ware best\u00e4tigt.
+              </p>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Das Prinzip ist einfach: <strong class="text-text">Niemand geht ein Risiko ein.</strong> Der K\u00e4ufer wei\u00df, dass sein Geld gesch\u00fctzt ist. Der Verk\u00e4ufer wei\u00df, dass das Geld bereits eingezahlt wurde und er es erh\u00e4lt, sobald die Ware ankommt.
+              </p>
+
+              <h2 id="so-funktioniert-es" class="text-xl font-bold text-text mt-10 mb-3">So funktioniert die Treuhand-Zahlung bei Ehren-Deal</h2>
+              <p class="text-text-secondary leading-relaxed mb-6">
+                Der gesamte Prozess ist in f\u00fcnf einfache Schritte aufgeteilt:
+              </p>
+
+              <!-- Numbered Steps -->
+              <div class="flex flex-col gap-6 mb-6">
+                <div class="flex gap-4 items-start">
+                  <div class="w-10 h-10 rounded-full bg-primary-light text-primary text-lg font-bold flex items-center justify-center flex-shrink-0">1</div>
+                  <div>
+                    <h3 class="font-semibold text-text mb-1">Deal vereinbaren</h3>
+                    <p class="text-sm text-text-secondary leading-relaxed">K\u00e4ufer und Verk\u00e4ufer einigen sich \u00fcber den Ehren-Deal Chat auf den Preis und die Konditionen. Der Verk\u00e4ufer erstellt einen Deal-Vorschlag.</p>
+                  </div>
+                </div>
+
+                <div class="flex gap-4 items-start">
+                  <div class="w-10 h-10 rounded-full bg-primary-light text-primary text-lg font-bold flex items-center justify-center flex-shrink-0">2</div>
+                  <div>
+                    <h3 class="font-semibold text-text mb-1">K\u00e4ufer zahlt auf Treuhandkonto</h3>
+                    <p class="text-sm text-text-secondary leading-relaxed">Der K\u00e4ufer \u00fcberweist den Kaufpreis auf das Ehren-Deal Treuhandkonto. Das Geld wird sicher verwahrt — weder der K\u00e4ufer noch der Verk\u00e4ufer k\u00f6nnen einseitig darauf zugreifen.</p>
+                  </div>
+                </div>
+
+                <div class="flex gap-4 items-start">
+                  <div class="w-10 h-10 rounded-full bg-primary-light text-primary text-lg font-bold flex items-center justify-center flex-shrink-0">3</div>
+                  <div>
+                    <h3 class="font-semibold text-text mb-1">Verk\u00e4ufer versendet die Ware</h3>
+                    <p class="text-sm text-text-secondary leading-relaxed">Sobald die Zahlung eingegangen ist, wird der Verk\u00e4ufer benachrichtigt und versendet den Artikel. Bei pers\u00f6nlicher \u00dcbergabe wird der Austausch per QR-Code best\u00e4tigt.</p>
+                  </div>
+                </div>
+
+                <div class="flex gap-4 items-start">
+                  <div class="w-10 h-10 rounded-full bg-success-light text-success text-lg font-bold flex items-center justify-center flex-shrink-0">4</div>
+                  <div>
+                    <h3 class="font-semibold text-text mb-1">K\u00e4ufer pr\u00fcft und best\u00e4tigt</h3>
+                    <p class="text-sm text-text-secondary leading-relaxed">Der K\u00e4ufer erh\u00e4lt die Ware, pr\u00fcft sie und best\u00e4tigt den Erhalt in der App. Entspricht die Ware nicht der Beschreibung, kann der K\u00e4ufer einen Streitfall er\u00f6ffnen.</p>
+                  </div>
+                </div>
+
+                <div class="flex gap-4 items-start">
+                  <div class="w-10 h-10 rounded-full bg-success-light text-success text-lg font-bold flex items-center justify-center flex-shrink-0">5</div>
+                  <div>
+                    <h3 class="font-semibold text-text mb-1">Geld wird freigegeben</h3>
+                    <p class="text-sm text-text-secondary leading-relaxed">Nach der Best\u00e4tigung durch den K\u00e4ufer wird der Betrag automatisch an den Verk\u00e4ufer ausgezahlt. Der Deal ist abgeschlossen, beide Seiten k\u00f6nnen eine Bewertung hinterlassen.</p>
+                  </div>
+                </div>
+              </div>
+
+              <h2 id="vergleich" class="text-xl font-bold text-text mt-10 mb-3">Treuhand vs. Direkt\u00fcberweisung im Vergleich</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Die Unterschiede sind erheblich — vor allem beim Risiko:
+              </p>
+
+              <!-- Comparison Table -->
+              <div class="overflow-x-auto mb-6">
+                <table class="w-full text-sm border border-border rounded-lg overflow-hidden">
+                  <thead>
+                    <tr class="bg-surface">
+                      <th class="text-left p-3 font-semibold text-text border-b border-border"></th>
+                      <th class="text-left p-3 font-semibold text-primary border-b border-border">Treuhand-Zahlung</th>
+                      <th class="text-left p-3 font-semibold text-text-secondary border-b border-border">Direkt\u00fcberweisung</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-text-secondary">
+                    <tr class="border-b border-border">
+                      <td class="p-3 font-medium text-text">Geldschutz</td>
+                      <td class="p-3">Geld wird verwahrt, bis Ware gepr\u00fcft</td>
+                      <td class="p-3">Geld sofort beim Verk\u00e4ufer, kein R\u00fcckhol</td>
+                    </tr>
+                    <tr class="border-b border-border">
+                      <td class="p-3 font-medium text-text">R\u00fcckerstattung</td>
+                      <td class="p-3">Automatisch bei Streitfall</td>
+                      <td class="p-3">Nur mit Kulanz der Bank, oft erfolglos</td>
+                    </tr>
+                    <tr class="border-b border-border">
+                      <td class="p-3 font-medium text-text">Betrugsrisiko</td>
+                      <td class="p-3">Minimal — Ware muss ankommen</td>
+                      <td class="p-3">Hoch — keine Kontrolle nach \u00dcberweisung</td>
+                    </tr>
+                    <tr class="border-b border-border">
+                      <td class="p-3 font-medium text-text">Verk\u00e4ufer-Sicherheit</td>
+                      <td class="p-3">Geld ist bereits eingezahlt</td>
+                      <td class="p-3">Risiko von Nichtzahlung bei Nachnahme</td>
+                    </tr>
+                    <tr>
+                      <td class="p-3 font-medium text-text">Streitfall-L\u00f6sung</td>
+                      <td class="p-3">Ehren-Deal vermittelt neutral</td>
+                      <td class="p-3">Auf eigene Faust (Polizei, Anwalt)</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h2 id="faq" class="text-xl font-bold text-text mt-10 mb-3">H\u00e4ufige Fragen zur Treuhand-Zahlung</h2>
+
+              <h3 class="text-base font-semibold text-text mt-6 mb-2">Was kostet die Treuhand-Zahlung?</h3>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                F\u00fcr den K\u00e4ufer f\u00e4llt eine Servicegeb\u00fchr von 0,50 Euro pro Transaktion an. Der Verk\u00e4ufer zahlt eine Provision von 5 % auf den Verkaufspreis. Alle Geb\u00fchren werden transparent vor dem Kauf angezeigt — keine versteckten Kosten.
+              </p>
+
+              <h3 class="text-base font-semibold text-text mt-6 mb-2">Wie lange dauert es, bis der Verk\u00e4ufer sein Geld erh\u00e4lt?</h3>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Sobald der K\u00e4ufer den Erhalt best\u00e4tigt, wird die Auszahlung ausgel\u00f6st. In der Regel ist das Geld innerhalb von 1\u20132 Werktagen auf dem Konto des Verk\u00e4ufers.
+              </p>
+
+              <h3 class="text-base font-semibold text-text mt-6 mb-2">Was passiert, wenn die Ware nicht der Beschreibung entspricht?</h3>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Du kannst innerhalb der Pr\u00fcffrist einen Streitfall er\u00f6ffnen. Das Geld bleibt auf dem Treuhandkonto, w\u00e4hrend unser Support-Team den Fall pr\u00fcft und zwischen K\u00e4ufer und Verk\u00e4ufer vermittelt. Kann keine Einigung erzielt werden, entscheidet Ehren-Deal auf Basis der vorliegenden Beweise.
+              </p>
+
+              <h3 class="text-base font-semibold text-text mt-6 mb-2">Funktioniert Treuhand auch bei pers\u00f6nlicher \u00dcbergabe?</h3>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Ja. Bei pers\u00f6nlicher \u00dcbergabe best\u00e4tigen beide Parteien den Deal per QR-Code vor Ort. Der K\u00e4ufer kann den Artikel pr\u00fcfen und dann direkt in der App best\u00e4tigen. So ist auch der pers\u00f6nliche Kauf abgesichert.
+              </p>
+
+            </div>
+
+            <!-- Author -->
+            <div class="flex items-center gap-4 mt-10 pt-8 border-t border-border">
+              <div class="w-12 h-12 rounded-full bg-primary-light text-primary flex items-center justify-center text-lg font-bold flex-shrink-0">E</div>
+              <div>
+                <div class="font-semibold text-text">Ehren-Deal Redaktion</div>
+                <div class="text-sm text-text-secondary">Unser Redaktionsteam schreibt \u00fcber sicheres Handeln, Verbraucherschutz und alles rund um den digitalen Marktplatz.</div>
+              </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="bg-gradient-to-br from-navy to-primary-dark rounded-lg p-6 sm:p-8 mt-10 text-center">
+              <h2 class="text-xl font-bold text-white mb-2">Bereit f\u00fcr gesch\u00fctztes Handeln?</h2>
+              <p class="text-white/70 mb-5 max-w-md mx-auto text-sm">Registriere dich jetzt und erlebe, wie einfach sicherer Kauf und Verkauf sein kann. Mit Treuhand-Schutz bei jedem Deal.</p>
+              <a href="/anmelden" class="btn-primary px-8">Jetzt registrieren</a>
+            </div>
+
+            <!-- Related Articles -->
+            <div class="mt-12">
+              <h2 class="text-h3 mb-6">Weitere Artikel</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {relatedArticles.map((article) => (
+                  <a href={`/ratgeber/${article.slug}`} class="card p-5 hover:border-primary transition-colors group">
+                    <h3 class="font-semibold text-text text-sm mb-2 group-hover:text-primary transition-colors">{article.title}</h3>
+                    <p class="text-caption text-text-secondary leading-relaxed">{article.excerpt}</p>
+                  </a>
+                ))}
+              </div>
+            </div>
+
+          </article>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  <Footer />
+
+  <!-- JSON-LD Article -->
+  <script is:inline type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": title,
+    "description": description,
+    "datePublished": publishDate,
+    "dateModified": publishDate,
+    "author": {
+      "@type": "Organization",
+      "name": "Ehren-Deal Redaktion",
+      "url": siteUrl
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Ehren-Deal",
+      "url": siteUrl,
+      "logo": { "@type": "ImageObject", "url": `${siteUrl}/logo.png` }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `${siteUrl}/ratgeber/treuhand-erklaert`
+    },
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Startseite", "item": siteUrl },
+        { "@type": "ListItem", "position": 2, "name": "Ratgeber", "item": `${siteUrl}/ratgeber` },
+        { "@type": "ListItem", "position": 3, "name": "Treuhand erkl\u00e4rt" }
+      ]
+    }
+  })} />
+</BaseLayout>

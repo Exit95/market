@@ -6,6 +6,7 @@ import { listingDayLimit } from '../../../lib/trust-score';
 import { prisma } from '../../../lib/auth';
 import { getFallbackListings, shouldUseListingFallback } from '../../../lib/listing-fallback';
 import { analyzeListingContent } from '../../../lib/ai-fraud-scanner';
+import { checkListing } from '../../../lib/content-filter';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -154,6 +155,10 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
         console.error('[POST /api/listings] Validation failed:', JSON.stringify(parsed.error.issues, null, 2), 'Body:', JSON.stringify(body));
         return jsonErr(400, parsed.error.issues[0]?.message ?? 'Validation error');
     }
+
+    // Content-Filter: Rassismus, Antisemitismus, Hate Speech, Vulgäres blockieren
+    const listingCheck = checkListing(parsed.data.title, parsed.data.description);
+    if (listingCheck) return jsonErr(400, listingCheck);
 
     // Rate limit: level-based (NEW=5, BASIC=10, VERIFIED=20, TRUSTED=30, ELITE=50 per day)
     let ts = await prisma.trustScore.findUnique({ where: { userId: auth.userId }, select: { level: true } });

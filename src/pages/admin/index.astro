@@ -35,7 +35,7 @@ function formatCents(cents: number) {
 
 <BaseLayout title="Admin Panel – Ehren-Deal">
     <Header />
-    <main class="adm-page">
+    <main id="main-content" class="adm-page">
         <!-- Sidebar -->
         <aside class="adm-sidebar" id="sidebar">
             <div class="sidebar-head">
@@ -382,7 +382,7 @@ function formatCents(cents: number) {
     .revenue-icon { background: rgba(27,101,166,.1); color: #1B65A6; }
     .stat-val { font-size: 1.5rem; font-weight: 700; color: #1A2332; line-height: 1.1; }
     .stat-label { font-size: .72rem; color: #64748B; text-transform: uppercase; font-family: 'Inter', system-ui, sans-serif; letter-spacing: .04em; }
-    .stat-sub { font-size: .7rem; color: #94A3B8; }
+    .stat-sub { font-size: .7rem; color: #6B7280; }
 
     /* ── Metrics Row ── */
     .metrics-row { display: flex; gap: .6rem; flex-wrap: wrap; margin-bottom: 2rem; }
@@ -411,7 +411,7 @@ function formatCents(cents: number) {
     .cell-nowrap { white-space: nowrap; }
     .cell-truncate { max-width: 350px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .action-code { background: rgba(27,101,166,.08); color: #1B65A6; padding: 1px 6px; border-radius: 3px; font-size: .72rem; }
-    .empty-msg { color: #94A3B8; padding: 1.5rem; text-align: center; font-size: .85rem; }
+    .empty-msg { color: #6B7280; padding: 1.5rem; text-align: center; font-size: .85rem; }
     .loading-msg { color: #64748B; padding: 2rem; text-align: center; }
 
     /* ── Search & Filter ── */
@@ -420,7 +420,7 @@ function formatCents(cents: number) {
         padding: .45rem .75rem; font-size: .8rem; min-width: 240px; font-family: 'Inter', system-ui, sans-serif;
     }
     .search-input:focus { outline: none; border-color: rgba(27,101,166,.4); box-shadow: 0 0 0 2px rgba(27,101,166,.1); }
-    .search-input::placeholder { color: #94A3B8; }
+    .search-input::placeholder { color: #6B7280; }
     .filter-select {
         background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 4px; color: #1A2332;
         padding: .45rem .6rem; font-size: .8rem; font-family: 'Inter', system-ui, sans-serif; cursor: pointer;
@@ -472,7 +472,7 @@ function formatCents(cents: number) {
     }
     .sig-type { font-weight: 700; font-size: .72rem; color: #1A2332; }
     .sig-sev { font-size: .7rem; font-weight: 700; }
-    .sig-meta { font-size: .62rem; color: #94A3B8; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sig-meta { font-size: .62rem; color: #6B7280; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .fc-actions { display: flex; gap: .4rem; flex-wrap: wrap; }
 
     /* ── Action Buttons ── */

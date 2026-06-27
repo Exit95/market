@@ -11,7 +11,7 @@ if (!token || !uid) return Astro.redirect("/passwort-vergessen");
 
 <BaseLayout title="Neues Passwort – Ehren-Deal">
     <Header />
-    <main class="min-h-[calc(100vh-70px)] flex items-center justify-center px-4 py-16 bg-background">
+    <main id="main-content" class="min-h-[calc(100vh-70px)] flex items-center justify-center px-4 py-16 bg-background">
         <div class="w-full max-w-md">
 
             <div class="card p-8 md:p-10">
@@ -90,7 +90,7 @@ if (!token || !uid) return Astro.redirect("/passwort-vergessen");
         const levels = [
             { color: '#ef4444', text: 'Schwach', width: '25%' },
             { color: '#f59e0b', text: 'Mittel', width: '50%' },
-            { color: '#06b6d4', text: 'Gut', width: '75%' },
+            { color: '#1B65A6', text: 'Gut', width: '75%' },
             { color: '#10b981', text: 'Sehr sicher', width: '100%' },
         ];
         if (!val.length) { pwBar.style.width = '0'; pwLabel.textContent = ''; return; }

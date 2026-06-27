@@ -8,13 +8,15 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 /** Prefix für Ehren-Deal im shared Bucket */
 const S3_PREFIX = 'ehren-deal/';
 
+import { S3_ENDPOINT, S3_REGION, S3_ACCESS_KEY, S3_SECRET_KEY, S3_BUCKET_PUBLIC, S3_PUBLIC_BASE_URL } from './env';
+
 function buildClient() {
     return new S3Client({
-        endpoint: import.meta.env.S3_ENDPOINT,
-        region: import.meta.env.S3_REGION || 'eu-central',
+        endpoint: S3_ENDPOINT(),
+        region: S3_REGION(),
         credentials: {
-            accessKeyId: import.meta.env.S3_ACCESS_KEY,
-            secretAccessKey: import.meta.env.S3_SECRET_KEY,
+            accessKeyId: S3_ACCESS_KEY(),
+            secretAccessKey: S3_SECRET_KEY(),
         },
         forcePathStyle: true,
     });
@@ -26,8 +28,8 @@ export function getS3Client() {
     return _client;
 }
 
-export const BUCKET_PUBLIC = () => import.meta.env.S3_BUCKET_PUBLIC || 'danapfel-digital';
-export const PUBLIC_BASE = () => import.meta.env.S3_PUBLIC_BASE_URL || '';
+export const BUCKET_PUBLIC = () => S3_BUCKET_PUBLIC();
+export const PUBLIC_BASE = () => S3_PUBLIC_BASE_URL();
 
 /** Prefix an Key anhängen (z.B. "listings/abc/img.jpg" → "ehren-deal/listings/abc/img.jpg") */
 export function prefixedKey(objectKey: string) {

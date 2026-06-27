@@ -7,4 +7,12 @@ export default defineConfig({
     output: 'server',
     adapter: node({ mode: 'standalone' }),
     integrations: [tailwind(), react()],
+    site: 'https://ehren-deal.de',
+    security: {
+        checkOrigin: false,
+    },
+    server: {
+        host: '0.0.0.0',
+        port: 3000,
+    },
 });

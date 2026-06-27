@@ -55,15 +55,21 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
             to: user.email,
             subject: 'Ehren-Deal – Dein Verifizierungscode',
             html: `
-                <div style="font-family:'Barlow',sans-serif;max-width:560px;margin:0 auto;background:#0a0a0b;padding:2rem;border:1px solid rgba(200,151,58,0.2)">
-                    <h2 style="color:#c8973a;font-family:'Cormorant Garamond',serif;font-weight:300;margin-bottom:1rem">Handynummer verifizieren</h2>
-                    <p style="color:#e8e4de;font-size:.9rem;line-height:1.6">Hallo ${name}, dein Verifizierungscode lautet:</p>
-                    <div style="margin:1.5rem 0;padding:1rem;background:#c8973a22;text-align:center;">
-                        <span style="font-size:2rem;font-weight:700;color:#c8973a;letter-spacing:.3em">${code}</span>
+                <div style="font-family:'Inter',system-ui,-apple-system,sans-serif;max-width:560px;margin:0 auto;background:#F8FAFB;padding:0">
+                    <div style="background:#1A2332;padding:24px 32px;text-align:center">
+                        <span style="color:#FFFFFF;font-size:20px;font-weight:600;letter-spacing:-0.02em">Ehren-Deal</span>
                     </div>
-                    <p style="color:#e8e4de99;font-size:.8rem;line-height:1.5">Der Code ist <strong style="color:#c8973a">10 Minuten</strong> gültig.</p>
-                    <hr style="border:none;height:1px;background:linear-gradient(90deg,transparent,#c8973a40,transparent);margin:1.5rem 0"/>
-                    <p style="color:#e8e4de50;font-size:.7rem;text-align:center">Ehren-Deal – Sicher handeln mit Ehre</p>
+                    <div style="background:#FFFFFF;padding:32px;border:1px solid #E5E7EB;border-top:none">
+                        <h2 style="color:#1A2332;font-size:20px;margin:0 0 12px">Handynummer verifizieren</h2>
+                        <p style="color:#64748B;font-size:14px;line-height:1.6;margin:0 0 20px">Hallo ${name}, dein Verifizierungscode lautet:</p>
+                        <div style="margin:16px 0;padding:16px;background:#E3F2FD;text-align:center;border-radius:8px">
+                            <span style="font-size:2rem;font-weight:700;color:#1B65A6;letter-spacing:.3em">${code}</span>
+                        </div>
+                        <p style="color:#94A3B8;font-size:13px;line-height:1.5">Der Code ist <strong style="color:#1A2332">10 Minuten</strong> gültig.</p>
+                    </div>
+                    <div style="padding:16px 32px;text-align:center">
+                        <p style="color:#94A3B8;font-size:12px;margin:0">Ehren-Deal — Sicher handeln mit Vertrauen</p>
+                    </div>
                 </div>`,
         });
     } catch (e) {

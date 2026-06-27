@@ -26,6 +26,12 @@ export const GET: APIRoute = async ({ params }) => {
         offeredCategory: { select: { id: true, name: true, slug: true, icon: true } },
         soughtCategories: { include: { category: { select: { id: true, name: true, slug: true, icon: true } } } },
         images: { orderBy: { position: 'asc' } },
+        proposals: {
+          orderBy: { createdAt: 'desc' },
+          include: {
+            proposer: { select: { id: true, firstName: true, lastName: true, avatarUrl: true, emailVerified: true, phoneVerified: true } },
+          },
+        },
       },
     });
 

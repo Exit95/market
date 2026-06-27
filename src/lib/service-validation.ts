@@ -4,7 +4,7 @@
  */
 import { z } from 'zod';
 
-export const ServiceListingCreateSchema = z.object({
+const ServiceListingBaseSchema = z.object({
   title: z.string()
     .min(10, 'Titel muss mindestens 10 Zeichen haben.')
     .max(80, 'Titel darf maximal 80 Zeichen haben.'),
@@ -33,14 +33,16 @@ export const ServiceListingCreateSchema = z.object({
   availability: z.array(z.enum(['WERKTAGS', 'ABENDS', 'WOCHENENDE', 'FLEXIBEL'])).optional(),
   experienceLevel: z.enum(['ANFAENGER', 'FORTGESCHRITTEN', 'PROFI']).optional(),
   requirements: z.string().max(500, 'Voraussetzungen dürfen maximal 500 Zeichen haben.').optional(),
-}).refine(data => {
+});
+
+export const ServiceListingCreateSchema = ServiceListingBaseSchema.refine(data => {
   if (data.locationType !== 'REMOTE') {
     return !!data.city && !!data.postalCode;
   }
   return true;
 }, { message: 'Stadt und PLZ sind bei Vor-Ort-Leistungen erforderlich.', path: ['city'] });
 
-export const ServiceListingUpdateSchema = ServiceListingCreateSchema.partial();
+export const ServiceListingUpdateSchema = ServiceListingBaseSchema.partial();
 
 export const ServiceListingQuerySchema = z.object({
   query: z.string().optional(),

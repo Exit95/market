@@ -19,7 +19,7 @@ if (!sessionUser) return Astro.redirect("/anmelden?redirect=/inserat-erstellen")
 
 <BaseLayout title="Anzeige aufgeben – Ehren-Deal">
     <Header />
-    <main class="create-main">
+    <main id="main-content" class="create-main">
         <div class="container-sm">
             <!-- Breadcrumb -->
             <nav class="text-caption mb-6 text-text-muted" aria-label="Breadcrumb">
@@ -125,7 +125,7 @@ if (!sessionUser) return Astro.redirect("/anmelden?redirect=/inserat-erstellen")
                                 required></textarea>
                         </div>
                         <div class="form-row">
-                            <div class="form-group" style="flex:1;">
+                            <div class="form-group flex-1">
                                 <label class="label" for="price"
                                     >Preis (€) *</label
                                 >
@@ -174,7 +174,7 @@ if (!sessionUser) return Astro.redirect("/anmelden?redirect=/inserat-erstellen")
                                     </p>
                                 </div>
                             </div>
-                            <div class="form-group" style="flex:1;">
+                            <div class="form-group flex-1">
                                 <label class="label" for="condition"
                                     >Zustand *</label
                                 >
@@ -196,7 +196,7 @@ if (!sessionUser) return Astro.redirect("/anmelden?redirect=/inserat-erstellen")
                             </div>
                         </div>
                         <div class="form-row" style="align-items:flex-end;">
-                            <div class="form-group" style="flex:1;">
+                            <div class="form-group flex-1">
                                 <label class="label" for="plz">PLZ *</label>
                                 <input
                                     type="text"

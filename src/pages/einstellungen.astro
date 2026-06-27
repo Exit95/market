@@ -25,7 +25,7 @@ if (!dbUser) return Astro.redirect("/anmelden?redirect=/einstellungen");
 
 <BaseLayout title="Einstellungen – Ehren-Deal">
     <Header />
-    <main class="settings-main">
+    <main id="main-content" class="settings-main">
         <div class="settings-container">
             <!-- Back Link -->
             <a href="/profil" class="back-link">
@@ -88,8 +88,8 @@ if (!dbUser) return Astro.redirect("/anmelden?redirect=/einstellungen");
                     </div>
                     <div class="form-group">
                         <label for="email">E-Mail-Adresse</label>
-                        <input type="email" id="email" value={dbUser.email} disabled />
-                        <span class="form-hint">E-Mail kann nicht geändert werden. {dbUser.emailVerified ? '✓ Verifiziert' : '⚠ Nicht verifiziert'}</span>
+                        <input type="email" id="email" name="email" value={dbUser.email} maxlength="200" />
+                        <span class="form-hint">{dbUser.emailVerified ? '✓ Verifiziert — bei Änderung wird eine neue Bestätigung nötig' : '⚠ Nicht verifiziert'}</span>
                     </div>
                     <div class="form-group">
                         <label for="phone">Handynummer</label>
@@ -357,6 +357,7 @@ document.getElementById('profile-form')?.addEventListener('submit', async (e) =>
     const data = {
         firstName: (document.getElementById('firstName') as HTMLInputElement).value.trim(),
         lastName: (document.getElementById('lastName') as HTMLInputElement).value.trim(),
+        email: (document.getElementById('email') as HTMLInputElement).value.trim(),
         phone: (document.getElementById('phone') as HTMLInputElement).value.trim(),
         city: (document.getElementById('city') as HTMLInputElement).value.trim(),
         postalCode: (document.getElementById('postalCode') as HTMLInputElement).value.trim(),

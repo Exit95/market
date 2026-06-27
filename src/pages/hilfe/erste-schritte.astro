@@ -1,0 +1,187 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+---
+
+<BaseLayout title="Erste Schritte – Hilfe-Center – Ehren-Deal" description="Starte auf Ehren-Deal: Registrierung, Verifizierung, Trust-Score und dein erster sicherer Deal." canonicalPath="/hilfe/erste-schritte">
+    <Header />
+    <main id="main-content" class="min-h-screen pt-12 pb-24 bg-background">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <!-- Breadcrumb -->
+            <nav aria-label="Breadcrumb" class="mb-8">
+                <ol class="flex items-center gap-2 text-sm text-text-secondary">
+                    <li><a href="/" class="hover:text-primary transition-colors">Startseite</a></li>
+                    <li class="flex items-center gap-2">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <a href="/hilfe" class="hover:text-primary transition-colors">Hilfe-Center</a>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <span class="text-text font-medium">Erste Schritte</span>
+                    </li>
+                </ol>
+            </nav>
+
+            <!-- Header -->
+            <div class="mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold text-primary mb-3">Erste Schritte</h1>
+                <p class="text-text-secondary text-lg max-w-2xl">
+                    Willkommen bei Ehren-Deal! Hier erfaehrst du alles, was du fuer deinen Start auf dem sichersten Marktplatz Deutschlands brauchst.
+                </p>
+            </div>
+
+            <!-- Quick Start Guide -->
+            <div class="card p-6 md:p-8 mb-10">
+                <h2 class="text-lg font-semibold text-text mb-6">So startest du in 4 Schritten</h2>
+                <div class="grid sm:grid-cols-2 gap-6">
+                    <div class="flex gap-4">
+                        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold flex-shrink-0">1</div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-text mb-1">Konto erstellen</h3>
+                            <p class="text-sm text-text-secondary">Registriere dich mit E-Mail und erstelle dein persoenliches Profil.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold flex-shrink-0">2</div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-text mb-1">Identitaet verifizieren</h3>
+                            <p class="text-sm text-text-secondary">Durchlaufe die KYC-Pruefung mit deinem Ausweisdokument.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold flex-shrink-0">3</div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-text mb-1">Marktplatz entdecken</h3>
+                            <p class="text-sm text-text-secondary">Stoebere durch Kategorien oder suche gezielt nach Artikeln.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold flex-shrink-0">4</div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-text mb-1">Sicher handeln</h3>
+                            <p class="text-sm text-text-secondary">Kaufe oder verkaufe mit Treuhand-Schutz und dem Ehren-Handschlag.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ Accordion -->
+            <div class="space-y-4" id="faq-accordion">
+
+                <!-- FAQ 1 -->
+                <div class="card overflow-hidden">
+                    <button class="faq-toggle w-full flex items-center justify-between p-5 text-left" aria-expanded="false">
+                        <span class="text-sm font-semibold text-text pr-4">Wie registriere ich mich bei Ehren-Deal?</span>
+                        <svg class="faq-chevron w-5 h-5 text-text-muted flex-shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <div class="text-sm text-text-secondary leading-relaxed space-y-3 border-t border-border pt-4">
+                            <p>Die Registrierung bei Ehren-Deal ist kostenlos und dauert nur wenige Minuten:</p>
+                            <ol class="list-decimal list-inside space-y-2 pl-1">
+                                <li>Klicke oben rechts auf <strong>Registrieren</strong> oder besuche die <a href="/anmelden" class="text-primary hover:underline">Anmeldeseite</a>.</li>
+                                <li>Gib deine E-Mail-Adresse und ein sicheres Passwort ein (mindestens 8 Zeichen).</li>
+                                <li>Bestaetige deine E-Mail-Adresse ueber den Link, den wir dir zusenden.</li>
+                                <li>Vervollstaendige dein Profil mit deinem Namen und optional einem Profilbild.</li>
+                            </ol>
+                            <p>Nach der Registrierung kannst du sofort den Marktplatz durchsuchen. Um zu kaufen oder zu verkaufen, ist eine <strong>Identitaetsverifizierung (KYC)</strong> erforderlich.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 2 -->
+                <div class="card overflow-hidden">
+                    <button class="faq-toggle w-full flex items-center justify-between p-5 text-left" aria-expanded="false">
+                        <span class="text-sm font-semibold text-text pr-4">Wie funktioniert der Trust-Score?</span>
+                        <svg class="faq-chevron w-5 h-5 text-text-muted flex-shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <div class="text-sm text-text-secondary leading-relaxed space-y-3 border-t border-border pt-4">
+                            <p>Der Trust-Score ist dein persoenliches Vertrauenslevel auf Ehren-Deal. Er zeigt anderen Nutzern auf einen Blick, wie zuverlaessig du bist. Der Score setzt sich aus mehreren Faktoren zusammen:</p>
+                            <ul class="list-disc list-inside space-y-2 pl-1">
+                                <li><strong>Verifizierungsstatus:</strong> KYC-Pruefung, E-Mail- und Telefon-Verifizierung erhoehen deinen Score.</li>
+                                <li><strong>Abgeschlossene Deals:</strong> Je mehr erfolgreiche Transaktionen du hast, desto hoeher dein Score.</li>
+                                <li><strong>Bewertungen:</strong> Positive Bewertungen von anderen Nutzern steigern dein Vertrauenslevel.</li>
+                                <li><strong>Profilqualitaet:</strong> Ein vollstaendiges Profil mit Bild traegt ebenfalls zum Score bei.</li>
+                            </ul>
+                            <p>Dein Trust-Score wird als Zahl und Badge auf deinem Profil angezeigt. Je hoeher dein Level, desto mehr Vertrauen geniessen deine Angebote.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 3 -->
+                <div class="card overflow-hidden">
+                    <button class="faq-toggle w-full flex items-center justify-between p-5 text-left" aria-expanded="false">
+                        <span class="text-sm font-semibold text-text pr-4">Was ist der Treuhand-Schutz?</span>
+                        <svg class="faq-chevron w-5 h-5 text-text-muted flex-shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <div class="text-sm text-text-secondary leading-relaxed space-y-3 border-t border-border pt-4">
+                            <p>Der Treuhand-Schutz ist das Herzstuck der Sicherheit auf Ehren-Deal. So funktioniert er:</p>
+                            <ol class="list-decimal list-inside space-y-2 pl-1">
+                                <li><strong>Kaeufer zahlt:</strong> Dein Geld geht auf ein sicheres Treuhandkonto, nicht direkt an den Verkaeufer.</li>
+                                <li><strong>Verkaeufer versendet:</strong> Erst nachdem die Zahlung eingegangen ist, wird der Versand ausgeloest.</li>
+                                <li><strong>Kaeufer bestaetigt:</strong> Du pruefst die Ware und bestaetigst den Erhalt.</li>
+                                <li><strong>Auszahlung:</strong> Erst nach deiner Bestaetigung erhaelt der Verkaeufer sein Geld.</li>
+                            </ol>
+                            <p>Falls die Ware nicht ankommt oder nicht der Beschreibung entspricht, wird dein Geld zurueckerstattet. Dein Geld ist zu jeder Zeit geschuetzt.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 4 -->
+                <div class="card overflow-hidden">
+                    <button class="faq-toggle w-full flex items-center justify-between p-5 text-left" aria-expanded="false">
+                        <span class="text-sm font-semibold text-text pr-4">Wie verifiziere ich mich (KYC)?</span>
+                        <svg class="faq-chevron w-5 h-5 text-text-muted flex-shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <div class="text-sm text-text-secondary leading-relaxed space-y-3 border-t border-border pt-4">
+                            <p>Die Identitaetspruefung (Know Your Customer) stellt sicher, dass alle Nutzer auf Ehren-Deal echte Personen sind. Das schuetzt dich vor Betrug.</p>
+                            <p><strong>Was du brauchst:</strong></p>
+                            <ul class="list-disc list-inside space-y-2 pl-1">
+                                <li>Einen gueltigen Personalausweis oder Reisepass</li>
+                                <li>Eine stabile Internetverbindung</li>
+                                <li>Eine Kamera (Smartphone oder Webcam)</li>
+                            </ul>
+                            <p><strong>So laeuft die Verifizierung ab:</strong></p>
+                            <ol class="list-decimal list-inside space-y-2 pl-1">
+                                <li>Gehe in deinen <a href="/einstellungen" class="text-primary hover:underline">Einstellungen</a> zum Bereich Verifizierung.</li>
+                                <li>Starte den Video-Ident-Prozess ueber unseren Partner IDnow.</li>
+                                <li>Halte deinen Ausweis in die Kamera und folge den Anweisungen.</li>
+                                <li>Die Pruefung dauert in der Regel nur wenige Minuten.</li>
+                            </ol>
+                            <p>Nach erfolgreicher Verifizierung erhaeltst du das <strong>Verifiziert-Badge</strong> auf deinem Profil und kannst sofort kaufen und verkaufen.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Back to Hilfe-Center -->
+            <div class="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+                <a href="/hilfe" class="text-sm text-primary hover:underline flex items-center gap-2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    Zurueck zum Hilfe-Center
+                </a>
+                <a href="/kontakt" class="btn btn-outline text-sm px-5">Kontakt aufnehmen</a>
+            </div>
+
+        </div>
+    </main>
+    <Footer />
+</BaseLayout>
+
+<script>
+    document.querySelectorAll('.faq-toggle').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            btn.setAttribute('aria-expanded', String(!expanded));
+            const content = btn.nextElementSibling as HTMLElement | null;
+            const chevron = btn.querySelector('.faq-chevron') as HTMLElement | null;
+            if (content) content.classList.toggle('hidden', expanded);
+            if (chevron) chevron.style.transform = expanded ? '' : 'rotate(180deg)';
+        });
+    });
+</script>

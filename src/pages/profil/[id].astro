@@ -10,6 +10,8 @@ if (!id) return Astro.redirect('/');
 // ── Try DB ──
 let seller: any = null;
 let listings: any[] = [];
+let reviews: any[] = [];
+let reviewStats = { count: 0, avgRating: 0 };
 
 try {
     seller = await prisma.user.findUnique({
@@ -46,7 +48,30 @@ try {
             treuhand: l.treuhand,
         }));
     }
-} catch { /* DB not available */ }
+
+    // Reviews laden
+    const dbReviews = await prisma.review.findMany({
+        where: { revieweeId: id },
+        include: {
+            reviewer: { select: { firstName: true, lastName: true } },
+            deal: { select: { listing: { select: { title: true } } } },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 20,
+    });
+    reviews = dbReviews.map((r: any) => ({
+        name: [r.reviewer.firstName, r.reviewer.lastName?.[0]].filter(Boolean).join(' ') + '.',
+        initial: (r.reviewer.firstName || 'N')[0].toUpperCase(),
+        stars: r.rating,
+        text: r.comment || '',
+        date: r.createdAt,
+        listingTitle: r.deal?.listing?.title || null,
+    }));
+    if (reviews.length > 0) {
+        const sum = reviews.reduce((s: number, r: any) => s + r.stars, 0);
+        reviewStats = { count: reviews.length, avgRating: Math.round(sum / reviews.length * 10) / 10 };
+    }
+} catch (e) { console.error('[profil] DB error:', e); }
 
 // ── Fallback: mock-seller IDs (from listing-fallback) ──
 if (!seller && id.startsWith('mock-seller-')) {
@@ -82,15 +107,29 @@ const initial = (seller.firstName || 'V')[0].toUpperCase();
 const trustScore = seller.trustScore?.score ?? 0;
 const memberSince = seller.createdAt.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
 
-const mockReviews = [
-    { name: 'Max B.', initial: 'M', stars: 5, text: 'Sehr netter Kontakt, schneller Versand. Gerne wieder!', date: 'vor 2 Wochen' },
-    { name: 'Anna S.', initial: 'A', stars: 4, text: 'Ware wie beschrieben, alles top. Kommunikation könnte etwas schneller sein.', date: 'vor 1 Monat' },
-];
+// Relative Zeitformatierung
+function timeAgo(date: Date): string {
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    if (days < 1) return 'Heute';
+    if (days === 1) return 'Gestern';
+    if (days < 7) return `vor ${days} Tagen`;
+    if (days < 30) return `vor ${Math.floor(days / 7)} Woche${Math.floor(days / 7) > 1 ? 'n' : ''}`;
+    if (days < 365) return `vor ${Math.floor(days / 30)} Monat${Math.floor(days / 30) > 1 ? 'en' : ''}`;
+    return `vor ${Math.floor(days / 365)} Jahr${Math.floor(days / 365) > 1 ? 'en' : ''}`;
+}
+
+// Falls DB-Reviews vorhanden: Datums-Format umwandeln
+const displayReviews = reviews.map((r: any) => ({ ...r, dateFormatted: timeAgo(new Date(r.date)) }));
+
+const finalReviews = displayReviews;
+const finalStats = reviewStats;
 ---
 
 <BaseLayout title={`${fullName} – Ehren-Deal`}>
     <Header />
-    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-20 bg-background min-h-screen">
+    <main id="main-content" class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-20 bg-background min-h-screen">
 
         <!-- Breadcrumb -->
         <nav class="flex items-center gap-2 text-text-muted mb-6 text-caption">
@@ -228,14 +267,23 @@ const mockReviews = [
 
         <!-- Bewertungen -->
         <section class="mt-12">
-            <h2 class="text-h3 text-text mb-6">
-                Bewertungen
-                <span class="text-text-muted text-base ml-1">({isMock ? mockReviews.length : 0})</span>
-            </h2>
+            <div class="flex items-center gap-4 mb-6">
+                <h2 class="text-h3 text-text">
+                    Bewertungen
+                    <span class="text-text-muted text-base ml-1">({finalStats.count})</span>
+                </h2>
+                {finalStats.count > 0 && (
+                    <div class="flex items-center gap-2 bg-accent-light px-3 py-1.5 rounded-full">
+                        <span class="text-accent text-sm">★</span>
+                        <span class="text-sm font-semibold text-text">{finalStats.avgRating}</span>
+                        <span class="text-caption text-text-muted">/ 5</span>
+                    </div>
+                )}
+            </div>
 
-            {isMock ? (
+            {finalReviews.length > 0 ? (
                 <div class="space-y-4">
-                    {mockReviews.map((review) => (
+                    {finalReviews.map((review: any) => (
                         <div class="bg-surface border border-border rounded-lg p-5 shadow-card">
                             <div class="flex items-start gap-4">
                                 <div class="w-10 h-10 bg-primary-light rounded-full flex items-center justify-center text-sm font-bold text-primary flex-shrink-0">
@@ -248,8 +296,15 @@ const mockReviews = [
                                             {'★'.repeat(review.stars)}{'☆'.repeat(5 - review.stars)}
                                         </span>
                                     </div>
-                                    <p class="text-body-sm text-text-secondary leading-relaxed">{review.text}</p>
-                                    <span class="text-text-muted text-caption mt-2 block">{review.date}</span>
+                                    {review.text && (
+                                        <p class="text-body-sm text-text-secondary leading-relaxed">{review.text}</p>
+                                    )}
+                                    <div class="flex items-center gap-3 mt-2">
+                                        <span class="text-text-muted text-caption">{review.dateFormatted}</span>
+                                        {review.listingTitle && (
+                                            <span class="text-text-muted text-caption">— {review.listingTitle}</span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>

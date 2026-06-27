@@ -40,6 +40,9 @@ let sellerId = '';
 let isFromDB = false;
 let dbCategory = '';
 
+let sellerReviewCount = 0;
+let sellerAvgRating = 0;
+
 let dbListing: any = null;
 try {
  dbListing = await prisma.listing.findUnique({
@@ -82,6 +85,17 @@ if (dbListing) {
  sellerMemberSince = s.createdAt.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
  sellerListingCount = s._count.listings;
  sellerTrustScore = s.trustScore?.score ?? 0;
+
+ // Seller Reviews
+ const sellerReviews = await prisma.review.aggregate({
+  where: { revieweeId: s.id },
+  _count: true,
+  _avg: { rating: true },
+ }).catch(() => null);
+ if (sellerReviews) {
+  sellerReviewCount = sellerReviews._count;
+  sellerAvgRating = Math.round((sellerReviews._avg.rating ?? 0) * 10) / 10;
+ }
 
  // All images
  allImages = dbListing.images.map((img: any) => ({ url: img.url, id: img.id }));
@@ -175,7 +189,7 @@ if (sellerTrustScore >= 50) securityScore += 5;
 if (sellerTrustScore >= 80) securityScore += 5;
 securityScore = Math.min(100, securityScore);
 const securityLabel = securityScore >= 80 ? 'Niedrig' : securityScore >= 50 ? 'Mittel' : 'Hoch';
-const securityColor = securityScore >= 80 ? '#52b788' : securityScore >= 50 ? '#d4a843' : '#c45c5c';
+const securityColor = securityScore >= 80 ? '#22A06B' : securityScore >= 50 ? '#D97706' : '#DC2626';
 
 // ── Related Listings (DB + static fallback) ──
 let relatedListings: any[] = [];
@@ -214,7 +228,7 @@ if (relatedListings.length < 3) {
  <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />
  <Header />
 
- <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20">
+ <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20">
 
  <!-- ═══ 1. Breadcrumb ═══ -->
  <nav class="flex items-center gap-2 text-text-muted mb-4 flex-wrap text-xs">
@@ -240,6 +254,8 @@ if (relatedListings.length < 3) {
  <img
  src={allImages[0]?.url || listing.image}
  alt={listing.title}
+ width="800"
+ height="600"
  class="w-full h-full object-cover"
  id="mainImg"
  fetchpriority="high"
@@ -448,8 +464,18 @@ if (relatedListings.length < 3) {
  </div>
  <div class="border-t border-border pt-3 flex flex-col gap-1">
  <div class="flex items-center gap-2">
- <span class="text-primary text-base">{stars}</span>
- <span class="text-sm font-semibold">{listing.sellerRating > 0 ? listing.sellerRating.toFixed(1) : '–'}</span>
+ {sellerReviewCount > 0 ? (
+  <>
+   <span class="text-accent text-sm">{'★'.repeat(Math.round(sellerAvgRating))}{'☆'.repeat(5 - Math.round(sellerAvgRating))}</span>
+   <span class="text-sm font-semibold">{sellerAvgRating}</span>
+   <span class="text-xs text-text-muted">({sellerReviewCount} {sellerReviewCount === 1 ? 'Bewertung' : 'Bewertungen'})</span>
+  </>
+ ) : (
+  <>
+   <span class="text-primary text-base">{stars}</span>
+   <span class="text-sm font-semibold">{listing.sellerRating > 0 ? listing.sellerRating.toFixed(1) : '–'}</span>
+  </>
+ )}
  </div>
  <span class="text-xs text-text-muted">Mitglied seit {sellerMemberSince} · {sellerListingCount} {sellerListingCount === 1 ? 'Anzeige' : 'Anzeigen'}</span>
  </div>

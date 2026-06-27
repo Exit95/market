@@ -5,7 +5,7 @@ import ChatApp from "../components/ChatApp";
 import { requireAuth, isAuthContext } from "../lib/auth-middleware";
 
 const auth = await requireAuth(Astro.request, Astro.cookies);
-if (!isAuthContext(auth)) return auth;
+if (!isAuthContext(auth)) return Astro.redirect('/anmelden');
 
 const currentUserId = auth.userId;
 const listingId = Astro.url.searchParams.get("listing") || undefined;
@@ -13,7 +13,7 @@ const listingId = Astro.url.searchParams.get("listing") || undefined;
 
 <BaseLayout title="Nachrichten – Ehren-Deal">
     <Header />
-    <main class="messenger-main">
+    <main id="main-content" class="messenger-main">
         <ChatApp client:load currentUserId={currentUserId} listingId={listingId} />
     </main>
 </BaseLayout>

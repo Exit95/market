@@ -2,12 +2,13 @@
  * src/lib/stripe.ts
  */
 import Stripe from 'stripe';
+import { STRIPE_SECRET_KEY } from './env';
 
 let _stripe: Stripe | null = null;
 
 export function getStripe(): Stripe {
     if (!_stripe) {
-        _stripe = new Stripe(import.meta.env.STRIPE_SECRET_KEY, {
+        _stripe = new Stripe(STRIPE_SECRET_KEY(), {
             apiVersion: '2025-01-27.acacia',
         });
     }

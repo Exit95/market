@@ -20,7 +20,7 @@ export const POST: APIRoute = async ({ request, cookies, params, clientAddress }
     if (deal.status !== 'PENDING') return err(409, `Deal status is ${deal.status}, expected PENDING`);
 
     const chargeAmount = deal.totalAmount + calcBuyerFee(); // Artikelpreis + 0,50 € Servicegebühr
-    const appUrl = import.meta.env.APP_URL || 'http://localhost:4321';
+    const appUrl = process.env.APP_URL || import.meta.env.APP_URL || 'http://localhost:4321';
 
     // Idempotency: reuse existing session/PI if already created
     if (deal.payment?.paymentIntentId) {

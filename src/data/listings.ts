@@ -18,16 +18,120 @@ export interface Listing {
     phone?: string;
 }
 
-export const categories = [
-    { slug: 'elektronik', label: 'Elektronik', icon: '/icons/elektronik.svg', count: 2841 },
-    { slug: 'fahrzeuge', label: 'Fahrzeuge', icon: '/icons/fahrzeuge.svg', count: 1923 },
-    { slug: 'mode', label: 'Mode & Kleidung', icon: '/icons/mode-bekleidung.svg', count: 3102 },
-    { slug: 'moebel', label: 'Möbel & Wohnen', icon: '/icons/moebel-wohnen.svg', count: 1547 },
-    { slug: 'sport', label: 'Sport & Freizeit', icon: '/icons/sport-freizeit.svg', count: 982 },
-    { slug: 'haushalt', label: 'Haushalt', icon: '/icons/haushalt.svg', count: 1238 },
-    { slug: 'bucher', label: 'Bücher & Medien', icon: '/icons/buecher-medien.svg', count: 741 },
-    { slug: 'spielzeug', label: 'Spielzeug', icon: '/icons/spielzeug.svg', count: 634 },
-    { slug: 'sonstiges', label: 'Sonstiges', icon: '/icons/mieten-kaufen.svg', count: 1085 },
+export interface SubCategory {
+    slug: string;
+    label: string;
+}
+
+export interface CategoryWithSubs {
+    slug: string;
+    label: string;
+    icon: string;
+    count: number;
+    subcategories: SubCategory[];
+}
+
+export const categories: CategoryWithSubs[] = [
+    {
+        slug: 'elektronik', label: 'Elektronik', icon: '/icons/elektronik.svg', count: 0,
+        subcategories: [
+            { slug: 'smartphones', label: 'Smartphones & Handys' },
+            { slug: 'laptops-pcs', label: 'Laptops & PCs' },
+            { slug: 'tablets', label: 'Tablets & E-Reader' },
+            { slug: 'gaming-konsolen', label: 'Gaming & Konsolen' },
+            { slug: 'tv-audio', label: 'TV & Audio' },
+            { slug: 'kameras', label: 'Kameras & Foto' },
+            { slug: 'elektronik-zubehoer', label: 'Zubehör & Kabel' },
+        ],
+    },
+    {
+        slug: 'fahrzeuge', label: 'Fahrzeuge', icon: '/icons/fahrzeuge.svg', count: 0,
+        subcategories: [
+            { slug: 'autos', label: 'Autos' },
+            { slug: 'motorraeder', label: 'Motorräder & Roller' },
+            { slug: 'fahrraeder', label: 'Fahrräder & E-Bikes' },
+            { slug: 'wohnmobile', label: 'Wohnmobile & Wohnwagen' },
+            { slug: 'fahrzeug-teile', label: 'Teile & Zubehör' },
+            { slug: 'boote', label: 'Boote & Wassersport' },
+        ],
+    },
+    {
+        slug: 'mode', label: 'Mode & Kleidung', icon: '/icons/mode-bekleidung.svg', count: 0,
+        subcategories: [
+            { slug: 'damenmode', label: 'Damenmode' },
+            { slug: 'herrenmode', label: 'Herrenmode' },
+            { slug: 'kinderbekleidung', label: 'Kinderbekleidung' },
+            { slug: 'schuhe', label: 'Schuhe' },
+            { slug: 'accessoires', label: 'Accessoires & Schmuck' },
+            { slug: 'taschen', label: 'Taschen & Koffer' },
+            { slug: 'designermode', label: 'Designermode & Luxus' },
+        ],
+    },
+    {
+        slug: 'moebel', label: 'Möbel & Wohnen', icon: '/icons/moebel-wohnen.svg', count: 0,
+        subcategories: [
+            { slug: 'wohnzimmer', label: 'Wohnzimmer' },
+            { slug: 'schlafzimmer', label: 'Schlafzimmer' },
+            { slug: 'kueche-esszimmer', label: 'Küche & Esszimmer' },
+            { slug: 'badezimmer', label: 'Badezimmer' },
+            { slug: 'buero-moebel', label: 'Büromöbel' },
+            { slug: 'garten-balkon', label: 'Garten & Balkon' },
+            { slug: 'dekoration', label: 'Dekoration & Lampen' },
+        ],
+    },
+    {
+        slug: 'sport', label: 'Sport & Freizeit', icon: '/icons/sport-freizeit.svg', count: 0,
+        subcategories: [
+            { slug: 'fitness', label: 'Fitness & Gym' },
+            { slug: 'outdoor', label: 'Outdoor & Camping' },
+            { slug: 'wintersport', label: 'Wintersport' },
+            { slug: 'ballsport', label: 'Ballsport' },
+            { slug: 'radsport', label: 'Radsport' },
+            { slug: 'wassersport', label: 'Wassersport' },
+        ],
+    },
+    {
+        slug: 'haushalt', label: 'Haushalt & Garten', icon: '/icons/haushalt.svg', count: 0,
+        subcategories: [
+            { slug: 'kuechengeraete', label: 'Küchengeräte' },
+            { slug: 'waschmaschinen', label: 'Waschmaschinen & Trockner' },
+            { slug: 'staubsauger', label: 'Staubsauger & Reinigung' },
+            { slug: 'gartengeraete', label: 'Gartengeräte' },
+            { slug: 'werkzeug', label: 'Werkzeug & Heimwerken' },
+            { slug: 'haustiere', label: 'Haustierbedarf' },
+        ],
+    },
+    {
+        slug: 'bucher', label: 'Bücher & Medien', icon: '/icons/buecher-medien.svg', count: 0,
+        subcategories: [
+            { slug: 'buecher', label: 'Bücher' },
+            { slug: 'filme-serien', label: 'Filme & Serien' },
+            { slug: 'musik', label: 'Musik & Vinyl' },
+            { slug: 'videospiele', label: 'Videospiele' },
+            { slug: 'comics-manga', label: 'Comics & Manga' },
+        ],
+    },
+    {
+        slug: 'spielzeug', label: 'Spielzeug & Baby', icon: '/icons/spielzeug.svg', count: 0,
+        subcategories: [
+            { slug: 'baby-kleinkind', label: 'Baby & Kleinkind' },
+            { slug: 'spielzeug-kinder', label: 'Spielzeug (3-12 Jahre)' },
+            { slug: 'lego-baukloetze', label: 'LEGO & Bausteine' },
+            { slug: 'puppen-figuren', label: 'Puppen & Figuren' },
+            { slug: 'kinderwagen', label: 'Kinderwagen & Autositze' },
+            { slug: 'kindermoebel', label: 'Kindermöbel' },
+        ],
+    },
+    {
+        slug: 'sonstiges', label: 'Sonstiges', icon: '/icons/mieten-kaufen.svg', count: 0,
+        subcategories: [
+            { slug: 'sammlerstuecke', label: 'Sammlerstücke & Kunst' },
+            { slug: 'musikinstrumente', label: 'Musikinstrumente' },
+            { slug: 'tickets-gutscheine', label: 'Tickets & Gutscheine' },
+            { slug: 'dienstleistungen', label: 'Dienstleistungen' },
+            { slug: 'tauschen-verschenken', label: 'Tauschen & Verschenken' },
+        ],
+    },
 ];
 
 

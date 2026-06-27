@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Geschützte Bereiche
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /einstellungen
+Disallow: /nachrichten
+Disallow: /messages/
+Disallow: /merkliste
+Disallow: /checkout/
+Disallow: /deal/verifizieren/
+Disallow: /passwort-vergessen
+Disallow: /passwort-reset/
+
+Sitemap: https://ehren-deal.de/sitemap.xml

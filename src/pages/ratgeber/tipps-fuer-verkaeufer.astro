@@ -1,0 +1,246 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+
+const title = "Erfolgreich verkaufen — Tipps f\u00fcr bessere Inserate";
+const description = "Mit diesen Tipps erstellst du bessere Inserate auf Ehren-Deal: Gute Fotos, faire Preise, ansprechende Beschreibungen und ein optimierter Trust-Score.";
+const publishDate = "2026-03-15";
+const readingTime = "5 Min.";
+const siteUrl = "https://ehren-deal.de";
+
+const relatedArticles = [
+  { slug: "sicher-online-kaufen", title: "Sicher online kaufen — 10 Tipps", excerpt: "Die wichtigsten Regeln f\u00fcr sicheres Einkaufen auf gebrauchten Marktpl\u00e4tzen." },
+  { slug: "treuhand-erklaert", title: "Treuhand-Zahlung erkl\u00e4rt", excerpt: "Wie der Zahlungsschutz bei Ehren-Deal funktioniert und warum er sicherer ist." },
+  { slug: "betrug-erkennen", title: "Betrug erkennen und vermeiden", excerpt: "Vorkasse-Betrug, Fake-Inserate und Phishing — so erkennst du die h\u00e4ufigsten Maschen." },
+];
+
+const tocItems = [
+  { id: "fotos", label: "Gute Fotos machen" },
+  { id: "beschreibung", label: "Die perfekte Beschreibung" },
+  { id: "preis", label: "Den richtigen Preis finden" },
+  { id: "reaktionszeit", label: "Schnell antworten" },
+  { id: "trust-score", label: "Trust-Score optimieren" },
+  { id: "treuhand-anbieten", label: "Treuhand-Schutz anbieten" },
+];
+---
+
+<BaseLayout
+  title={`${title} | Ehren-Deal Ratgeber`}
+  description={description}
+  canonicalPath="/ratgeber/tipps-fuer-verkaeufer"
+>
+  <Header />
+  <main id="main-content" class="min-h-screen">
+
+    <!-- Article Header -->
+    <section class="bg-gradient-to-br from-success to-primary text-white py-14 sm:py-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="text-sm text-white/50 mb-6" aria-label="Breadcrumb">
+          <ol class="flex items-center gap-1.5 flex-wrap">
+            <li><a href="/" class="hover:text-white/80 transition-colors">Startseite</a></li>
+            <li>/</li>
+            <li><a href="/ratgeber" class="hover:text-white/80 transition-colors">Ratgeber</a></li>
+            <li>/</li>
+            <li class="text-white/80">Tipps f\u00fcr Verk\u00e4ufer</li>
+          </ol>
+        </nav>
+        <div class="max-w-3xl">
+          <span class="text-xs font-semibold bg-white/20 text-white px-3 py-1 rounded-full mb-4 inline-block">Tipps & Tricks</span>
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight mb-4">
+            {title}
+          </h1>
+          <div class="flex flex-wrap items-center gap-4 text-sm text-white/60">
+            <span>Ehren-Deal Redaktion</span>
+            <span>&middot;</span>
+            <time datetime={publishDate}>
+              {new Date(publishDate).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}
+            </time>
+            <span>&middot;</span>
+            <span>{readingTime} Lesezeit</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Article Content -->
+    <section class="py-10 sm:py-14">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col lg:flex-row gap-10">
+
+          <!-- Sidebar TOC -->
+          <aside class="lg:w-72 flex-shrink-0 order-2 lg:order-1">
+            <div class="lg:sticky lg:top-8">
+              <nav class="card p-5" aria-label="Inhaltsverzeichnis">
+                <h2 class="text-sm font-semibold text-text mb-3 uppercase tracking-wide">Inhaltsverzeichnis</h2>
+                <ol class="flex flex-col gap-2">
+                  {tocItems.map((item) => (
+                    <li>
+                      <a href={`#${item.id}`} class="text-sm text-text-secondary hover:text-primary transition-colors leading-snug block">
+                        {item.label}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+
+              <!-- Share -->
+              <div class="card p-5 mt-4">
+                <h2 class="text-sm font-semibold text-text mb-3 uppercase tracking-wide">Teilen</h2>
+                <div class="flex gap-2">
+                  <a href={`https://www.facebook.com/sharer/sharer.php?u=${siteUrl}/ratgeber/tipps-fuer-verkaeufer`} target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary transition-colors" aria-label="Auf Facebook teilen">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                  </a>
+                  <a href={`https://twitter.com/intent/tweet?url=${siteUrl}/ratgeber/tipps-fuer-verkaeufer&text=${encodeURIComponent(title)}`} target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary transition-colors" aria-label="Auf X teilen">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 01-3.14 1.53A4.48 4.48 0 0012 7.5v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5 0-.28-.03-.56-.08-.83A7.72 7.72 0 0023 3z"/></svg>
+                  </a>
+                  <a href={`mailto:?subject=${encodeURIComponent(title)}&body=${siteUrl}/ratgeber/tipps-fuer-verkaeufer`} class="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary transition-colors" aria-label="Per E-Mail teilen">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <!-- Main Article -->
+          <article class="flex-grow order-1 lg:order-2 max-w-3xl">
+            <div class="prose-custom">
+
+              <p class="text-lg text-text-secondary leading-relaxed mb-6">
+                Ein gutes Inserat verkauft sich fast von selbst. Doch was macht ein gutes Inserat aus? Es beginnt bei den Fotos, geht \u00fcber die Beschreibung bis hin zum richtigen Preis. Mit diesen bew\u00e4hrten Tipps steigerst du deine Verkaufschancen auf Ehren-Deal erheblich.
+              </p>
+
+              <h2 id="fotos" class="text-xl font-bold text-text mt-10 mb-3">Gute Fotos machen den Unterschied</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Fotos sind das Erste, was K\u00e4ufer sehen. Schlechte Bilder sorgen daf\u00fcr, dass dein Inserat \u00fcberscrollt wird — egal wie gut der Artikel ist. So machst du es besser:
+              </p>
+              <ul class="list-disc pl-5 text-text-secondary leading-relaxed mb-4 flex flex-col gap-1.5">
+                <li><strong class="text-text">Tageslicht nutzen:</strong> Fotografiere bei nat\u00fcrlichem Licht, am besten am Fenster oder drau\u00dfen. Vermeide Blitzlicht, es verf\u00e4lscht Farben und erzeugt harte Schatten.</li>
+                <li><strong class="text-text">Neutraler Hintergrund:</strong> Ein aufger\u00e4umter, einfarbiger Hintergrund lenkt nicht vom Artikel ab. Ein wei\u00dfer Tisch oder ein Bettlaken funktionieren gut.</li>
+                <li><strong class="text-text">Mehrere Perspektiven:</strong> Zeige den Artikel von vorne, hinten, von der Seite und im Detail. Bei Elektronik: Zeige das Display im eingeschalteten Zustand.</li>
+                <li><strong class="text-text">M\u00e4ngel dokumentieren:</strong> Kratzer, Gebrauchsspuren oder fehlende Teile solltest du offen zeigen. Das schafft Vertrauen und vermeidet sp\u00e4tere Reklamationen.</li>
+                <li><strong class="text-text">Mindestens 4 Bilder:</strong> Inserate mit mehreren Fotos werden deutlich h\u00e4ufiger angeklickt als solche mit nur einem Bild.</li>
+              </ul>
+
+              <h2 id="beschreibung" class="text-xl font-bold text-text mt-10 mb-3">Die perfekte Artikelbeschreibung</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Eine gute Beschreibung beantwortet alle Fragen, die ein K\u00e4ufer haben k\u00f6nnte, bevor er sie stellen muss. Das spart dir Nachrichten und beschleunigt den Verkauf.
+              </p>
+              <ul class="list-disc pl-5 text-text-secondary leading-relaxed mb-4 flex flex-col gap-1.5">
+                <li><strong class="text-text">Wichtiges zuerst:</strong> Marke, Modell, Gr\u00f6\u00dfe, Farbe, Zustand — die Kerninfos geh\u00f6ren in den ersten Satz.</li>
+                <li><strong class="text-text">Zustand ehrlich beschreiben:</strong> &bdquo;Leichte Gebrauchsspuren am Rahmen, Display einwandfrei&ldquo; ist besser als &bdquo;guter Zustand&ldquo;. Je konkreter, desto besser.</li>
+                <li><strong class="text-text">Grund f\u00fcr den Verkauf:</strong> K\u00e4ufer fragen sich oft, warum jemand einen Artikel verkauft. Ein kurzer Satz wie &bdquo;Upgrade auf ein neues Modell&ldquo; nimmt Unsicherheit.</li>
+                <li><strong class="text-text">Zubeh\u00f6r auflisten:</strong> Originalverpackung, Ladekabel, Bedienungsanleitung — erw\u00e4hne alles, was dabei ist.</li>
+              </ul>
+
+              <h2 id="preis" class="text-xl font-bold text-text mt-10 mb-3">Den richtigen Preis finden</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Der Preis entscheidet, ob K\u00e4ufer klicken oder weiterscrollen. So findest du den Sweet Spot:
+              </p>
+              <ul class="list-disc pl-5 text-text-secondary leading-relaxed mb-4 flex flex-col gap-1.5">
+                <li><strong class="text-text">Marktrecherche:</strong> Suche auf Ehren-Deal und anderen Plattformen nach vergleichbaren Artikeln. Was verlangen andere Verk\u00e4ufer?</li>
+                <li><strong class="text-text">Faustregel:</strong> Gebrauchte Artikel in gutem Zustand erzielen typischerweise 40\u201360 % des Neupreises. Bei fast neuen Artikeln mit OVP bis zu 70 %.</li>
+                <li><strong class="text-text">Verhandlungsspielraum:</strong> Setze den Preis leicht \u00fcber deinem Wunschpreis an. Viele K\u00e4ufer verhandeln gern, und ein kleiner Nachlass erh\u00f6ht die Abschlussrate.</li>
+              </ul>
+              <div class="bg-primary-light/40 border border-primary/20 rounded-lg p-4 mb-4">
+                <p class="text-sm text-text font-medium">
+                  Tipp: Gib in der Beschreibung an, ob der Preis verhandelbar ist (&bdquo;VB&ldquo;). Das senkt die H\u00fcrde f\u00fcr Interessenten, dich zu kontaktieren.
+                </p>
+              </div>
+
+              <h2 id="reaktionszeit" class="text-xl font-bold text-text mt-10 mb-3">Schnelle Antworten bringen mehr Verk\u00e4ufe</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Wenn ein K\u00e4ufer eine Frage stellt, ist sein Interesse am h\u00f6chsten. Je schneller du antwortest, desto wahrscheinlicher ist der Verkauf. Studien zeigen: Antworten innerhalb einer Stunde f\u00fchren bis zu dreimal h\u00e4ufiger zum Abschluss als Antworten am n\u00e4chsten Tag.
+              </p>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Aktiviere die Benachrichtigungen von Ehren-Deal, damit du keine Nachricht verpasst. Ein freundlicher, hilfsbereiter Ton in der Kommunikation wird \u00fcbrigens auch in Bewertungen positiv erw\u00e4hnt.
+              </p>
+
+              <h2 id="trust-score" class="text-xl font-bold text-text mt-10 mb-3">Trust-Score gezielt optimieren</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Dein Trust-Score auf Ehren-Deal ist dein digitaler Ruf. K\u00e4ufer entscheiden oft anhand des Scores, ob sie dir vertrauen. So verbesserst du ihn:
+              </p>
+              <ul class="list-disc pl-5 text-text-secondary leading-relaxed mb-4 flex flex-col gap-1.5">
+                <li><strong class="text-text">Verifiziere dein Profil:</strong> E-Mail, Telefonnummer und Identit\u00e4t — jede Verifizierungsstufe erh\u00f6ht deinen Trust-Score.</li>
+                <li><strong class="text-text">Deals erfolgreich abschlie\u00dfen:</strong> Jeder reibungslos abgewickelte Deal verbessert dein Profil.</li>
+                <li><strong class="text-text">Positive Bewertungen sammeln:</strong> Bitte K\u00e4ufer freundlich, eine Bewertung zu hinterlassen. Eine kurze Nachricht nach dem erfolgreichen Deal gen\u00fcgt.</li>
+                <li><strong class="text-text">Fair und transparent handeln:</strong> Beschreibungen, die der Realit\u00e4t entsprechen, f\u00fchren zu zufriedenen K\u00e4ufern und guten Bewertungen.</li>
+              </ul>
+
+              <h2 id="treuhand-anbieten" class="text-xl font-bold text-text mt-10 mb-3">Treuhand-Schutz anbieten</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Als Verk\u00e4ufer profitierst du ebenfalls vom Treuhand-Schutz. K\u00e4ufer bevorzugen Inserate mit Treuhand-Option, weil sie sich sicherer f\u00fchlen. Das bedeutet f\u00fcr dich: mehr Anfragen und schnellere Verk\u00e4ufe. Au\u00dferdem sch\u00fctzt die Treuhand-Zahlung auch dich als Verk\u00e4ufer — der K\u00e4ufer hat bereits bezahlt, bevor du den Artikel versendest.
+              </p>
+
+            </div>
+
+            <!-- Author -->
+            <div class="flex items-center gap-4 mt-10 pt-8 border-t border-border">
+              <div class="w-12 h-12 rounded-full bg-primary-light text-primary flex items-center justify-center text-lg font-bold flex-shrink-0">E</div>
+              <div>
+                <div class="font-semibold text-text">Ehren-Deal Redaktion</div>
+                <div class="text-sm text-text-secondary">Unser Redaktionsteam schreibt \u00fcber sicheres Handeln, Verbraucherschutz und alles rund um den digitalen Marktplatz.</div>
+              </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="bg-gradient-to-br from-navy to-primary-dark rounded-lg p-6 sm:p-8 mt-10 text-center">
+              <h2 class="text-xl font-bold text-white mb-2">Starte jetzt mit dem Verkaufen</h2>
+              <p class="text-white/70 mb-5 max-w-md mx-auto text-sm">Erstelle kostenlos dein erstes Inserat auf Ehren-Deal und erreiche K\u00e4ufer, die Wert auf Sicherheit legen.</p>
+              <a href="/anmelden" class="btn-primary px-8">Jetzt registrieren</a>
+            </div>
+
+            <!-- Related Articles -->
+            <div class="mt-12">
+              <h2 class="text-h3 mb-6">Weitere Artikel</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {relatedArticles.map((article) => (
+                  <a href={`/ratgeber/${article.slug}`} class="card p-5 hover:border-primary transition-colors group">
+                    <h3 class="font-semibold text-text text-sm mb-2 group-hover:text-primary transition-colors">{article.title}</h3>
+                    <p class="text-caption text-text-secondary leading-relaxed">{article.excerpt}</p>
+                  </a>
+                ))}
+              </div>
+            </div>
+
+          </article>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  <Footer />
+
+  <!-- JSON-LD Article -->
+  <script is:inline type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": title,
+    "description": description,
+    "datePublished": publishDate,
+    "dateModified": publishDate,
+    "author": {
+      "@type": "Organization",
+      "name": "Ehren-Deal Redaktion",
+      "url": siteUrl
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Ehren-Deal",
+      "url": siteUrl,
+      "logo": { "@type": "ImageObject", "url": `${siteUrl}/logo.png` }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `${siteUrl}/ratgeber/tipps-fuer-verkaeufer`
+    },
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Startseite", "item": siteUrl },
+        { "@type": "ListItem", "position": 2, "name": "Ratgeber", "item": `${siteUrl}/ratgeber` },
+        { "@type": "ListItem", "position": 3, "name": "Tipps f\u00fcr Verk\u00e4ufer" }
+      ]
+    }
+  })} />
+</BaseLayout>
