@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { lucia, prisma } from '../../../lib/auth';
 import { sendMail, emailVerifyHtml } from '../../../lib/mailer';
 import { checkRateLimit, rateLimitResponse } from '../../../lib/rate-limit';
+import { checkUsername, checkEmail } from '../../../lib/content-filter';
 
 const RegisterSchema = z.object({
     email: z.string().email('Ungültige E-Mail-Adresse'),
@@ -32,6 +33,13 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
 
     const { password, firstName, lastName, phone } = parsed.data;
     const email = parsed.data.email.toLowerCase().trim();
+
+    // Content-Filter: Rassismus, Antisemitismus, Hate Speech blockieren
+    const nameCheck = checkUsername(firstName, lastName);
+    if (nameCheck) return err(400, nameCheck);
+
+    const emailCheck = checkEmail(email);
+    if (emailCheck) return err(400, emailCheck);
 
     const exists = await prisma.user.findUnique({ where: { email } });
     if (exists) return err(409, 'E-Mail bereits registriert');
@@ -68,7 +76,8 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
             create: { id: `email-${user.id}`, userId: user.id, type: 'EMAIL', status: 'PENDING', metaJson: { token: verifyToken }, expiresAt: expires },
         });
 
-        const verifyUrl = `${import.meta.env.APP_URL ?? 'http://localhost:4321'}/api/verify/email/confirm?token=${verifyToken}&uid=${user.id}`;
+        const appUrl = process.env.APP_URL || import.meta.env.APP_URL || 'http://localhost:4321';
+        const verifyUrl = `${appUrl}/api/verify/email/confirm?token=${verifyToken}&uid=${user.id}`;
         await sendMail({ to: email, subject: 'Ehren-Deal – E-Mail bestätigen', html: emailVerifyHtml(verifyUrl) });
     } catch (e) {
         console.error('[register] Verification email failed:', e);

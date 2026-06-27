@@ -4,14 +4,13 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { categories } from "../data/listings";
 
-// Server-side: fetch first page from our own API
-const url = new URL("/api/listings", Astro.url.origin);
+const internalOrigin = import.meta.env.PROD ? `http://localhost:${import.meta.env.PORT || 3000}` : Astro.url.origin;
+const url = new URL("/api/listings", internalOrigin);
 url.searchParams.set("pageSize", "20");
 url.searchParams.set("page", "1");
 
-// Forward search params from URL
 for (const [k, v] of Astro.url.searchParams) {
-    if (["query", "category", "minPrice", "maxPrice", "city", "lat", "lng", "radius", "page", "pageSize"].includes(k)) {
+    if (["query", "category", "minPrice", "maxPrice", "city", "lat", "lng", "radius", "page", "pageSize", "sort", "treuhand"].includes(k)) {
         url.searchParams.set(k, v);
     }
 }
@@ -26,171 +25,197 @@ const currentPage = pagination.page ?? 1;
 const totalPages = pagination.totalPages ?? 1;
 const currentQuery = Astro.url.searchParams.get("query") ?? "";
 const currentCat = Astro.url.searchParams.get("category") ?? "";
+const currentSort = Astro.url.searchParams.get("sort") ?? "";
+const currentMinPrice = Astro.url.searchParams.get("minPrice") ?? "";
+const currentMaxPrice = Astro.url.searchParams.get("maxPrice") ?? "";
+const currentTreuhand = Astro.url.searchParams.get("treuhand") === "true";
 ---
 
-<BaseLayout title="Ehren-Deal · Handeln mit Handschlag">
+<BaseLayout title="Ehren-Deal – Sicher kaufen und verkaufen">
     <Header />
-    <main class="min-h-screen pt-8 pb-24">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <main id="main-content" class="min-h-screen">
 
-            <!-- Hero Section -->
-            <div class="mb-16 text-center pt-16 pb-4">
-                <p class="font-condensed text-[.7rem] font-medium tracking-[.2em] uppercase text-primary mb-5">Marktplatz</p>
-                <h1 class="font-headings font-light text-5xl md:text-6xl lg:text-7xl leading-[1.05] mb-4 text-foreground">
-                    Handeln<br/><em class="italic text-primary">mit Handschlag</em>
-                </h1>
-                <hr class="gold-rule" />
-                <p class="text-sm text-foreground/75 font-light max-w-md mx-auto leading-relaxed">
-                    Verifizierte Identitäten · Treuhand-Schutz · Lokale Deals
-                </p>
-
-                <!-- Search bar -->
-                <div class="pt-10 max-w-3xl mx-auto">
-                    <form id="searchForm" method="GET" class="flex flex-col gap-3 p-3 bg-secondary/50 border border-foreground/[.20]">
-                        <div class="flex flex-col sm:flex-row gap-3">
-                            <input
-                                name="query"
-                                value={currentQuery}
-                                placeholder="Was suchst du?"
-                                class="input-field flex-grow bg-transparent"
-                            />
-                            <select name="category" class="input-field sm:w-52 bg-transparent">
-                                <option value="">Alle Kategorien</option>
-                                {
-                                    categories.map((c) => (
-                                        <option
-                                            value={c.slug.toUpperCase()}
-                                            selected={currentCat === c.slug.toUpperCase()}
-                                        >
-                                            {c.label}
-                                        </option>
-                                    ))
-                                }
-                            </select>
-                            <button type="submit" class="btn-primary sm:w-36">
-                                Suchen
-                            </button>
-                        </div>
-                        <!-- Umkreissuche -->
-                        <div class="flex flex-col sm:flex-row gap-3 items-center">
-                            <select id="radiusSelect" name="radius" class="input-field sm:w-44 bg-transparent text-sm">
-                                <option value="">Kein Umkreis</option>
-                                <option value="5">5 km Umkreis</option>
-                                <option value="10">10 km Umkreis</option>
-                                <option value="25">25 km Umkreis</option>
-                                <option value="50">50 km Umkreis</option>
-                                <option value="100">100 km Umkreis</option>
-                                <option value="200">200 km Umkreis</option>
-                            </select>
-                            <button type="button" id="geoLocateBtn" class="flex items-center gap-2 text-sm text-primary hover:text-primary/80 font-condensed uppercase tracking-wider transition-colors whitespace-nowrap">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line></svg>
-                                <span id="geoLocateText">Standort nutzen</span>
-                            </button>
-                            <input type="hidden" name="lat" id="geoLat" />
-                            <input type="hidden" name="lng" id="geoLng" />
-                            <span id="geoStatus" class="text-xs text-primary/80 hidden"></span>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Pillars -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-2xl mx-auto mb-16 text-center">
-                <div>
-                    <div class="w-8 h-8 mx-auto mb-3 flex items-center justify-center text-primary/60">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M7 11v4a1 1 0 001 1h1m4-6v4a1 1 0 001 1h1m-8 0h8m-8 0H6m12 0h-2m-4-8l4-4m0 0l4 4m-4-4v12"/></svg>
-                    </div>
-                    <h3 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-foreground/80 mb-1">Handschlag</h3>
-                    <p class="text-xs text-foreground/80 font-light">Transparent & verbindlich</p>
-                </div>
-                <div>
-                    <div class="w-8 h-8 mx-auto mb-3 flex items-center justify-center text-primary/60">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                    </div>
-                    <h3 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-foreground/80 mb-1">Treuhand</h3>
-                    <p class="text-xs text-foreground/80 font-light">Dein Geld bleibt sicher</p>
-                </div>
-                <div>
-                    <div class="w-8 h-8 mx-auto mb-3 flex items-center justify-center text-primary/60">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    </div>
-                    <h3 class="font-condensed font-medium text-xs tracking-[.08em] uppercase text-foreground/80 mb-1">Identitäten</h3>
-                    <p class="text-xs text-foreground/80 font-light">Keine Fake-Profile</p>
-                </div>
-            </div>
-
-            <!-- Result summary -->
-            <div class="flex justify-between items-end mb-8 border-b border-foreground/[.20] pb-4">
-                <div>
-                    <h2 class="text-2xl font-headings font-light text-foreground">
-                        {currentQuery ? `Ergebnisse für „${currentQuery}"` : "Aktuelle Angebote"}
-                    </h2>
-                    <p class="text-foreground/80 text-xs mt-1.5 font-condensed font-light tracking-wider uppercase">
-                        {pagination.total} Anzeige{pagination.total !== 1 ? "n" : ""} gefunden
+        <!-- Hero -->
+        <section class="bg-gradient-to-br from-navy to-primary-dark text-white py-16 sm:py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="max-w-2xl">
+                    <p class="text-sm font-semibold text-success mb-3 tracking-wide">Käuferschutz bei jedem Deal</p>
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white leading-[1.1] mb-4">
+                        Kaufen und verkaufen.<br>Mit echtem Schutz.
+                    </h1>
+                    <p class="text-lg text-white/70 mb-8 max-w-lg">
+                        Der Marktplatz mit Treuhand-Zahlung. Dein Geld ist sicher, bis du zufrieden bist.
                     </p>
-                </div>
-                <div class="hidden sm:flex items-center">
-                    <span class="trust-badge">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Sicher Handeln
-                    </span>
+
+                    <form id="searchForm" method="GET" class="flex flex-col sm:flex-row gap-2 max-w-xl mb-6">
+                        <label class="sr-only" for="searchQuery">Suchbegriff</label>
+                        <input
+                            id="searchQuery"
+                            name="query"
+                            value={currentQuery}
+                            placeholder="Was suchst du?"
+                            class="flex-grow px-4 py-3.5 rounded-DEFAULT bg-white text-text placeholder-text-muted text-base focus:outline-none focus:ring-2 focus:ring-primary/40"
+                        />
+                        <button type="submit" class="btn-primary px-8">
+                            Suchen
+                        </button>
+                    </form>
+
+                    <div class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/60">
+                        <span>Treuhand-Schutz</span>
+                        <span>Verifizierte Nutzer</span>
+                        <span>Digitaler Handschlag</span>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Listings Grid -->
-            {
-                listings.length > 0 ? (
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {listings.map((l: any) => (
-                            <a href={`/listing/${l.id}`} class="group block h-full">
-                                <article class="bg-secondary/40 border border-foreground/[.20] overflow-hidden hover:border-primary/20 transition-all duration-500 h-full flex flex-col relative">
+        <!-- Leistungstausch Teaser -->
+        <section class="bg-gradient-to-r from-teal-600 to-teal-500 py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-white">NEU: Leistungstausch</h2>
+                            <p class="text-sm text-white/80">Tausche deine Fähigkeiten — ohne Geld, ohne Waren.</p>
+                        </div>
+                    </div>
+                    <a href="/leistungstausch" class="inline-flex items-center gap-2 px-6 py-2.5 bg-white text-teal-700 rounded-DEFAULT text-sm font-semibold hover:bg-teal-50 transition-colors flex-shrink-0">
+                        Jetzt entdecken
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+            </div>
+        </section>
 
-                                    <!-- Badges -->
-                                    <div class="absolute top-3 right-3 flex flex-col gap-2 z-10">
-                                        {l.treuhand && (
-                                            <span class="bg-primary/90 backdrop-blur-sm text-primary-foreground text-[.65rem] px-2 py-0.5 font-condensed font-medium uppercase tracking-wider">
-                                                Treuhand
-                                            </span>
-                                        )}
-                                        {l.seller?.trustScore?.level === 'VERIFIED' && (
-                                            <span class="bg-foreground/80 backdrop-blur-sm text-background text-[.65rem] px-2 py-0.5 font-condensed font-medium uppercase tracking-wider flex items-center gap-1">
-                                                <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-                                                Verifiziert
-                                            </span>
-                                        )}
-                                    </div>
+        <!-- Trust Bar -->
+        <section class="bg-primary-light/40 border-b border-border py-6">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center sm:text-left">
+                    <div class="flex items-center gap-3 sm:justify-start justify-center">
+                        <div class="w-10 h-10 rounded-full bg-success flex items-center justify-center text-white font-bold flex-shrink-0 text-sm">G</div>
+                        <div>
+                            <div class="text-sm font-semibold text-text">Geld-zurück-Garantie</div>
+                            <div class="text-caption text-text-secondary">Zahlung erst nach Erhalt</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 sm:justify-start justify-center">
+                        <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold flex-shrink-0 text-sm">V</div>
+                        <div>
+                            <div class="text-sm font-semibold text-text">Verifizierte Identitäten</div>
+                            <div class="text-caption text-text-secondary">KYC-geprüfte Verkäufer</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 sm:justify-start justify-center">
+                        <div class="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-white font-bold flex-shrink-0 text-sm">T</div>
+                        <div>
+                            <div class="text-sm font-semibold text-text">Trust-Score System</div>
+                            <div class="text-caption text-text-secondary">Transparente Bewertungen</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-                                    <!-- Image -->
-                                    <div class="aspect-[4/3] w-full bg-secondary relative overflow-hidden flex-shrink-0">
+        <!-- Categories + Listings -->
+        <section class="py-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+                <div class="mb-8">
+                    <div class="flex flex-wrap gap-2">
+                        <a href="/" class={`category-pill ${!currentCat ? 'active' : ''}`}>Alle</a>
+                        {categories.map((c) => (
+                            <a
+                                href={`/?category=${c.slug.toUpperCase()}`}
+                                class={`category-pill ${currentCat === c.slug.toUpperCase() ? 'active' : ''}`}
+                            >
+                                {c.label}
+                            </a>
+                        ))}
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-border">
+                    <p class="text-sm text-text-secondary">
+                        <span class="font-semibold text-text">{pagination.total}</span>
+                        {" "}Anzeige{pagination.total !== 1 ? "n" : ""}
+                        {currentQuery && <span> für <em class="not-italic font-semibold text-primary">„{currentQuery}"</em></span>}
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <form id="filterForm" method="GET" class="hidden sm:flex items-center gap-2">
+                            {currentQuery && <input type="hidden" name="query" value={currentQuery} />}
+                            {currentCat && <input type="hidden" name="category" value={currentCat} />}
+                            <label class="sr-only" for="minPrice">Mindestpreis</label>
+                            <input id="minPrice" name="minPrice" type="number" min="0" value={currentMinPrice} placeholder="€ von" class="input-field w-24 text-sm py-2" />
+                            <label class="sr-only" for="maxPrice">Maximalpreis</label>
+                            <input id="maxPrice" name="maxPrice" type="number" min="0" value={currentMaxPrice} placeholder="€ bis" class="input-field w-24 text-sm py-2" />
+                            <label class="flex items-center gap-1.5 text-sm text-text-secondary cursor-pointer select-none whitespace-nowrap">
+                                <input type="checkbox" name="treuhand" value="true" checked={currentTreuhand} class="accent-primary w-4 h-4" />
+                                Nur Treuhand-Schutz
+                            </label>
+                            <button type="submit" class="btn-ghost text-sm py-2">Filtern</button>
+                        </form>
+                        <form method="GET" id="sortForm">
+                            {currentQuery && <input type="hidden" name="query" value={currentQuery} />}
+                            {currentCat && <input type="hidden" name="category" value={currentCat} />}
+                            {currentMinPrice && <input type="hidden" name="minPrice" value={currentMinPrice} />}
+                            {currentMaxPrice && <input type="hidden" name="maxPrice" value={currentMaxPrice} />}
+                            {currentTreuhand && <input type="hidden" name="treuhand" value="true" />}
+                            <select name="sort" onchange="this.form.submit()" class="select-field w-auto py-2 px-3 text-sm cursor-pointer">
+                                <option value="" selected={!currentSort}>Neueste zuerst</option>
+                                <option value="price_asc" selected={currentSort === "price_asc"}>Preis aufsteigend</option>
+                                <option value="price_desc" selected={currentSort === "price_desc"}>Preis absteigend</option>
+                            </select>
+                        </form>
+                    </div>
+                </div>
+
+                {listings.length > 0 ? (
+                    <div class="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        {listings.map((l: any, i: number) => (
+                            <a href={`/inserat/${l.id}`} class="group block h-full">
+                                <article class="card h-full flex flex-col">
+                                    <div class="aspect-[4/3] w-full bg-background relative overflow-hidden flex-shrink-0">
                                         {l.images[0] ? (
                                             <img
                                                 src={l.images[0].url}
                                                 alt={l.title}
-                                                class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out"
-                                                loading="lazy"
+                                                width="400"
+                                                height="300"
+                                                class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                                                loading={i < 4 ? "eager" : "lazy"}
+                                                fetchpriority={i === 0 ? "high" : "auto"}
                                             />
                                         ) : (
-                                            <div class="w-full h-full flex items-center justify-center text-foreground/75">
-                                                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                            <div class="w-full h-full flex items-center justify-center text-text-muted text-sm">
+                                                Kein Bild
                                             </div>
                                         )}
                                     </div>
 
-                                    <!-- Content -->
                                     <div class="p-4 flex flex-col flex-grow">
-                                        <div class="text-lg font-headings font-light text-primary mb-0.5">
-                                            {(l.price / 100).toLocaleString("de-DE", { style: "currency", currency: "EUR" })}
+                                        <div class="flex flex-wrap gap-1.5 mb-2">
+                                            {l.treuhand && (
+                                                <span class="badge-treuhand">Treuhand-Schutz</span>
+                                            )}
+                                            {l.seller?.trustScore?.level && ['VERIFIED', 'TRUSTED', 'ELITE'].includes(l.seller.trustScore.level) && (
+                                                <span class="badge-verifiziert">Verifiziert</span>
+                                            )}
                                         </div>
-                                        <h3 class="font-light text-foreground/80 mb-2 line-clamp-2 leading-snug text-sm">
+
+                                        <h3 class="font-semibold text-text mb-1 line-clamp-2 leading-snug text-sm">
                                             {l.title}
                                         </h3>
-                                        <div class="mt-auto pt-3 flex items-center justify-between text-[.65rem] text-foreground/80 font-condensed tracking-wider uppercase">
-                                            <div class="flex items-center gap-1">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                                {l.city}
+
+                                        <div class="mt-auto pt-3 flex items-end justify-between">
+                                            <div class="text-lg font-bold text-primary">
+                                                {(l.price / 100).toLocaleString("de-DE", { style: "currency", currency: "EUR" })}
                                             </div>
-                                            <div class="text-foreground/75">
-                                                {l.category}
+                                            <div class="text-caption text-text-muted truncate ml-2">
+                                                {l.city}
                                             </div>
                                         </div>
                                     </div>
@@ -199,95 +224,259 @@ const currentCat = Astro.url.searchParams.get("category") ?? "";
                         ))}
                     </div>
                 ) : (
-                    <div class="text-center py-24 rounded-default border border-dashed border-foreground/25">
-                        <svg class="w-12 h-12 mx-auto mb-4 text-foreground/75" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        <h3 class="text-xl font-headings font-medium text-foreground mb-2">Keine Angebote gefunden</h3>
-                        <p class="text-foreground/80 max-w-sm mx-auto font-light">
+                    <div class="text-center py-20 rounded-DEFAULT border border-dashed border-border">
+                        <h3 class="text-h3 text-text mb-2">Keine Angebote gefunden</h3>
+                        <p class="text-text-secondary max-w-sm mx-auto">
                             Versuche andere Suchbegriffe oder erweitere deine Filterkriterien.
                         </p>
                     </div>
-                )
-            }
+                )}
 
-            <!-- Pagination -->
-            {
-                totalPages > 1 && (
-                    <nav class="flex items-center justify-center gap-4 mt-16 pb-8">
+                {totalPages > 1 && (
+                    <nav class="flex items-center justify-center gap-4 mt-12 pb-4">
                         {currentPage > 1 && (
                             <a
                                 href={`?${new URLSearchParams({ ...Object.fromEntries(Astro.url.searchParams), page: String(currentPage - 1) })}`}
-                                class="px-5 py-2.5 border border-foreground/25 text-foreground font-condensed text-xs tracking-wider uppercase hover:border-primary hover:text-primary transition-colors"
+                                class="btn-secondary"
                             >
-                                ← Zurück
+                                Zurück
                             </a>
                         )}
-                        <span class="text-foreground/75 font-medium text-sm px-4">
+                        <span class="text-sm text-text-secondary font-medium px-4">
                             Seite {currentPage} von {totalPages}
                         </span>
                         {currentPage < totalPages && (
                             <a
                                 href={`?${new URLSearchParams({ ...Object.fromEntries(Astro.url.searchParams), page: String(currentPage + 1) })}`}
-                                class="px-5 py-2.5 border border-foreground/25 text-primary font-condensed text-xs tracking-wider uppercase hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
+                                class="btn-primary text-sm py-2 px-6"
                             >
-                                Weiter →
+                                Weiter
                             </a>
                         )}
                     </nav>
-                )
-            }
-        </div>
+                )}
+            </div>
+        </section>
+
+        <!-- So funktioniert's -->
+        <section class="py-16 bg-surface border-t border-border">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-h2 mb-2">So funktioniert Ehren-Deal</h2>
+                    <p class="text-text-secondary">In drei Schritten sicher handeln</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-3xl mx-auto">
+                    <div class="text-center">
+                        <div class="w-12 h-12 rounded-full bg-primary-light text-primary text-lg font-bold flex items-center justify-center mx-auto mb-4">1</div>
+                        <h3 class="text-h4 mb-2">Inserat finden</h3>
+                        <p class="text-sm text-text-secondary leading-relaxed">Stöbere in Tausenden Inseraten oder nutze die Suche.</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 rounded-full bg-success-light text-success text-lg font-bold flex items-center justify-center mx-auto mb-4">2</div>
+                        <h3 class="text-h4 mb-2">Sicher bezahlen</h3>
+                        <p class="text-sm text-text-secondary leading-relaxed">Zahle per Treuhand — dein Geld wird erst freigegeben, wenn du zufrieden bist.</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 rounded-full bg-accent-light text-accent text-lg font-bold flex items-center justify-center mx-auto mb-4">3</div>
+                        <h3 class="text-h4 mb-2">Deal bestätigen</h3>
+                        <p class="text-sm text-text-secondary leading-relaxed">Bestätige den Erhalt per QR-Code, Versand-Tracking oder digital.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Risk Reversal -->
+        <section class="py-16 bg-primary-light/40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-10">
+                    <h2 class="text-h2 mb-2">Dein Geld ist sicher. Immer.</h2>
+                    <p class="text-text-secondary">Unser Treuhand-System schützt jeden Kauf</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-4 max-w-2xl mx-auto">
+                    <div class="flex gap-3 items-start">
+                        <svg class="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                        <div>
+                            <div class="font-semibold text-sm text-text">Geld-zurück-Garantie</div>
+                            <div class="text-caption text-text-secondary">Nicht zufrieden? Volle Erstattung.</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 items-start">
+                        <svg class="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                        <div>
+                            <div class="font-semibold text-sm text-text">Verifizierte Verkäufer</div>
+                            <div class="text-caption text-text-secondary">ID-Prüfung für mehr Sicherheit</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 items-start">
+                        <svg class="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                        <div>
+                            <div class="font-semibold text-sm text-text">Sichere Zahlung</div>
+                            <div class="text-caption text-text-secondary">Verschlüsselt und PCI-konform</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 items-start">
+                        <svg class="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                        <div>
+                            <div class="font-semibold text-sm text-text">Streitfall-Lösung</div>
+                            <div class="text-caption text-text-secondary">Wir vermitteln bei Problemen</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Warum Ehren-Deal -->
+        <section class="py-16 bg-surface">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-10">
+                    <h2 class="text-h2 mb-2">Warum Ehren-Deal?</h2>
+                    <p class="text-text-secondary text-sm">Das unterscheidet uns von anderen Marktplätzen.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                    <div class="card p-6 text-center">
+                        <div class="w-12 h-12 rounded-full bg-success-light text-success flex items-center justify-center mx-auto mb-4">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </div>
+                        <h3 class="text-sm font-semibold text-text mb-2">Echtes Treuhandkonto</h3>
+                        <p class="text-sm text-text-secondary leading-relaxed">Dein Geld liegt sicher auf einem Treuhandkonto. Erst nach deiner Bestätigung wird es freigegeben.</p>
+                    </div>
+                    <div class="card p-6 text-center">
+                        <div class="w-12 h-12 rounded-full bg-primary-light text-primary flex items-center justify-center mx-auto mb-4">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        </div>
+                        <h3 class="text-sm font-semibold text-text mb-2">Verifizierte Identitäten</h3>
+                        <p class="text-sm text-text-secondary leading-relaxed">Verkäufer werden per KYC-Verfahren geprüft. Du weißt, mit wem du handelst.</p>
+                    </div>
+                    <div class="card p-6 text-center">
+                        <div class="w-12 h-12 rounded-full bg-accent-light text-accent flex items-center justify-center mx-auto mb-4">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        </div>
+                        <h3 class="text-sm font-semibold text-text mb-2">Transparenter Trust-Score</h3>
+                        <p class="text-sm text-text-secondary leading-relaxed">Jeder Nutzer hat einen öffentlichen Trust-Score. Keine manipulierten Bewertungen.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-10">
+                    <h2 class="text-h2 mb-2">Häufig gestellte Fragen</h2>
+                </div>
+                <div class="max-w-2xl mx-auto flex flex-col gap-3" id="faqAccordion">
+                    <div class="card overflow-hidden">
+                        <button type="button" class="faq-toggle w-full flex items-center justify-between p-5 cursor-pointer text-sm font-semibold text-text hover:text-primary transition-colors text-left" aria-expanded="false">
+                            <span>Was ist der Treuhand-Schutz?</span>
+                            <svg class="w-4 h-4 text-text-muted transition-transform duration-200 faq-chevron flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="faq-content hidden px-5 pb-5 text-sm text-text-secondary leading-relaxed">
+                            Beim Treuhand-Schutz wird dein Geld sicher auf einem Treuhandkonto verwahrt. Erst wenn du den Erhalt der Ware bestätigst, wird der Betrag an den Verkäufer freigegeben. So bist du als Käufer immer geschützt.
+                        </div>
+                    </div>
+                    <div class="card overflow-hidden">
+                        <button type="button" class="faq-toggle w-full flex items-center justify-between p-5 cursor-pointer text-sm font-semibold text-text hover:text-primary transition-colors text-left" aria-expanded="false">
+                            <span>Was kostet Ehren-Deal?</span>
+                            <svg class="w-4 h-4 text-text-muted transition-transform duration-200 faq-chevron flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="faq-content hidden px-5 pb-5 text-sm text-text-secondary leading-relaxed">
+                            Das Erstellen von Inseraten ist kostenlos. Bei einem erfolgreichen Verkauf über den Treuhand-Service fällt für den Käufer eine Servicegebühr von 0,50 € und für den Verkäufer eine Verkaufsprovision von 5 % an. Alle Gebühren werden vor Kaufabschluss transparent angezeigt.
+                        </div>
+                    </div>
+                    <div class="card overflow-hidden">
+                        <button type="button" class="faq-toggle w-full flex items-center justify-between p-5 cursor-pointer text-sm font-semibold text-text hover:text-primary transition-colors text-left" aria-expanded="false">
+                            <span>Wie funktioniert die Verifizierung?</span>
+                            <svg class="w-4 h-4 text-text-muted transition-transform duration-200 faq-chevron flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="faq-content hidden px-5 pb-5 text-sm text-text-secondary leading-relaxed">
+                            Du kannst dich per E-Mail, Telefonnummer und Identitätsprüfung (KYC) verifizieren. Je mehr Verifizierungen, desto höher dein Trust-Score — und desto mehr Vertrauen schenken dir Käufer.
+                        </div>
+                    </div>
+                    <div class="card overflow-hidden">
+                        <button type="button" class="faq-toggle w-full flex items-center justify-between p-5 cursor-pointer text-sm font-semibold text-text hover:text-primary transition-colors text-left" aria-expanded="false">
+                            <span>Was passiert bei Problemen mit einem Kauf?</span>
+                            <svg class="w-4 h-4 text-text-muted transition-transform duration-200 faq-chevron flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="faq-content hidden px-5 pb-5 text-sm text-text-secondary leading-relaxed">
+                            Unser Support-Team hilft dir weiter. Bei Treuhand-Käufen ist dein Geld geschützt, bis die Situation geklärt ist. Du kannst außerdem jederzeit eine Anzeige melden.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA -->
+        <section class="bg-gradient-to-br from-navy to-primary-dark text-white py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3">Bereit für sichere Deals?</h2>
+                <p class="text-white/70 mb-8 max-w-md mx-auto">Kostenlos registrieren. Keine versteckten Gebühren.</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="/anmelden" class="btn-primary px-8">Jetzt registrieren</a>
+                    <a href="/sicherheit" class="btn-outline border-white/30 text-white hover:bg-white/10 px-8">Mehr erfahren</a>
+                </div>
+            </div>
+        </section>
+
     </main>
     <Footer />
+
+    <script is:inline type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Was ist der Treuhand-Schutz?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Beim Treuhand-Schutz wird dein Geld sicher auf einem Treuhandkonto verwahrt. Erst wenn du den Erhalt der Ware bestätigst, wird der Betrag an den Verkäufer freigegeben."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Was kostet Ehren-Deal?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Das Erstellen von Inseraten ist kostenlos. Bei einem erfolgreichen Verkauf fällt für den Käufer eine Servicegebühr von 0,50 € und für den Verkäufer eine Provision von 5% an."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Wie funktioniert die Verifizierung?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Du kannst dich per E-Mail, Telefonnummer und Identitätsprüfung (KYC) verifizieren. Je mehr Verifizierungen, desto höher dein Trust-Score."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Was passiert bei Problemen mit einem Kauf?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Unser Support-Team hilft dir weiter. Bei Treuhand-Käufen ist dein Geld geschützt, bis die Situation geklärt ist."
+          }
+        }
+      ]
+    }
+    </script>
 </BaseLayout>
 
 <script>
-    const geoBtn = document.getElementById('geoLocateBtn');
-    const geoText = document.getElementById('geoLocateText');
-    const geoStatus = document.getElementById('geoStatus');
-    const latInput = document.getElementById('geoLat') as HTMLInputElement;
-    const lngInput = document.getElementById('geoLng') as HTMLInputElement;
-    const radiusSelect = document.getElementById('radiusSelect') as HTMLSelectElement;
-
-    // Restore radius from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('radius') && radiusSelect) {
-        radiusSelect.value = urlParams.get('radius')!;
-    }
-    if (urlParams.get('lat') && latInput) latInput.value = urlParams.get('lat')!;
-    if (urlParams.get('lng') && lngInput) lngInput.value = urlParams.get('lng')!;
-
-    if (geoBtn) {
-        geoBtn.addEventListener('click', () => {
-            if (!navigator.geolocation) {
-                if (geoStatus) { geoStatus.textContent = 'Geolocation nicht verfügbar'; geoStatus.classList.remove('hidden'); }
-                return;
+    document.querySelectorAll('.faq-toggle').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const content = btn.nextElementSibling as HTMLElement;
+            const chevron = btn.querySelector('.faq-chevron') as HTMLElement;
+            const isOpen = !content.classList.contains('hidden');
+            if (isOpen) {
+                content.classList.add('hidden');
+                chevron.style.transform = 'rotate(0deg)';
+                btn.setAttribute('aria-expanded', 'false');
+            } else {
+                content.classList.remove('hidden');
+                chevron.style.transform = 'rotate(180deg)';
+                btn.setAttribute('aria-expanded', 'true');
             }
-            if (geoText) geoText.textContent = 'Wird ermittelt…';
-            navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    latInput.value = String(pos.coords.latitude);
-                    lngInput.value = String(pos.coords.longitude);
-                    if (geoText) geoText.textContent = 'Standort erkannt';
-                    if (geoStatus) { geoStatus.textContent = `${pos.coords.latitude.toFixed(2)}, ${pos.coords.longitude.toFixed(2)}`; geoStatus.classList.remove('hidden'); }
-                    // Default radius if none selected
-                    if (radiusSelect && !radiusSelect.value) radiusSelect.value = '25';
-                },
-                (err) => {
-                    const msgs: Record<number, string> = { 1: 'Zugriff verweigert', 2: 'Nicht verfügbar', 3: 'Timeout' };
-                    if (geoStatus) { geoStatus.textContent = msgs[err.code] || 'Fehler'; geoStatus.classList.remove('hidden'); geoStatus.style.color = '#e53e3e'; }
-                    if (geoText) geoText.textContent = 'Standort nutzen';
-                },
-                { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
-            );
         });
-    }
-
-    // Remove empty geo fields before submit
-    document.getElementById('searchForm')?.addEventListener('submit', () => {
-        if (!latInput?.value || !lngInput?.value || !radiusSelect?.value) {
-            latInput.removeAttribute('name');
-            lngInput.removeAttribute('name');
-            if (!radiusSelect.value) radiusSelect.removeAttribute('name');
-        }
     });
 </script>

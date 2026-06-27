@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { requireAuth, isAuthContext } from '../../../../lib/auth-middleware';
 import { checkRateLimit, rateLimitResponse } from '../../../../lib/rate-limit';
 import { filterMessage } from '../../../../lib/message-filter';
+import { checkContent } from '../../../../lib/content-filter';
 import { scanChatMessageKI } from '../../../../lib/ai-fraud-scanner';
 import { publishMessage } from '../../../../lib/ably';
 import { prisma } from '../../../../lib/auth';
@@ -57,6 +58,10 @@ export const POST: APIRoute = async ({ request, cookies, params, clientAddress }
 
     const parsed = MessageSchema.safeParse(body);
     if (!parsed.success) return err(400, parsed.error.issues[0]?.message ?? 'Validation error');
+
+    // Hate-Speech Filter
+    const hateCheck = checkContent(parsed.data.body);
+    if (hateCheck) return err(400, hateCheck);
 
     // Content filter & Ehren-Deal Scam Scanner (Regel + KI)
     const { blocked, reason } = filterMessage(parsed.data.body);

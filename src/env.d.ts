@@ -16,10 +16,10 @@ interface ImportMetaEnv {
     readonly IDNOW_COMPANY_ID: string;
     readonly IDNOW_BASE_URL: string;
 
-    // Mangopay
-    readonly MANGOPAY_CLIENT_ID: string;
-    readonly MANGOPAY_API_KEY: string;
-    readonly MANGOPAY_BASE_URL: string;
+    // Stripe
+    readonly STRIPE_SECRET_KEY: string;
+    readonly STRIPE_WEBHOOK_SECRET: string;
+    readonly STRIPE_PUBLISHABLE_KEY: string;
 
     // Algolia
     readonly ALGOLIA_APP_ID: string;

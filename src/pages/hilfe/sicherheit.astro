@@ -1,0 +1,230 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+---
+
+<BaseLayout title="Sicherheit & Verifizierung – Hilfe-Center – Ehren-Deal" description="Erfahre, wie Ehren-Deal dich mit KYC-Verifizierung, Betrugsschutz und sicheren Prozessen absichert." canonicalPath="/hilfe/sicherheit">
+    <Header />
+    <main id="main-content" class="min-h-screen pt-12 pb-24 bg-background">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <!-- Breadcrumb -->
+            <nav aria-label="Breadcrumb" class="mb-8">
+                <ol class="flex items-center gap-2 text-sm text-text-secondary">
+                    <li><a href="/" class="hover:text-primary transition-colors">Startseite</a></li>
+                    <li class="flex items-center gap-2">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <a href="/hilfe" class="hover:text-primary transition-colors">Hilfe-Center</a>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <span class="text-text font-medium">Sicherheit & Verifizierung</span>
+                    </li>
+                </ol>
+            </nav>
+
+            <!-- Header -->
+            <div class="mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold text-primary mb-3">Sicherheit & Verifizierung</h1>
+                <p class="text-text-secondary text-lg max-w-2xl">
+                    Ehren-Deal setzt auf mehrere Sicherheitsebenen, um dich vor Betrug zu schuetzen. Hier erfaehrst du, wie unser Schutzsystem funktioniert.
+                </p>
+            </div>
+
+            <!-- Security Pillars -->
+            <div class="grid sm:grid-cols-3 gap-4 mb-10">
+                <div class="card p-5 text-center">
+                    <div class="w-10 h-10 rounded-full bg-primary-light flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </div>
+                    <h3 class="text-sm font-semibold text-text mb-1">KYC-Verifizierung</h3>
+                    <p class="text-xs text-text-secondary">Jeder Nutzer wird mit Ausweisdokument geprueft</p>
+                </div>
+                <div class="card p-5 text-center">
+                    <div class="w-10 h-10 rounded-full bg-primary-light flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <h3 class="text-sm font-semibold text-text mb-1">Treuhand-Schutz</h3>
+                    <p class="text-xs text-text-secondary">Geld ist sicher bis zur Warenbestaetigung</p>
+                </div>
+                <div class="card p-5 text-center">
+                    <div class="w-10 h-10 rounded-full bg-primary-light flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    </div>
+                    <h3 class="text-sm font-semibold text-text mb-1">Betrugserkennung</h3>
+                    <p class="text-xs text-text-secondary">Automatische Pruefung verdaechtiger Aktivitaeten</p>
+                </div>
+            </div>
+
+            <!-- FAQ Accordion -->
+            <div class="space-y-4" id="faq-accordion">
+
+                <!-- FAQ 1 -->
+                <div class="card overflow-hidden">
+                    <button class="faq-toggle w-full flex items-center justify-between p-5 text-left" aria-expanded="false">
+                        <span class="text-sm font-semibold text-text pr-4">Was ist KYC und warum ist es notwendig?</span>
+                        <svg class="faq-chevron w-5 h-5 text-text-muted flex-shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <div class="text-sm text-text-secondary leading-relaxed space-y-3 border-t border-border pt-4">
+                            <p><strong>KYC</strong> steht fuer "Know Your Customer" (Kenne deinen Kunden) und ist ein gesetzlich vorgeschriebenes Verfahren zur Identitaetspruefung. Auf Ehren-Deal bedeutet das:</p>
+                            <p><strong>Warum KYC?</strong></p>
+                            <ul class="list-disc list-inside space-y-2 pl-1">
+                                <li><strong>Betrugsschutz:</strong> Anonyme Fake-Profile werden verhindert. Jeder Nutzer ist eine verifizierte, reale Person.</li>
+                                <li><strong>Gesetzliche Pflicht:</strong> Als Zahlungsplattform mit Treuhand-Service sind wir gesetzlich zur Identitaetspruefung verpflichtet (Geldwaeschegesetz).</li>
+                                <li><strong>Vertrauen:</strong> Verifizierte Nutzer geniessen mehr Vertrauen und haben einen hoeheren Trust-Score.</li>
+                                <li><strong>Sicherheit:</strong> Im Streitfall koennen wir Ansprueche zuordnen und durchsetzen.</li>
+                            </ul>
+                            <p><strong>Was wird geprueft?</strong></p>
+                            <ul class="list-disc list-inside space-y-2 pl-1">
+                                <li>Gueltigkeit des Ausweisdokuments (Personalausweis oder Reisepass)</li>
+                                <li>Uebereinstimmung von Foto und Person (Liveness-Check)</li>
+                                <li>Uebereinstimmung der Daten mit den Profilangaben</li>
+                            </ul>
+                            <p>Die Verifizierung wird von unserem Partner <strong>IDnow</strong> durchgefuehrt, einem zertifizierten Anbieter fuer digitale Identitaetspruefungen. Deine Daten werden verschluesselt uebertragen und gemaess DSGVO verarbeitet.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 2 -->
+                <div class="card overflow-hidden">
+                    <button class="faq-toggle w-full flex items-center justify-between p-5 text-left" aria-expanded="false">
+                        <span class="text-sm font-semibold text-text pr-4">Wie schuetzt mich Ehren-Deal vor Betrug?</span>
+                        <svg class="faq-chevron w-5 h-5 text-text-muted flex-shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <div class="text-sm text-text-secondary leading-relaxed space-y-3 border-t border-border pt-4">
+                            <p>Ehren-Deal setzt auf ein mehrstufiges Sicherheitssystem, das dich umfassend schuetzt:</p>
+                            <p><strong>1. Identitaetspruefung (KYC)</strong></p>
+                            <p>Alle Nutzer muessen sich mit einem gueltigen Ausweisdokument verifizieren. Anonyme Betrugsprofile koennen auf Ehren-Deal nicht existieren.</p>
+                            <p><strong>2. Treuhand-Zahlung</strong></p>
+                            <p>Dein Geld wird nie direkt an den Verkaeufer ueberwiesen, sondern auf einem sicheren Treuhandkonto verwahrt. Erst nach deiner Bestaetigung erfolgt die Auszahlung.</p>
+                            <p><strong>3. Trust-Score & Bewertungen</strong></p>
+                            <p>Das transparente Bewertungssystem zeigt dir auf einen Blick, wie zuverlaessig ein Nutzer ist. Je hoeher der Trust-Score, desto vertrauenswuerdiger.</p>
+                            <p><strong>4. KI-gestuetzte Betrugserkennung</strong></p>
+                            <p>Unsere Algorithmen analysieren Inserate, Preise und Nutzerverhalten in Echtzeit auf typische Betrugsmuster und verdaechtige Aktivitaeten.</p>
+                            <p><strong>5. Streitschlichtung</strong></p>
+                            <p>Bei Konflikten zwischen Kaeufer und Verkaeufer bieten wir ein faires, transparentes Schlichtungsverfahren. Unser Support-Team prueft jeden Fall individuell.</p>
+                            <p><strong>6. Sichere Kommunikation</strong></p>
+                            <p>Alle Nachrichten zwischen Nutzern laufen ueber die Plattform. Das schuetzt deine persoenlichen Kontaktdaten und ermoeglicht es uns, bei Problemen nachzuvollziehen, was vereinbart wurde.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 3 -->
+                <div class="card overflow-hidden">
+                    <button class="faq-toggle w-full flex items-center justify-between p-5 text-left" aria-expanded="false">
+                        <span class="text-sm font-semibold text-text pr-4">Wie melde ich verdaechtige Aktivitaeten?</span>
+                        <svg class="faq-chevron w-5 h-5 text-text-muted flex-shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <div class="text-sm text-text-secondary leading-relaxed space-y-3 border-t border-border pt-4">
+                            <p>Wenn dir etwas verdaechtig vorkommt, zoeegere nicht, es zu melden. Deine Meldung hilft, die Plattform fuer alle sicher zu halten.</p>
+                            <p><strong>Was solltest du melden?</strong></p>
+                            <ul class="list-disc list-inside space-y-2 pl-1">
+                                <li>Inserate mit unrealistisch niedrigen Preisen</li>
+                                <li>Nutzer, die auf Zahlung ausserhalb der Plattform bestehen</li>
+                                <li>Verdaechtige Nachrichten mit Links zu externen Seiten</li>
+                                <li>Inserate fuer verbotene oder gestohlene Waren</li>
+                                <li>Profile, die mehrfach unter verschiedenen Namen auftreten</li>
+                            </ul>
+                            <p><strong>So meldest du verdaechtige Aktivitaeten:</strong></p>
+                            <ol class="list-decimal list-inside space-y-2 pl-1">
+                                <li><strong>Inserat melden:</strong> Klicke auf der Inseratseite auf das Melde-Symbol und waehle einen Grund.</li>
+                                <li><strong>Nutzer melden:</strong> Gehe zum Profil des Nutzers und waehle "Nutzer melden".</li>
+                                <li><strong>Per E-Mail:</strong> Schreibe an <a href="mailto:office@ehren-deal.de" class="text-primary hover:underline">office@ehren-deal.de</a> mit dem Betreff "Verdachtsfall".</li>
+                            </ol>
+                            <p>Unser Sicherheitsteam prueft jede Meldung und ergreift bei Bedarf Massnahmen, bis hin zur Kontosperrung.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 4 -->
+                <div class="card overflow-hidden">
+                    <button class="faq-toggle w-full flex items-center justify-between p-5 text-left" aria-expanded="false">
+                        <span class="text-sm font-semibold text-text pr-4">Tipps: So schuetzt du dich selbst vor Betrug</span>
+                        <svg class="faq-chevron w-5 h-5 text-text-muted flex-shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <div class="text-sm text-text-secondary leading-relaxed space-y-3 border-t border-border pt-4">
+                            <p>Auch mit den besten Sicherheitsmassnahmen ist es wichtig, selbst wachsam zu sein. Beachte diese Regeln:</p>
+
+                            <div class="space-y-4">
+                                <div>
+                                    <p class="font-medium text-text mb-1">Immer ueber die Plattform zahlen</p>
+                                    <p>Ueberweise niemals Geld direkt an einen Verkaeufer, z.B. per PayPal "Freunde & Familie", Ueberweisung oder Kryptowaeaehrung. Nur Zahlungen ueber Ehren-Deal sind geschuetzt.</p>
+                                </div>
+
+                                <div>
+                                    <p class="font-medium text-text mb-1">Zu gute Angebote hinterfragen</p>
+                                    <p>Wenn ein Preis zu gut klingt, um wahr zu sein, ist er es wahrscheinlich. Ein iPhone fuer 50 Euro ist ein Warnsignal.</p>
+                                </div>
+
+                                <div>
+                                    <p class="font-medium text-text mb-1">Verkaeuferprofil pruefen</p>
+                                    <p>Achte auf den Trust-Score, Bewertungen und den Verifizierungsstatus. Ein neues Konto ohne Bewertungen erfordert mehr Vorsicht.</p>
+                                </div>
+
+                                <div>
+                                    <p class="font-medium text-text mb-1">Keine persoenlichen Daten teilen</p>
+                                    <p>Gib niemals Bankdaten, Passwoerter oder persoenliche Dokumente im Chat weiter. Ehren-Deal wird dich niemals nach deinem Passwort fragen.</p>
+                                </div>
+
+                                <div>
+                                    <p class="font-medium text-text mb-1">Kommunikation auf der Plattform halten</p>
+                                    <p>Wechsle nicht auf WhatsApp, Telegram oder andere Messenger. Gespraeche auf Ehren-Deal sind dokumentiert und schuetzen dich im Streitfall.</p>
+                                </div>
+
+                                <div>
+                                    <p class="font-medium text-text mb-1">Ware gruendlich pruefen</p>
+                                    <p>Bestaetige den Erhalt erst, nachdem du den Artikel sorgfaeltig geprueft hast. Nach der Bestaetigung ist der Deal abgeschlossen.</p>
+                                </div>
+                            </div>
+
+                            <div class="info-box p-4 mt-4">
+                                <p class="text-sm"><strong class="text-text">Im Zweifel:</strong> Kontaktiere unseren <a href="/kontakt" class="text-primary hover:underline">Support</a>, bevor du eine Zahlung taetigst oder eine Ware bestaetigst. Wir helfen dir gerne.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Link to full security page -->
+            <div class="info-box p-5 flex items-start gap-4 mt-10">
+                <svg class="w-5 h-5 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                <div>
+                    <p class="text-sm text-text font-medium mb-1">Ausfuehrliche Sicherheitsinfos</p>
+                    <p class="text-sm text-text-secondary">Detaillierte Informationen zum Ehren-Handschlag, Treuhandkonto und unseren sechs Sicherheitssaeulen findest du auf unserer <a href="/sicherheit" class="text-primary hover:underline">Sicherheitsseite</a>.</p>
+                </div>
+            </div>
+
+            <!-- Back to Hilfe-Center -->
+            <div class="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+                <a href="/hilfe" class="text-sm text-primary hover:underline flex items-center gap-2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    Zurueck zum Hilfe-Center
+                </a>
+                <a href="/kontakt" class="btn btn-outline text-sm px-5">Kontakt aufnehmen</a>
+            </div>
+
+        </div>
+    </main>
+    <Footer />
+</BaseLayout>
+
+<script>
+    document.querySelectorAll('.faq-toggle').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            btn.setAttribute('aria-expanded', String(!expanded));
+            const content = btn.nextElementSibling as HTMLElement | null;
+            const chevron = btn.querySelector('.faq-chevron') as HTMLElement | null;
+            if (content) content.classList.toggle('hidden', expanded);
+            if (chevron) chevron.style.transform = expanded ? '' : 'rotate(180deg)';
+        });
+    });
+</script>

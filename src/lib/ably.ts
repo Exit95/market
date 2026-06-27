@@ -7,7 +7,7 @@ import Ably from 'ably';
 let _rest: Ably.Rest | null = null;
 
 function getAbly() {
-    if (!_rest) _rest = new Ably.Rest(import.meta.env.ABLY_API_KEY);
+    if (!_rest) _rest = new Ably.Rest(process.env.ABLY_API_KEY || import.meta.env.ABLY_API_KEY);
     return _rest;
 }
 

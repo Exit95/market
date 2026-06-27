@@ -4,11 +4,11 @@ import { lucia } from '../lib/auth';
 const navLinks = [
     { href: "/", label: "Startseite" },
     { href: "/kategorien", label: "Kategorien" },
+    { href: "/leistungstausch", label: "Leistungstausch", teal: true },
     { href: "/sicherheit", label: "Sicherheit" },
 ];
 const currentPath = Astro.url.pathname;
 
-// Check auth status
 let authUser: { firstName: string | null; lastName: string | null; email: string; role: string } | null = null;
 const sessionId = Astro.cookies.get(lucia.sessionCookieName)?.value;
 if (sessionId) {
@@ -22,36 +22,16 @@ if (sessionId) {
 const displayName = authUser?.firstName || authUser?.email?.split('@')[0] || 'Konto';
 ---
 
-<header class="sticky top-0 z-50 bg-background/90 backdrop-blur-xl border-b border-foreground/[.20]">
+<a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-primary focus:text-white focus:px-4 focus:py-2 focus:rounded">
+    Zum Inhalt springen
+</a>
+
+<header class="sticky top-0 z-50 bg-surface border-b border-border">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             <!-- Logo -->
-            <a href="/" class="flex items-center gap-3 flex-shrink-0 group">
-                <div class="medallion-wrap">
-                    <svg class="ring-svg" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <path id="rp" d="M70,70 m-52,0 a52,52 0 1,1 104,0 a52,52 0 1,1-104,0"/>
-                        </defs>
-                        <text font-family="Barlow Condensed, sans-serif" font-size="8.8" fill="#c8973a" letter-spacing="5.2" font-weight="400" opacity=".65">
-                            <textPath href="#rp">EHREN-DEAL  ·  HANDELN MIT HANDSCHLAG  ·  </textPath>
-                        </text>
-                        <circle cx="70" cy="70" r="61" stroke="#c8973a" stroke-width=".4" opacity=".15"/>
-                    </svg>
-                    <div class="medal-inner">
-                        <svg class="mark-svg" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M4 20 L13 14 L19 18 L21 18 L27 14 L36 20" stroke="#c8973a" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M13 14 L13 27" stroke="#c8973a" stroke-width="1.4" stroke-linecap="round" opacity=".4"/>
-                            <path d="M27 14 L27 27" stroke="#c8973a" stroke-width="1.4" stroke-linecap="round" opacity=".4"/>
-                            <path d="M19 18 L19 28" stroke="#c8973a" stroke-width="1.4" stroke-linecap="round" opacity=".6"/>
-                            <path d="M21 18 L21 28" stroke="#c8973a" stroke-width="1.4" stroke-linecap="round" opacity=".6"/>
-                            <line x1="13" y1="27" x2="27" y2="27" stroke="#c8973a" stroke-width="1.4" stroke-linecap="round" opacity=".3"/>
-                            <circle cx="20" cy="9" r="1.2" fill="#c8973a" opacity=".5"/>
-                        </svg>
-                    </div>
-                </div>
-                <span class="font-condensed font-medium text-lg tracking-[.12em] uppercase text-foreground">
-                    Ehren‑Deal
-                </span>
+            <a href="/" class="flex items-center gap-2 flex-shrink-0">
+                <span class="font-bold text-lg text-navy tracking-tight">Ehren-Deal</span>
             </a>
 
             <!-- Desktop Nav -->
@@ -59,10 +39,14 @@ const displayName = authUser?.firstName || authUser?.email?.split('@')[0] || 'Ko
                 {navLinks.map((link) => (
                     <a
                         href={link.href}
-                        class={`font-condensed text-[.78rem] font-medium tracking-[.08em] uppercase transition-colors duration-200 ${
-                            currentPath === link.href
-                            ? "text-primary"
-                            : "text-foreground/80 hover:text-foreground"
+                        class={`text-sm font-medium transition-colors duration-200 ${
+                            currentPath.startsWith(link.href) && link.href !== '/'
+                            ? (link.teal ? "text-teal-600" : "text-primary")
+                            : currentPath === link.href
+                            ? (link.teal ? "text-teal-600" : "text-primary")
+                            : link.teal
+                            ? "text-teal-600 hover:text-teal-700"
+                            : "text-text-secondary hover:text-text"
                         }`}
                     >
                         {link.label}
@@ -70,82 +54,138 @@ const displayName = authUser?.firstName || authUser?.email?.split('@')[0] || 'Ko
                 ))}
             </nav>
 
-            <!-- Right side -->
-            <div class="hidden md:flex items-center gap-5">
+            <!-- Desktop Actions -->
+            <div class="hidden md:flex items-center gap-3">
                 {authUser ? (
                     <>
-                        <a href="/dashboard/deals" class="font-condensed text-[.78rem] font-medium tracking-[.08em] uppercase text-foreground/80 hover:text-foreground transition-colors">
-                            Meine Deals
+                        <a href="/nachrichten" class={`p-2 rounded-lg transition-colors ${currentPath === '/nachrichten' ? 'text-primary bg-primary-light' : 'text-text-secondary hover:text-text hover:bg-background'}`} title="Nachrichten">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        </a>
+                        <a href="/dashboard/deals" class={`p-2 rounded-lg transition-colors ${currentPath.startsWith('/dashboard') ? 'text-primary bg-primary-light' : 'text-text-secondary hover:text-text hover:bg-background'}`} title="Meine Deals">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                         </a>
                         <div class="relative" id="userMenuWrap">
-                            <button id="userMenuBtn" class="flex items-center gap-2 font-condensed text-[.78rem] font-medium tracking-[.08em] uppercase text-foreground/80 hover:text-foreground transition-colors">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <button id="userMenuBtn" class="flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-text transition-colors ml-1">
+                                <div class="w-8 h-8 rounded-full bg-primary-light text-primary flex items-center justify-center text-xs font-bold">
+                                    {(authUser.firstName?.[0] || authUser.email[0]).toUpperCase()}
+                                </div>
                                 {displayName}
                             </button>
-                            <div id="userDropdown" class="hidden absolute right-0 top-full mt-2 w-48 bg-background border border-foreground/[.20] shadow-lg z-50">
-                                <a href="/profil" class="block px-4 py-2.5 text-xs font-condensed uppercase tracking-wider text-foreground/80 hover:bg-foreground/[.06] hover:text-foreground transition-colors">Profil</a>
-                                <a href="/dashboard/deals" class="block px-4 py-2.5 text-xs font-condensed uppercase tracking-wider text-foreground/80 hover:bg-foreground/[.06] hover:text-foreground transition-colors">Meine Deals</a>
+                            <div id="userDropdown" class="hidden absolute right-0 top-full mt-2 w-52 bg-surface border border-border rounded-DEFAULT shadow-lg z-50 py-1">
+                                <a href="/profil" class="block px-4 py-2.5 text-sm text-text-secondary hover:bg-background hover:text-text transition-colors">Profil</a>
+                                <a href="/nachrichten" class="block px-4 py-2.5 text-sm text-text-secondary hover:bg-background hover:text-text transition-colors">Nachrichten</a>
+                                <a href="/merkliste" class="block px-4 py-2.5 text-sm text-text-secondary hover:bg-background hover:text-text transition-colors">Merkliste</a>
+                                <a href="/dashboard/listings" class="block px-4 py-2.5 text-sm text-text-secondary hover:bg-background hover:text-text transition-colors">Meine Anzeigen</a>
+                                <a href="/dashboard/deals" class="block px-4 py-2.5 text-sm text-text-secondary hover:bg-background hover:text-text transition-colors">Meine Deals</a>
+                                <a href="/leistungstausch/deals" class="block px-4 py-2.5 text-sm text-teal-600 hover:bg-teal-50 hover:text-teal-700 transition-colors">Leistungstausch-Deals</a>
+                                <a href="/einstellungen" class="block px-4 py-2.5 text-sm text-text-secondary hover:bg-background hover:text-text transition-colors">Einstellungen</a>
                                 {authUser.role === 'ADMIN' && (
-                                    <a href="/admin" class="block px-4 py-2.5 text-xs font-condensed uppercase tracking-wider text-primary/80 hover:bg-primary/[.06] hover:text-primary transition-colors">Admin</a>
+                                    <a href="/admin" class="block px-4 py-2.5 text-sm text-primary hover:bg-primary-light transition-colors">Admin</a>
                                 )}
-                                <button id="logoutBtn" class="w-full text-left px-4 py-2.5 text-xs font-condensed uppercase tracking-wider text-foreground/80 hover:bg-foreground/[.06] hover:text-foreground transition-colors border-t border-foreground/[.12]">Abmelden</button>
+                                <button id="logoutBtn" class="w-full text-left px-4 py-2.5 text-sm text-text-secondary hover:bg-background hover:text-text transition-colors border-t border-border">Abmelden</button>
                             </div>
                         </div>
                     </>
                 ) : (
-                    <a href="/anmelden" class="font-condensed text-[.78rem] font-medium tracking-[.08em] uppercase text-foreground/80 hover:text-foreground transition-colors">
+                    <a href="/anmelden" class="text-sm font-medium text-text-secondary hover:text-text transition-colors">
                         Anmelden
                     </a>
                 )}
-                <a href="/inserat-erstellen" class="btn-outline text-[.72rem] py-1.5 px-4">
+                <a href="/inserat-erstellen" class="btn-primary text-sm py-2 px-5">
                     Anzeige aufgeben
                 </a>
             </div>
 
             <!-- Mobile Menu Button -->
-            <button
-                class="md:hidden p-2 text-foreground/75 hover:text-foreground transition-colors focus:outline-none"
-                id="mobileMenuBtn"
-                aria-label="Menü öffnen"
-                aria-expanded="false"
-                aria-controls="mobileMenu"
-            >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            </button>
+            <div class="flex md:hidden items-center gap-2">
+                {authUser && (
+                    <a href="/nachrichten" class="p-2 text-text-secondary hover:text-primary transition-colors" title="Nachrichten">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </a>
+                )}
+                <button
+                    class="p-2 text-text-secondary hover:text-text transition-colors focus:outline-none"
+                    id="mobileMenuBtn"
+                    aria-label="Menü öffnen"
+                    aria-expanded="false"
+                    aria-controls="mobileMenu"
+                >
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- Mobile Menu -->
-    <div class="md:hidden hidden absolute top-full left-0 w-full bg-background border-b border-foreground/[.20]" id="mobileMenu">
+    <div class="md:hidden absolute top-full left-0 w-full bg-surface border-b border-border z-40" id="mobileMenu" style="max-height:0;overflow:hidden;transition:max-height 0.3s ease;">
         <div class="px-6 pt-3 pb-6 space-y-1">
             {navLinks.map((link) => (
                 <a
                     href={link.href}
-                    class={`block py-3 font-condensed text-sm font-medium tracking-wider uppercase border-b border-foreground/[.20] ${
-                        currentPath === link.href ? "text-primary" : "text-foreground/75 hover:text-foreground"
+                    class={`block py-3 text-sm font-medium border-b border-border-light ${
+                        currentPath.startsWith(link.href) && link.href !== '/'
+                        ? (link.teal ? "text-teal-600" : "text-primary")
+                        : currentPath === link.href
+                        ? (link.teal ? "text-teal-600" : "text-primary")
+                        : link.teal
+                        ? "text-teal-600 hover:text-teal-700"
+                        : "text-text-secondary hover:text-text"
                     }`}
                 >
                     {link.label}
                 </a>
             ))}
-            <div class="pt-4 space-y-3">
+            <div class="pt-4 space-y-1">
                 {authUser ? (
                     <>
-                        <a href="/dashboard/deals" class="block text-center py-3 font-condensed text-sm font-medium text-foreground/75 hover:text-foreground transition-colors uppercase tracking-wider">
+                        <div class="flex items-center gap-3 py-3 border-b border-border-light">
+                            <div class="w-10 h-10 rounded-full bg-primary-light text-primary flex items-center justify-center text-sm font-bold">
+                                {(authUser.firstName?.[0] || authUser.email[0]).toUpperCase()}
+                            </div>
+                            <div>
+                                <div class="text-sm font-semibold text-text">{displayName}</div>
+                                <div class="text-caption text-text-muted">{authUser.email}</div>
+                            </div>
+                        </div>
+                        <a href="/profil" class="flex items-center gap-3 py-3 text-sm font-medium text-text-secondary hover:text-text transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            Profil
+                        </a>
+                        <a href="/nachrichten" class="flex items-center gap-3 py-3 text-sm font-medium text-text-secondary hover:text-text transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            Nachrichten
+                        </a>
+                        <a href="/dashboard/listings" class="flex items-center gap-3 py-3 text-sm font-medium text-text-secondary hover:text-text transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                            Meine Anzeigen
+                        </a>
+                        <a href="/dashboard/deals" class="flex items-center gap-3 py-3 text-sm font-medium text-text-secondary hover:text-text transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                             Meine Deals
                         </a>
-                        <button id="mobileLogoutBtn" class="block w-full text-center py-3 font-condensed text-sm font-medium text-foreground/75 hover:text-foreground transition-colors uppercase tracking-wider">
-                            Abmelden
-                        </button>
+                        <a href="/merkliste" class="flex items-center gap-3 py-3 text-sm font-medium text-text-secondary hover:text-text transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                            Merkliste
+                        </a>
+                        <a href="/einstellungen" class="flex items-center gap-3 py-3 text-sm font-medium text-text-secondary hover:text-text transition-colors border-b border-border-light">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                            Einstellungen
+                        </a>
+                        {authUser.role === 'ADMIN' && (
+                            <a href="/admin" class="flex items-center gap-3 py-3 text-sm font-medium text-primary hover:bg-primary-light transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                Admin Dashboard
+                            </a>
+                        )}
+                        <a href="/inserat-erstellen" class="btn-primary w-full flex items-center justify-center py-3 mt-2">Anzeige aufgeben</a>
+                        <button id="mobileLogoutBtn" class="w-full text-center py-3 text-sm font-medium text-text-muted hover:text-danger transition-colors mt-1">Abmelden</button>
                     </>
                 ) : (
-                    <a href="/anmelden" class="block text-center py-3 font-condensed text-sm font-medium text-foreground/75 hover:text-foreground transition-colors uppercase tracking-wider">
-                        Anmelden
-                    </a>
+                    <>
+                        <a href="/anmelden" class="block text-center py-3 text-sm font-medium text-text-secondary hover:text-text transition-colors">Anmelden</a>
+                        <a href="/inserat-erstellen" class="btn-primary w-full flex items-center justify-center py-3">Anzeige aufgeben</a>
+                    </>
                 )}
-                <a href="/inserat-erstellen" class="btn-outline w-full flex items-center justify-center py-2.5">
-                    Anzeige aufgeben
-                </a>
             </div>
         </div>
     </div>
@@ -153,28 +193,34 @@ const displayName = authUser?.firstName || authUser?.email?.split('@')[0] || 'Ko
 
 <script>
     const btn = document.getElementById("mobileMenuBtn");
-    const menu = document.getElementById("mobileMenu");
+    const menu = document.getElementById("mobileMenu") as HTMLElement | null;
+    const btnSvg = btn?.querySelector("svg");
+
+    const hamburgerPath = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"></path>';
+    const xPath = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 6l12 12M6 18L18 6"></path>';
+
+    let mobileMenuOpen = false;
 
     btn?.addEventListener("click", () => {
-        const isHidden = menu?.classList.contains('hidden');
-        if (isHidden) {
-            menu?.classList.remove('hidden');
+        mobileMenuOpen = !mobileMenuOpen;
+        if (mobileMenuOpen) {
+            if (menu) menu.style.maxHeight = "600px";
+            if (btnSvg) btnSvg.innerHTML = xPath;
             btn.setAttribute('aria-expanded', 'true');
             btn.setAttribute('aria-label', 'Menü schließen');
         } else {
-            menu?.classList.add('hidden');
+            if (menu) menu.style.maxHeight = "0";
+            if (btnSvg) btnSvg.innerHTML = hamburgerPath;
             btn.setAttribute('aria-expanded', 'false');
             btn.setAttribute('aria-label', 'Menü öffnen');
         }
     });
 
-    // User dropdown toggle
     const userMenuBtn = document.getElementById("userMenuBtn");
     const userDropdown = document.getElementById("userDropdown");
     userMenuBtn?.addEventListener("click", () => {
         userDropdown?.classList.toggle("hidden");
     });
-    // Close dropdown on outside click
     document.addEventListener("click", (e) => {
         if (userDropdown && !userDropdown.classList.contains("hidden")) {
             const wrap = document.getElementById("userMenuWrap");
@@ -184,7 +230,6 @@ const displayName = authUser?.firstName || authUser?.email?.split('@')[0] || 'Ko
         }
     });
 
-    // Logout handler
     async function doLogout() {
         try {
             await fetch("/api/auth/logout", { method: "POST" });
@@ -194,35 +239,3 @@ const displayName = authUser?.firstName || authUser?.email?.split('@')[0] || 'Ko
     document.getElementById("logoutBtn")?.addEventListener("click", doLogout);
     document.getElementById("mobileLogoutBtn")?.addEventListener("click", doLogout);
 </script>
-
-
-<style>
-    .medallion-wrap {
-        position: relative;
-        width: 64px;
-        height: 64px;
-        flex-shrink: 0;
-    }
-    .ring-svg {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        animation: spin-slow 25s linear infinite;
-    }
-    .medal-inner {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .mark-svg {
-        width: 30px;
-        height: 30px;
-    }
-    @keyframes spin-slow {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-</style>

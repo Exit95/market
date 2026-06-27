@@ -4,37 +4,68 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 
-// ──────────────────────────── calcFee ────────────────────────────────────────
+// ──────────────────────────── Gebührenmodell ────────────────────────────────
 
 // Re-implement locally to avoid import.meta.env dependency
-const FEE_RATE = 0.024;
-function calcFee(amountCents: number) {
-    return Math.round(amountCents * FEE_RATE);
+const BUYER_FEE_CENTS = 50; // 0,50 € feste Servicegebühr
+const SELLER_COMMISSION_RATE = 0.05; // 5 % Verkaufsprovision
+
+function calcBuyerFee(): number {
+    return BUYER_FEE_CENTS;
 }
 
-describe('calcFee (2.4% platform fee)', () => {
-    it('calculates 2.4% of 10000 cents (100€)', () => {
-        expect(calcFee(10000)).toBe(240);
+function calcSellerCommission(priceCents: number): number {
+    return Math.round(priceCents * SELLER_COMMISSION_RATE);
+}
+
+function calcBuyerTotal(priceCents: number): number {
+    return priceCents + BUYER_FEE_CENTS;
+}
+
+function calcSellerPayout(priceCents: number): number {
+    return priceCents - calcSellerCommission(priceCents);
+}
+
+describe('Käufer-Servicegebühr (0,50 € fest)', () => {
+    it('returns 50 cents always', () => {
+        expect(calcBuyerFee()).toBe(50);
     });
 
-    it('calculates fee for 94900 cents (949€)', () => {
-        expect(calcFee(94900)).toBe(2278);
+    it('calculates buyer total (price + 0,50 €)', () => {
+        expect(calcBuyerTotal(10000)).toBe(10050); // 100 € + 0,50 €
+        expect(calcBuyerTotal(94900)).toBe(94950); // 949 € + 0,50 €
+        expect(calcBuyerTotal(0)).toBe(50);        // 0 € + 0,50 €
+    });
+});
+
+describe('Verkäufer-Provision (5 %)', () => {
+    it('calculates 5% of 10000 cents (100 €)', () => {
+        expect(calcSellerCommission(10000)).toBe(500);
+    });
+
+    it('calculates commission for 94900 cents (949 €)', () => {
+        expect(calcSellerCommission(94900)).toBe(4745);
     });
 
     it('returns 0 for 0 cents', () => {
-        expect(calcFee(0)).toBe(0);
+        expect(calcSellerCommission(0)).toBe(0);
     });
 
     it('rounds correctly for small amounts', () => {
-        // 500 * 0.024 = 12
-        expect(calcFee(500)).toBe(12);
-        // 123 * 0.024 = 2.952 → rounds to 3
-        expect(calcFee(123)).toBe(3);
+        // 500 * 0.05 = 25
+        expect(calcSellerCommission(500)).toBe(25);
+        // 123 * 0.05 = 6.15 → rounds to 6
+        expect(calcSellerCommission(123)).toBe(6);
+    });
+
+    it('calculates seller payout correctly', () => {
+        expect(calcSellerPayout(10000)).toBe(9500);  // 100 € - 5 € = 95 €
+        expect(calcSellerPayout(94900)).toBe(90155);  // 949 € - 47,45 € = 901,55 €
     });
 
     it('handles large amounts', () => {
-        // 1_000_000 * 0.024 = 24000
-        expect(calcFee(1_000_000)).toBe(24000);
+        // 1_000_000 * 0.05 = 50000
+        expect(calcSellerCommission(1_000_000)).toBe(50000);
     });
 });
 

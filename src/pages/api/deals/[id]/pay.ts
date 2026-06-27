@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { requireAuth, isAuthContext } from '../../../../lib/auth-middleware';
-import { getStripe } from '../../../../lib/stripe';
+import { getStripe, calcBuyerFee } from '../../../../lib/stripe';
 import { prisma } from '../../../../lib/auth';
 
 /**
@@ -19,8 +19,8 @@ export const POST: APIRoute = async ({ request, cookies, params, clientAddress }
     if (deal.buyerId !== auth.userId) return err(403, 'Forbidden');
     if (deal.status !== 'PENDING') return err(409, `Deal status is ${deal.status}, expected PENDING`);
 
-    const chargeAmount = deal.totalAmount + deal.feeCents; // price + platform fee
-    const appUrl = import.meta.env.APP_URL || 'http://localhost:4321';
+    const chargeAmount = deal.totalAmount + calcBuyerFee(); // Artikelpreis + 0,50 € Servicegebühr
+    const appUrl = process.env.APP_URL || import.meta.env.APP_URL || 'http://localhost:4321';
 
     // Idempotency: reuse existing session/PI if already created
     if (deal.payment?.paymentIntentId) {

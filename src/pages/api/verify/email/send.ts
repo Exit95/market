@@ -25,7 +25,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         create: { id: `email-${auth.userId}`, userId: auth.userId, type: 'EMAIL', status: 'PENDING', metaJson: { token }, expiresAt: expires },
     });
 
-    const url = `${import.meta.env.APP_URL}/api/verify/email/confirm?token=${token}&uid=${auth.userId}`;
+    const appUrl = process.env.APP_URL || import.meta.env.APP_URL || 'http://localhost:4321';
+    const url = `${appUrl}/api/verify/email/confirm?token=${token}&uid=${auth.userId}`;
 
     await sendMail({ to: user.email, subject: 'Ehren-Deal – E-Mail bestätigen', html: emailVerifyHtml(url) });
 

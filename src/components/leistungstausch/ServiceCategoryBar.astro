@@ -1,0 +1,23 @@
+---
+import { serviceCategories } from '../../data/service-categories';
+
+interface Props {
+  activeSlug?: string;
+}
+const { activeSlug } = Astro.props;
+---
+
+<div class="bg-surface border-b border-border">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center gap-2 py-3 overflow-x-auto scrollbar-hide -mx-4 px-4">
+      <a href="/leistungstausch" class={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${!activeSlug ? 'bg-teal-600 text-white' : 'bg-background text-text-secondary hover:bg-teal-50 hover:text-teal-700'}`}>
+        Alle
+      </a>
+      {serviceCategories.map((cat) => (
+        <a href={`/leistungstausch?offeredCategory=${cat.slug}`} class={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${activeSlug === cat.slug ? 'bg-teal-600 text-white' : 'bg-background text-text-secondary hover:bg-teal-50 hover:text-teal-700'}`}>
+          {cat.name}
+        </a>
+      ))}
+    </div>
+  </div>
+</div>

@@ -1,0 +1,205 @@
+Du bist ein Elite-Team aus:
+- Senior Mobile UX Designer
+- Senior UI Designer
+- Senior Product Designer
+- Senior Marketplace UX Specialist
+- Senior Trust Experience Designer
+
+Deine Aufgabe ist es, das vollständige UX- und UI-Konzept für die Mobile-App Ehren-Deal zu entwerfen.
+
+Projektkontext:
+Ehren-Deal ist ein fairer, moderner, sicherer und vertrauenswürdiger Marktplatz für Deutschland. Die App soll sich optisch und funktional klar von überladenen oder billig wirkenden Kleinanzeigen-Apps abheben.
+
+Designziel:
+Die App muss professionell, sauber, ruhig und hochwertig wirken. Nutzer sollen schnell merken:
+- hier ist es übersichtlich
+- hier ist es sicherer
+- hier sind Prozesse klar
+- hier kann ich vertrauensvoll handeln
+
+Gestaltungsprinzipien:
+- mobile first
+- klare visuelle Hierarchie
+- wenige, aber starke visuelle Elemente
+- großzügige Abstände
+- moderne Karten und Listen
+- keine Reizüberflutung
+- keine verspielte Billigoptik
+- seriös, aber nicht langweilig
+- Vertrauen muss visuell spürbar sein
+- Kernaktionen in wenigen Taps erreichbar
+- Status müssen auf einen Blick erfassbar sein
+
+Zentrale UX-Ziele:
+1. Vertrauen aufbauen
+2. Inserate schnell erfassbar machen
+3. Deal-Prozesse klar führen
+4. Kommunikation einfach machen
+5. Verkäufer und Käufer nicht verwirren
+6. Relevante Informationen priorisieren
+7. Sicherheits- und Verifizierungsmerkmale sichtbar machen
+8. Friktion reduzieren, aber Missbrauch nicht begünstigen
+
+Definiere ein komplettes UX/UI-Konzept für folgende Bereiche:
+
+1. Onboarding
+- Begrüßung
+- Werte von Ehren-Deal
+- Vorteile gegenüber klassischen Plattformen
+- Einstieg als Käufer oder Verkäufer
+- Registrierung ohne unnötige Hürden
+
+2. Startseite / Home
+- wie sieht der Feed aus
+- welche Elemente stehen oben
+- wie werden Kategorien eingebunden
+- wie werden Highlights oder vertrauensfördernde Elemente gezeigt
+- wie wird Suche eingebunden
+- wie wird Personalisierung vorbereitet
+
+3. Suche und Filter
+- mobilefreundliche Filtersheets
+- klare Sortierung
+- gute Lesbarkeit
+- Standort, Preis, Zustand, Versand, Kategorie, verifizierter Verkäufer
+- Suchergebnisse nicht chaotisch wirken lassen
+
+4. Inserat-Karten
+Definiere genau:
+- Bildaufbau
+- Titel
+- Preis
+- Standort
+- Versand / Abholung
+- Zustand
+- Vertrauensmerkmale
+- Favoriten-Button
+- Verkäuferinfos ja/nein
+- wie viel Information auf Kartenebene sinnvoll ist
+
+5. Inserat-Detailseite
+Muss enthalten:
+- Bilder
+- Titel
+- Preis
+- Standort
+- Zustand
+- Beschreibung
+- Versand / Abholung
+- Verkäuferkarte
+- Vertrauensmerkmale
+- CTA für Nachricht / Deal starten / Favorit
+- Meldung
+- ähnliche Inserate
+Lege fest, wie diese Seite aufgebaut sein soll, damit sie vertrauenswürdig und nicht überladen wirkt.
+
+6. Inserat erstellen
+- Step-by-step oder Single Screen
+- wie Bilder hochgeladen werden
+- wie Kategorie gewählt wird
+- wie Zustand und Versandart eingegeben werden
+- wie Preis und Beschreibung geführt werden
+- wie Validierung und Fehler angezeigt werden
+- wie der Prozess schnell, aber hochwertig wirkt
+
+7. Chat
+- klare Zuordnung zum Inserat
+- Deal-Bezug sichtbar
+- Systemnachrichten bei Statuswechseln
+- Buttons für Deal-Aktionen
+- Melden und Blockieren
+- seriöse, aufgeräumte Chat-Ansicht
+
+8. Deal-Ansicht
+- Status sichtbar
+- Verlauf sichtbar
+- nächste sinnvolle Aktion klar
+- Dokumentation des Deals
+- keine Verwirrung
+- klares Gefühl von Kontrolle und Nachvollziehbarkeit
+
+9. Profil
+- öffentliches Profil
+- Vertrauensmerkmale
+- Bewertungen
+- aktive Inserate
+- Mitglied seit
+- Verifizierungsstatus
+- Design muss Vertrauen und Seriosität transportieren
+
+10. Mein Bereich
+- meine Inserate
+- meine Deals
+- Favoriten
+- Nachrichten
+- Bewertungen
+- Einstellungen
+- Verifizierung
+- Meldungen oder Support
+Lege fest, wie diese Bereiche in der Navigation sinnvoll organisiert werden.
+
+11. Vertrauenselemente
+Definiere ein visuelles System für:
+- verifizierter Nutzer
+- neu registrierter Nutzer
+- viele gute Bewertungen
+- schnelle Antwortzeit
+- problematische Konten nur intern
+- Deal-Status
+- versicherter / geschützter Ablauf falls später relevant
+
+12. Leere Zustände
+- keine Suchergebnisse
+- keine Nachrichten
+- keine Deals
+- keine Favoriten
+- keine Inserate
+Diese Zustände sollen nicht tot wirken, sondern führen.
+
+13. Fehlerzustände
+- Upload fehlgeschlagen
+- Netzwerkfehler
+- ungültige Eingaben
+- Login fehlgeschlagen
+- Nachricht nicht gesendet
+Definiere klare UX-Regeln dafür.
+
+14. Navigation
+Empfiehl eine gute Mobile-Navigation:
+- Bottom Tab Bar
+- Stack-Navigation
+- modale Flows
+Lege fest, wie man Home, Suche, Inserate erstellen, Nachrichten und Profil elegant erreichbar macht.
+
+15. Designsystem
+Definiere:
+- Farbrolle
+- Typografie-Hierarchie
+- Karten
+- Buttons
+- Inputs
+- Chips
+- Badges
+- Status-Indikatoren
+- Listen
+- Abstände
+- Icon-Verwendung
+Kein konkreter Farbwahn. Fokus auf System, Klarheit und Vertrauen.
+
+Lieferformat:
+1. UX-Leitprinzipien
+2. Informationsarchitektur
+3. Hauptnavigation
+4. Screen-by-Screen-Konzept
+5. Inserat-Karten-Konzept
+6. Detailseiten-Konzept
+7. Deal- und Chat-UX
+8. Vertrauenssystem visuell
+9. Leere und Fehlerzustände
+10. Designsystem-Grundregeln
+
+Wichtige Regeln:
+- Denke wie ein Produktdesigner für ein reales Startup
+- Kein Dribbble-Fantasiedesign ohne Alltagstauglichkeit
+- Fokus auf Vertrauensaufbau, Klarheit und Geschwindigkeit
+- Das Produkt muss hochwertig und real nutzbar wirken

@@ -49,7 +49,7 @@ export async function createIdent(userId: string, userEmail: string): Promise<Id
                 email: userEmail,
             },
             style: {
-                themeColor: '#06b6d4',
+                themeColor: '#1B65A6',
                 requestRedirect: `${import.meta.env.APP_URL}/kyc/callback`,
             },
         }),
@@ -97,10 +97,33 @@ export async function getIdentStatus(identId: string): Promise<IdentStatusResult
 }
 
 /**
- * Validate IDnow webhook signature
- * In production: verify HMAC signature from IDnow
+ * Validate IDnow webhook payload structure.
+ * HMAC validation: IDnow sendet einen X-HMAC-SHA256 Header wenn ein Webhook-Secret konfiguriert ist.
  */
-export function validateWebhookPayload(payload: unknown): boolean {
-    // TODO: implement HMAC validation with IDnow webhook secret
-    return payload !== null && typeof payload === 'object';
+export function validateWebhookPayload(payload: unknown, hmacHeader?: string | null): boolean {
+    if (payload === null || typeof payload !== 'object') return false;
+
+    const webhookSecret = import.meta.env.IDNOW_WEBHOOK_SECRET;
+    if (webhookSecret && hmacHeader) {
+        return verifyHmac(webhookSecret, JSON.stringify(payload), hmacHeader);
+    }
+
+    // Ohne Secret: nur Struktur-Validierung (Sandbox / Test-Modus)
+    return true;
+}
+
+function verifyHmac(secret: string, body: string, receivedHmac: string): boolean {
+    try {
+        const { createHmac } = require('node:crypto');
+        const expectedHmac = createHmac('sha256', secret).update(body).digest('hex');
+        // Constant-time Vergleich
+        if (expectedHmac.length !== receivedHmac.length) return false;
+        let result = 0;
+        for (let i = 0; i < expectedHmac.length; i++) {
+            result |= expectedHmac.charCodeAt(i) ^ receivedHmac.charCodeAt(i);
+        }
+        return result === 0;
+    } catch {
+        return false;
+    }
 }

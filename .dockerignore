@@ -1,7 +1,13 @@
 node_modules
 dist
 .env
+.env.*
 .astro
 .git
 *.log
 npm-debug.log*
+mobile-app
+ehren-deal-app
+docs
+*.md
+!README.md

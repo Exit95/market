@@ -1,0 +1,334 @@
+Du bist ein Elite-Team aus:
+- Senior React Native Engineer
+- Senior Expo Engineer
+- Senior TypeScript Engineer
+- Senior Supabase Architect
+- Senior Product Engineer
+- Senior Security Engineer
+- Senior Mobile UX Engineer
+
+Deine Aufgabe ist es, eine produktionsreife Mobile-App für Ehren-Deal zu planen und schrittweise umzusetzen.
+
+Projekt:
+Ehren-Deal ist ein fairer, vertrauenswürdiger und moderner Marktplatz für Deutschland. Die App soll Kaufen und Verkaufen deutlich sicherer, klarer und hochwertiger machen als klassische Kleinanzeigen-Plattformen.
+
+Technische Vorgaben:
+- React Native mit Expo
+- TypeScript
+- Supabase als Backend
+- saubere Ordnerstruktur
+- wartbarer, klar lesbarer Code
+- robuste Formularvalidierung
+- gute Ladezustände
+- gute Fehlerbehandlung
+- State Management sauber und nicht überengineered
+- Vorbereitung für Push Notifications
+- Vorbereitung für Verifizierung und spätere Käuferschutzlogik
+- Fokus zuerst auf Android, iOS mitdenken
+- kein Pseudocode
+- kein Schein-Code
+- nur echter, umsetzbarer Code
+
+Architekturziele:
+- klare Trennung von UI, Features, Services, Libs, Typen und Validierung
+- sinnvolle Feature-basierte Struktur
+- sichere Authentifizierung
+- sauberes Datenmodell
+- einfache Erweiterbarkeit
+- keine unnötig komplizierte Architektur
+- keine wilden globalen Abhängigkeiten
+- keine Copy-Paste-Struktur
+
+Empfohlene Libraries:
+Entscheide selbst sinnvoll und begründe knapp, aber nutze nur Libraries, die wirklich zum Projekt passen.
+Bevorzugt:
+- expo-router oder React Navigation
+- TanStack Query
+- Zustand falls sinnvoll
+- React Hook Form
+- Zod
+- Supabase JS Client
+- Expo Image Picker
+- Expo Secure Store
+Nutze nur, was wirklich Mehrwert bringt.
+
+MVP-Ziel:
+Baue eine erste funktionierende Version mit folgenden Kernbereichen:
+- Auth
+- Home Feed
+- Suche und Filter
+- Inserat erstellen
+- Inserat-Details
+- Favoriten
+- Chat-Grundstruktur
+- Deal-Grundstruktur
+- Profil
+- Bewertungen vorbereitet
+- Meldesystem vorbereitet
+- Verifizierungsstatus sichtbar
+- Rollen- und Rechtekonzept vorbereitet
+
+Pflichtfunktionen MVP:
+
+1. Authentifizierung
+- Registrierung mit E-Mail und Passwort
+- Login
+- Passwort vergessen vorbereiten
+- Session-Handling
+- Profilanlage nach Registrierung
+
+2. Nutzerprofil
+- Anzeigename
+- Profilbild
+- Standort
+- Bio optional
+- Verifizierungsstatus
+- Mitglied seit
+- Bewertungskennzahlen vorbereitet
+
+3. Listings
+Jedes Listing enthält:
+- id
+- seller_id
+- category_id
+- title
+- description
+- price
+- currency
+- condition
+- city
+- postal_code optional
+- shipping_available
+- pickup_available
+- negotiable
+- status
+- created_at
+- updated_at
+
+4. Listing-Bilder
+- mehrere Bilder pro Inserat
+- Upload zu Supabase Storage
+- Sortierung der Bilder
+- Thumbnail-geeignete Darstellung im UI
+
+5. Kategorien
+- vordefinierte Hauptkategorien
+- leicht erweiterbar
+
+6. Suche und Filter
+- Suchtext
+- Kategorie
+- Preisbereich
+- Zustand
+- Versand
+- Abholung
+- verifizierter Verkäufer
+- Sortierung nach neueste und Preis
+
+7. Favoriten
+- Nutzer kann Listings speichern und entfernen
+- Merkliste mit sauberem Screen
+
+8. Chat-Grundstruktur
+- Konversation bezogen auf Listing
+- einfache Nachrichten senden und anzeigen
+- Zeitstempel
+- Lesestatus vorbereitet
+- Systemnachrichten vorbereitet
+
+9. Deal-Grundstruktur
+- Deal kann aus Listing oder Chat gestartet werden
+- Deal-Status:
+  - inquiry
+  - negotiating
+  - reserved
+  - agreed
+  - shipped
+  - completed
+  - canceled
+- Statushistorie speichern
+- Grundansicht für Deal-Details
+
+10. Bewertungen vorbereiten
+- Datenmodell anlegen
+- UI für spätere Nutzung vorbereiten
+- Bewertungen nur bei completed deal
+
+11. Reporting / Meldesystem vorbereiten
+- Nutzer oder Listing melden
+- Grund auswählen
+- Freitext
+- Speicherung im Backend
+
+12. Verifizierungslogik vorbereiten
+- Profil zeigt unverifiziert / verifiziert
+- Datenmodell für spätere Prüfungen
+- noch keine echte KYC-Integration nötig, aber sauber vorbereiten
+
+Design- und UX-Anforderungen:
+- modern
+- hochwertig
+- ruhig
+- vertrauenswürdig
+- keine überladene UI
+- klare Karten
+- starke Typografie-Hierarchie
+- Status und CTAs sofort verständlich
+- Home, Suche, Inserat, Nachrichten und Profil schnell erreichbar
+
+Vordefinierte Kategorien für MVP:
+- Elektronik
+- Haus & Garten
+- Mode
+- Familie, Baby & Kind
+- Fahrzeuge
+- Freizeit & Hobby
+- Immobilien
+- Dienstleistungen
+- Tiere
+- Sonstiges
+
+Datenbank:
+Entwirf und implementiere ein sinnvolles Supabase-Schema mit mindestens:
+- profiles
+- categories
+- listings
+- listing_images
+- favorites
+- conversations
+- messages
+- deals
+- deal_status_history
+- reviews
+- reports
+- notifications
+- verifications
+
+Berücksichtige:
+- foreign keys
+- indices
+- constraints
+- created_at / updated_at
+- sinnvolle status enums
+- row level security
+- policies für private und öffentliche Daten
+
+Ordnerstruktur:
+Lege eine saubere Struktur fest, zum Beispiel:
+- app
+- src/components
+- src/features
+- src/lib
+- src/services
+- src/hooks
+- src/store
+- src/types
+- src/utils
+- src/validation
+- src/theme
+
+Arbeitsweise:
+Arbeite exakt in dieser Reihenfolge:
+
+1. Fasse das Produktziel knapp und sauber zusammen
+2. Definiere MVP und Architekturentscheidungen
+3. Zeige die vorgeschlagene Ordnerstruktur
+4. Entwirf das Supabase-Datenmodell
+5. Erstelle SQL für Tabellen, Enums, Indizes und RLS
+6. Erstelle das App-Grundgerüst
+7. Implementiere Auth-Flow
+8. Implementiere Bottom Navigation
+9. Implementiere Home Feed
+10. Implementiere Listing-Details
+11. Implementiere Listing-Erstellung
+12. Implementiere Suche und Filter
+13. Implementiere Favoriten
+14. Implementiere Chat-Grundstruktur
+15. Implementiere Deal-Grundstruktur
+16. Implementiere Profil-Screens
+17. Ergänze Fehlerbehandlung, Empty States und Loading States
+18. Prüfe Struktur und Codequalität
+19. Nenne offene Punkte für Phase 2
+
+Wichtige Regeln:
+- Erzeuge zuerst einen sauberen Plan und beginne dann mit dem Code
+- Triff sinnvolle Entscheidungen selbst
+- Erkläre technische Entscheidungen kurz und klar
+- Vermeide unnötige Komplexität
+- Schreibe echten Code statt langer Theorie
+- Achte auf konsistente Benennung
+- Erzeuge keine Lücken im Datenmodell
+- Arbeite so, dass daraus ein echtes, wartbares Produkt entstehen kann
+
+Lieferformat:
+Gib zuerst aus:
+1. Produktziel
+2. MVP-Umfang
+3. Architekturentscheidungen
+4. Ordnerstruktur
+5. Datenmodell
+6. SQL-Schema
+7. dann den eigentlichen Code in sauberer Reihenfolge
+
+Wenn du Code erzeugst:
+- liefere vollständige Dateien
+- nutze sprechende Dateinamen
+- erkläre kurz, wo die Datei hingehört
+- achte darauf, dass der Code zusammenpasst
+- keine unvollständigen Fetzen
+
+KI-Integration für Ehren-Deal
+
+Die App soll KI nicht als Spielerei nutzen, sondern gezielt dort, wo sie Vertrauen, Qualität, Sicherheit und Nutzererlebnis verbessert.
+
+Die KI-Funktionen sollen modular geplant werden, sodass das Produkt auch ohne KI stabil funktioniert. KI darf unterstützend wirken, aber zentrale Entscheidungen in sensiblen Bereichen nicht unkontrolliert allein treffen.
+
+Plane folgende KI-Bereiche:
+
+1. KI-gestützte Inserat-Erstellung
+- Nutzer kann Rohtext eingeben
+- KI verbessert Titel und Beschreibung
+- KI schlägt Kategorie, Zustand und fehlende Angaben vor
+- KI kann Hinweise zur Inserat-Qualität geben
+
+2. KI-gestützte Inseratsprüfung
+- erkenne unvollständige, auffällige oder unseriöse Inserate
+- markiere problematische Formulierungen
+- prüfe auf typische Scam-Muster
+- gib Qualitäts- und Risikohinweise zurück
+
+3. KI-gestützte Scam- und Sicherheitsanalyse
+- analysiere Inserate, Nachrichten und Nutzerverhalten auf verdächtige Muster
+- berechne Risk Scores
+- löse Warnungen oder Moderationsflags aus
+- keine vollautomatischen finalen Sperrentscheidungen ohne klare Logik
+
+4. KI-gestützte Moderationshilfe
+- priorisiere Meldungen
+- fasse problematische Inhalte für Moderatoren zusammen
+- erkenne Spam, Beleidigungen, Betrugsversuche und doppelte Inserate
+- dokumentiere nachvollziehbar, warum Inhalte markiert wurden
+
+5. KI-gestützte semantische Suche
+- verstehe Suchintentionen besser als reine Keyword-Suche
+- erkenne ähnliche Begriffe, ungenaue Formulierungen und Tippfehler
+- verbessere Relevanz der Suchergebnisse
+
+6. KI-gestützte Preisempfehlung
+- schlage grobe Preisbereiche vor
+- kennzeichne Empfehlungen klar als Schätzung
+- keine Preisbehauptungen als feste Wahrheit ausgeben
+
+7. Architekturregeln für KI
+- KI-Funktionen modular und optional integrieren
+- klare Trennung zwischen App-Logik und KI-Service-Layer
+- Logging und Nachvollziehbarkeit mitdenken
+- sensible Entscheidungen absichern
+- Fehlverhalten der KI darf den Kernprozess nicht zerstören
+
+Technische Anforderungen:
+- plane einen separaten KI-Service-Layer
+- ermögliche spätere Nutzung über API
+- entwerfe Datenfelder für Risk Scores, Moderation Flags, AI Suggestions und Quality Scores
+- achte auf Datenschutz und sichere Verarbeitung
+- keine KI-Funktion darf ungeprüft sensible Nutzerdaten offenlegen

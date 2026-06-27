@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -108,31 +108,123 @@ enum FraudSeverity {
   CRITICAL
 }
 
+// ─── Leistungstausch Enums ───────────────────────────────────────────────────
+
+enum ServiceEffort {
+  UNTER_1_STUNDE
+  EIN_BIS_DREI_STUNDEN
+  DREI_BIS_ACHT_STUNDEN
+  MEHRERE_TAGE
+  FORTLAUFEND
+}
+
+enum ServiceLocationType {
+  VOR_ORT
+  REMOTE
+  BEIDES
+}
+
+enum ServiceExperienceLevel {
+  ANFAENGER
+  FORTGESCHRITTEN
+  PROFI
+}
+
+enum ServiceListingStatus {
+  ACTIVE
+  PAUSED
+  MATCHED
+  COMPLETED
+  EXPIRED
+  REMOVED
+}
+
+enum ServiceReportReason {
+  NICHT_DIENSTLEISTUNG
+  DISKRIMINIERUNG
+  SPAM
+  BETRUG
+  UNANGEMESSEN
+  DUPLIKAT
+  SONSTIGES
+}
+
+enum ServiceProposalStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  COUNTERED
+  WITHDRAWN
+  EXPIRED
+}
+
+enum ServiceDealStatus {
+  ACTIVE
+  COMPLETED
+  DISPUTED
+  CANCELLED
+}
+
+enum ServiceDisputeReason {
+  NICHT_ERSCHIENEN
+  LEISTUNG_MANGELHAFT
+  ANDERE_LEISTUNG
+  KEINE_LEISTUNG
+  KOMMUNIKATION
+  SONSTIGES
+}
+
+enum ServiceDisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  CLOSED
+}
+
+// ─── Service Category (Leistungstausch) ──────────────────────────────────────
+
+model ServiceCategory {
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  icon         String?
+  description  String?
+  position     Int      @default(0)
+  listingCount Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  offeredListings ServiceListing[]               @relation("OfferedCategory")
+  soughtListings  ServiceListingSoughtCategory[]
+
+  @@index([slug])
+  @@map("service_categories")
+}
+
 // ─── User ─────────────────────────────────────────────────────────────────────
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  passwordHash  String
-  firstName     String?
-  lastName      String?
-  phone         String?
-  avatarUrl     String?
-  city          String?
-  postalCode    String?
-  role          Role      @default(USER)
+  id           String  @id @default(cuid())
+  email        String  @unique
+  passwordHash String
+  firstName    String?
+  lastName     String?
+  phone        String?
+  avatarUrl    String?
+  city         String?
+  postalCode   String?
+  role         Role    @default(USER)
 
   // Verification flags
-  emailVerified Boolean   @default(false)
-  phoneVerified Boolean   @default(false)
-  idVerified    Boolean   @default(false)
+  emailVerified Boolean @default(false)
+  phoneVerified Boolean @default(false)
+  idVerified    Boolean @default(false)
 
   // Account state
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  bannedAt      DateTime?
-  banReason     String?
-  shadowBanned  Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  bannedAt     DateTime?
+  banReason    String?
+  shadowBanned Boolean   @default(false)
 
   // Mangopay / KYC
   mangopayId       String?
@@ -140,20 +232,36 @@ model User {
   kycIdentId       String?
 
   // Relations
-  sessions         Session[]
-  listings         Listing[]
-  buyerConversations  Conversation[] @relation("BuyerConversations")
-  sellerConversations Conversation[] @relation("SellerConversations")
-  messagesSent     Message[]
-  buyerDeals       Deal[]      @relation("BuyerDeals")
-  sellerDeals      Deal[]      @relation("SellerDeals")
-  disputes         Dispute[]   @relation("DisputeOpener")
-  verifications    Verification[]
-  trustScore       TrustScore?
-  fraudSignals     FraudSignal[]
-  auditLogs        AuditLog[]
-  adminActionsAsAdmin  AdminAction[] @relation("AdminActionsAsAdmin")
-  adminActionsAsTarget AdminAction[] @relation("AdminActionsAsTarget")
+  sessions             Session[]
+  listings             Listing[]
+  buyerConversations   Conversation[]  @relation("BuyerConversations")
+  sellerConversations  Conversation[]  @relation("SellerConversations")
+  messagesSent         Message[]
+  buyerDeals           Deal[]          @relation("BuyerDeals")
+  sellerDeals          Deal[]          @relation("SellerDeals")
+  disputes             Dispute[]       @relation("DisputeOpener")
+  verifications        Verification[]
+  trustScore           TrustScore?
+  fraudSignals         FraudSignal[]
+  auditLogs            AuditLog[]
+  adminActionsAsAdmin  AdminAction[]   @relation("AdminActionsAsAdmin")
+  adminActionsAsTarget AdminAction[]   @relation("AdminActionsAsTarget")
+  savedListings        SavedListing[]
+  listingReports       ListingReport[]
+  reviewsGiven         Review[]        @relation("ReviewsGiven")
+  reviewsReceived      Review[]        @relation("ReviewsReceived")
+
+  // Leistungstausch
+  serviceListings          ServiceListing[]       @relation("UserServiceListings")
+  serviceListingReports    ServiceListingReport[] @relation("UserServiceListingReports")
+  serviceProposalsSent     ServiceProposal[]      @relation("ServiceProposalsSent")
+  serviceProposalsReceived ServiceProposal[]      @relation("ServiceProposalsReceived")
+  serviceDealsAsPartyA     ServiceDeal[]          @relation("ServiceDealsAsPartyA")
+  serviceDealsAsPartyB     ServiceDeal[]          @relation("ServiceDealsAsPartyB")
+  serviceReviewsGiven      ServiceReview[]        @relation("ServiceReviewsGiven")
+  serviceReviewsReceived   ServiceReview[]        @relation("ServiceReviewsReceived")
+  serviceDisputesOpened    ServiceDispute[]       @relation("ServiceDisputesOpened")
+  serviceProfile           ServiceProfile?        @relation("UserServiceProfile")
 
   @@index([email])
   @@index([role])
@@ -176,34 +284,36 @@ model Session {
 // ─── Listing ──────────────────────────────────────────────────────────────────
 
 model Listing {
-  id           String          @id @default(cuid())
-  title        String
-  description  String
-  price        Int             // in Cent
-  currency     String          @default("EUR")
-  category     ListingCategory
-  city         String
-  postalCode   String
-  country      String          @default("DE")
-  status       ListingStatus   @default(DRAFT)
-  treuhand     Boolean         @default(false)
-  condition    String?         // Neu | Sehr gut | Gut | Akzeptabel
-  viewCount    Int             @default(0)
+  id          String          @id @default(cuid())
+  title       String
+  description String
+  price       Int // in Cent
+  currency    String          @default("EUR")
+  category    ListingCategory
+  city        String
+  postalCode  String
+  country     String          @default("DE")
+  status      ListingStatus   @default(DRAFT)
+  treuhand    Boolean         @default(false)
+  condition   String? // Neu | Sehr gut | Gut | Akzeptabel
+  viewCount   Int             @default(0)
 
   // Geo-Koordinaten (für Umkreissuche)
-  latitude     Float?
-  longitude    Float?
+  latitude  Float?
+  longitude Float?
 
-  sellerId     String
-  seller       User            @relation(fields: [sellerId], references: [id])
+  sellerId String
+  seller   User   @relation(fields: [sellerId], references: [id])
 
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-  soldAt       DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  soldAt    DateTime?
 
-  images       ListingImage[]
+  images        ListingImage[]
   conversations Conversation[]
-  deals        Deal[]
+  deals         Deal[]
+  savedBy       SavedListing[]
+  reports       ListingReport[]
 
   @@index([sellerId])
   @@index([category])
@@ -220,7 +330,7 @@ model ListingImage {
   id        String   @id @default(cuid())
   listingId String
   listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  objectKey String   // S3 key
+  objectKey String // S3 key
   url       String
   position  Int      @default(0)
   createdAt DateTime @default(now())
@@ -232,17 +342,17 @@ model ListingImage {
 // ─── Conversation ─────────────────────────────────────────────────────────────
 
 model Conversation {
-  id        String    @id @default(cuid())
+  id        String   @id @default(cuid())
   listingId String
-  listing   Listing   @relation(fields: [listingId], references: [id])
+  listing   Listing  @relation(fields: [listingId], references: [id])
   buyerId   String
-  buyer     User      @relation("BuyerConversations", fields: [buyerId], references: [id])
+  buyer     User     @relation("BuyerConversations", fields: [buyerId], references: [id])
   sellerId  String
-  seller    User      @relation("SellerConversations", fields: [sellerId], references: [id])
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  seller    User     @relation("SellerConversations", fields: [sellerId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  messages  Message[]
+  messages Message[]
 
   // One conversation per (listing, buyer) pair
   @@unique([listingId, buyerId])
@@ -275,32 +385,33 @@ model Message {
 // ─── Deal ────────────────────────────────────────────────────────────────────
 
 model Deal {
-  id                  String             @id @default(cuid())
-  listingId           String
-  listing             Listing            @relation(fields: [listingId], references: [id])
-  buyerId             String
-  buyer               User               @relation("BuyerDeals", fields: [buyerId], references: [id])
-  sellerId            String
-  seller              User               @relation("SellerDeals", fields: [sellerId], references: [id])
-  status              DealStatus         @default(PENDING)
-  totalAmount         Int                // in Cent
-  feeCents            Int                @default(0)
-  currency            String             @default("EUR")
-  trackingCode        String?
-  carrier             String?
+  id           String     @id @default(cuid())
+  listingId    String
+  listing      Listing    @relation(fields: [listingId], references: [id])
+  buyerId      String
+  buyer        User       @relation("BuyerDeals", fields: [buyerId], references: [id])
+  sellerId     String
+  seller       User       @relation("SellerDeals", fields: [sellerId], references: [id])
+  status       DealStatus @default(PENDING)
+  totalAmount  Int // in Cent
+  feeCents     Int        @default(0)
+  currency     String     @default("EUR")
+  trackingCode String?
+  carrier      String?
 
   // Ehren-Deal Handshake Security
-  handshakeStatus     HandshakeStatus    @default(PENDING)
-  verificationMethod  VerificationMethod @default(SHIPPING)
-  trustScoreImpact    Int                @default(0)
-  fraudSignals        String[]           // Array of Risk Flags
+  handshakeStatus    HandshakeStatus    @default(PENDING)
+  verificationMethod VerificationMethod @default(SHIPPING)
+  trustScoreImpact   Int                @default(0)
+  fraudSignals       String?  @db.Text // JSON array of Risk Flags
 
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime           @updatedAt
-  completedAt         DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  completedAt DateTime?
 
-  payment             Payment?
-  dispute             Dispute?
+  payment Payment?
+  dispute Dispute?
+  review  Review?
 
   @@index([buyerId])
   @@index([sellerId])
@@ -334,18 +445,18 @@ model Payment {
 // ─── Dispute ──────────────────────────────────────────────────────────────────
 
 model Dispute {
-  id           String        @id @default(cuid())
-  dealId       String        @unique
-  deal         Deal          @relation(fields: [dealId], references: [id])
-  openedById   String
-  openedBy     User          @relation("DisputeOpener", fields: [openedById], references: [id])
-  reason       String
-  status       DisputeStatus @default(OPEN)
-  resolution   String?
-  metaJson     Json?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  resolvedAt   DateTime?
+  id         String        @id @default(cuid())
+  dealId     String        @unique
+  deal       Deal          @relation(fields: [dealId], references: [id])
+  openedById String
+  openedBy   User          @relation("DisputeOpener", fields: [openedById], references: [id])
+  reason     String
+  status     DisputeStatus @default(OPEN)
+  resolution String?
+  metaJson   Json?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  resolvedAt DateTime?
 
   @@index([dealId])
   @@index([status])
@@ -376,7 +487,7 @@ model TrustScore {
   id        String     @id @default(cuid())
   userId    String     @unique
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  score     Int        @default(0)  // 0-100
+  score     Int        @default(0) // 0-100
   level     TrustLevel @default(NEW)
   updatedAt DateTime   @updatedAt
 
@@ -389,7 +500,7 @@ model FraudSignal {
   id         String        @id @default(cuid())
   userId     String
   user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  type       String        // e.g. "multiple_failed_logins", "suspicious_listing"
+  type       String // e.g. "multiple_failed_logins", "suspicious_listing"
   severity   FraudSeverity
   metaJson   Json?
   createdAt  DateTime      @default(now())
@@ -407,7 +518,7 @@ model AuditLog {
   id        String   @id @default(cuid())
   actorId   String?
   actor     User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
-  action    String   // "login", "logout", "register", "failed_login", ...
+  action    String // "login", "logout", "register", "failed_login", ...
   ip        String?
   userAgent String?
   metaJson  Json?
@@ -422,17 +533,298 @@ model AuditLog {
 // ─── AdminAction ──────────────────────────────────────────────────────────────
 
 model AdminAction {
-  id             String   @id @default(cuid())
-  adminId        String
-  admin          User     @relation("AdminActionsAsAdmin", fields: [adminId], references: [id])
-  targetUserId   String?
-  targetUser     User?    @relation("AdminActionsAsTarget", fields: [targetUserId], references: [id])
-  actionType     String   // "ban", "unban", "shadow_ban", "remove_listing", ...
-  metaJson       Json?
-  createdAt      DateTime @default(now())
+  id           String   @id @default(cuid())
+  adminId      String
+  admin        User     @relation("AdminActionsAsAdmin", fields: [adminId], references: [id])
+  targetUserId String?
+  targetUser   User?    @relation("AdminActionsAsTarget", fields: [targetUserId], references: [id])
+  actionType   String // "ban", "unban", "shadow_ban", "remove_listing", ...
+  metaJson     Json?
+  createdAt    DateTime @default(now())
 
   @@index([adminId])
   @@index([targetUserId])
   @@index([actionType])
   @@map("admin_actions")
+}
+
+// ─── SavedListing ──────────────────────────────────────────────────────────────
+
+model SavedListing {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, listingId])
+  @@index([userId])
+  @@index([listingId])
+  @@map("saved_listings")
+}
+
+// ─── ListingReport ─────────────────────────────────────────────────────────────
+
+model ListingReport {
+  id         String              @id @default(cuid())
+  listingId  String
+  listing    Listing             @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  reporterId String
+  reporter   User                @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  reason     ListingReportReason
+  details    String?
+  status     ReportStatus        @default(OPEN)
+  createdAt  DateTime            @default(now())
+  resolvedAt DateTime?
+
+  @@unique([listingId, reporterId])
+  @@index([listingId])
+  @@index([reporterId])
+  @@index([status])
+  @@map("listing_reports")
+}
+
+enum ListingReportReason {
+  SPAM
+  FRAUD
+  WRONG_CATEGORY
+  PROHIBITED_ITEM
+  ALREADY_SOLD
+  DUPLICATE
+  OTHER
+}
+
+enum ReportStatus {
+  OPEN
+  REVIEWED
+  RESOLVED
+  DISMISSED
+}
+
+// ─── Review ──────────────────────────────────────────────────────────────────
+
+model Review {
+  id         String   @id @default(cuid())
+  dealId     String   @unique
+  deal       Deal     @relation(fields: [dealId], references: [id])
+  reviewerId String
+  reviewer   User     @relation("ReviewsGiven", fields: [reviewerId], references: [id])
+  revieweeId String
+  reviewee   User     @relation("ReviewsReceived", fields: [revieweeId], references: [id])
+  rating     Int // 1-5
+  comment    String?
+  createdAt  DateTime @default(now())
+
+  @@index([reviewerId])
+  @@index([revieweeId])
+  @@index([createdAt(sort: Desc)])
+  @@map("reviews")
+}
+
+// ─── Service Listing (Leistungstausch) ───────────────────────────────────────
+
+model ServiceListing {
+  id                 String                  @id @default(cuid())
+  title              String
+  offeredDescription String                  @db.Text
+  soughtDescription  String                  @db.Text
+  effort             ServiceEffort
+  locationType       ServiceLocationType
+  city               String?
+  postalCode         String?
+  latitude           Float?
+  longitude          Float?
+  availability       String?                 @db.Text // JSON array: ["WERKTAGS","ABENDS"]
+  experienceLevel    ServiceExperienceLevel?
+  requirements       String?                 @db.Text
+  expiresAt          DateTime
+  status             ServiceListingStatus    @default(ACTIVE)
+  viewCount          Int                     @default(0)
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+
+  userId            String
+  user              User                           @relation("UserServiceListings", fields: [userId], references: [id])
+  offeredCategoryId String
+  offeredCategory   ServiceCategory                @relation("OfferedCategory", fields: [offeredCategoryId], references: [id])
+  soughtCategories  ServiceListingSoughtCategory[]
+  images            ServiceListingImage[]
+  reports           ServiceListingReport[]
+  proposals         ServiceProposal[]
+
+  @@index([userId])
+  @@index([offeredCategoryId])
+  @@index([status, createdAt])
+  @@index([latitude, longitude])
+  @@map("service_listings")
+}
+
+// ─── Service Listing ↔ Sought Category (M:N) ────────────────────────────────
+
+model ServiceListingSoughtCategory {
+  id               String          @id @default(cuid())
+  serviceListingId String
+  serviceListing   ServiceListing  @relation(fields: [serviceListingId], references: [id], onDelete: Cascade)
+  categoryId       String
+  category         ServiceCategory @relation(fields: [categoryId], references: [id])
+
+  @@unique([serviceListingId, categoryId])
+  @@index([categoryId])
+  @@map("service_listing_sought_categories")
+}
+
+// ─── Service Listing Image ───────────────────────────────────────────────────
+
+model ServiceListingImage {
+  id               String         @id @default(cuid())
+  serviceListingId String
+  serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [id], onDelete: Cascade)
+  url              String
+  position         Int            @default(0)
+  createdAt        DateTime       @default(now())
+
+  @@index([serviceListingId])
+  @@map("service_listing_images")
+}
+
+// ─── Service Listing Report ──────────────────────────────────────────────────
+
+model ServiceListingReport {
+  id               String              @id @default(cuid())
+  serviceListingId String
+  serviceListing   ServiceListing      @relation(fields: [serviceListingId], references: [id])
+  reporterId       String
+  reporter         User                @relation("UserServiceListingReports", fields: [reporterId], references: [id])
+  reason           ServiceReportReason
+  description      String?             @db.Text
+  status           String              @default("OPEN")
+  createdAt        DateTime            @default(now())
+
+  @@unique([serviceListingId, reporterId])
+  @@index([serviceListingId])
+  @@map("service_listing_reports")
+}
+
+// ─── Service Proposal (Leistungstausch) ──────────────────────────────────────
+
+model ServiceProposal {
+  id                 String                @id @default(cuid())
+  serviceListingId   String
+  serviceListing     ServiceListing        @relation(fields: [serviceListingId], references: [id])
+  proposerId         String
+  proposer           User                  @relation("ServiceProposalsSent", fields: [proposerId], references: [id])
+  receiverId         String
+  receiver           User                  @relation("ServiceProposalsReceived", fields: [receiverId], references: [id])
+  offeredDescription String                @db.Text
+  offeredCategoryId  String
+  offeredEffort      ServiceEffort
+  soughtDescription  String                @db.Text
+  soughtEffort       ServiceEffort
+  locationType       ServiceLocationType
+  proposedLocation   String?
+  proposedTimeframe  String?
+  message            String?               @db.Text
+  status             ServiceProposalStatus @default(PENDING)
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+
+  parentProposalId String?
+  parentProposal   ServiceProposal?  @relation("CounterProposals", fields: [parentProposalId], references: [id])
+  counterProposals ServiceProposal[] @relation("CounterProposals")
+  deal             ServiceDeal?
+
+  @@index([serviceListingId])
+  @@index([proposerId])
+  @@index([receiverId])
+  @@index([status])
+  @@map("service_proposals")
+}
+
+// ─── Service Deal (Leistungstausch) ─────────────────────────────────────────
+
+model ServiceDeal {
+  id                String            @id @default(cuid())
+  proposalId        String            @unique
+  proposal          ServiceProposal   @relation(fields: [proposalId], references: [id])
+  partyAId          String
+  partyA            User              @relation("ServiceDealsAsPartyA", fields: [partyAId], references: [id])
+  partyBId          String
+  partyB            User              @relation("ServiceDealsAsPartyB", fields: [partyBId], references: [id])
+  partyACompleted   Boolean           @default(false)
+  partyACompletedAt DateTime?
+  partyBCompleted   Boolean           @default(false)
+  partyBCompletedAt DateTime?
+  cancelRequestedBy String?
+  status            ServiceDealStatus @default(ACTIVE)
+  completedAt       DateTime?
+  cancelledAt       DateTime?
+  cancelReason      String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  reviews ServiceReview[]
+  dispute ServiceDispute?
+
+  @@index([partyAId])
+  @@index([partyBId])
+  @@index([status])
+  @@map("service_deals")
+}
+
+// ─── Service Review (Leistungstausch) ───────────────────────────────────────
+
+model ServiceReview {
+  id                  String      @id @default(cuid())
+  dealId              String
+  deal                ServiceDeal @relation(fields: [dealId], references: [id])
+  reviewerId          String
+  reviewer            User        @relation("ServiceReviewsGiven", fields: [reviewerId], references: [id])
+  revieweeId          String
+  reviewee            User        @relation("ServiceReviewsReceived", fields: [revieweeId], references: [id])
+  rating              Int
+  comment             String?     @db.Text
+  qualityRating       Int?
+  reliabilityRating   Int?
+  communicationRating Int?
+  createdAt           DateTime    @default(now())
+
+  @@unique([dealId, reviewerId])
+  @@index([revieweeId])
+  @@map("service_reviews")
+}
+
+// ─── Service Dispute (Leistungstausch) ──────────────────────────────────────
+
+model ServiceDispute {
+  id          String               @id @default(cuid())
+  dealId      String               @unique
+  deal        ServiceDeal          @relation(fields: [dealId], references: [id])
+  openedById  String
+  openedBy    User                 @relation("ServiceDisputesOpened", fields: [openedById], references: [id])
+  reason      ServiceDisputeReason
+  description String               @db.Text
+  status      ServiceDisputeStatus @default(OPEN)
+  resolution  String?              @db.Text
+  resolvedAt  DateTime?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  @@map("service_disputes")
+}
+
+// ─── Service Profile (Leistungstausch) ──────────────────────────────────────
+
+model ServiceProfile {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation("UserServiceProfile", fields: [userId], references: [id])
+  bio          String?  @db.Text
+  skills       String?  @db.Text // JSON array: ["Webdesign","Fotografie"]
+  availability String?  @db.Text // JSON array: ["WERKTAGS","WOCHENENDE"]
+  responseTime String? // "Antwortet meist innerhalb 2 Stunden"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("service_profiles")
 }

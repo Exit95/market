@@ -64,7 +64,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     });
 
     // Send email with plaintext token in URL
-    const resetUrl = `${import.meta.env.APP_URL ?? 'http://localhost:4321'}/passwort-reset/${rawToken}?uid=${user.id}`;
+    const appUrl = process.env.APP_URL || import.meta.env.APP_URL || 'http://localhost:4321';
+    const resetUrl = `${appUrl}/passwort-reset/${rawToken}?uid=${user.id}`;
     try {
         await sendMail({
             to: email,

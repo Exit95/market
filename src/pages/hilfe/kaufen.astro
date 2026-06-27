@@ -1,0 +1,166 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+---
+
+<BaseLayout title="Sicher kaufen – Hilfe-Center – Ehren-Deal" description="Alles zum sicheren Einkauf auf Ehren-Deal: Treuhand-Schutz, Warenerhalt bestaetigen und Hilfe bei Problemen." canonicalPath="/hilfe/kaufen">
+    <Header />
+    <main id="main-content" class="min-h-screen pt-12 pb-24 bg-background">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <!-- Breadcrumb -->
+            <nav aria-label="Breadcrumb" class="mb-8">
+                <ol class="flex items-center gap-2 text-sm text-text-secondary">
+                    <li><a href="/" class="hover:text-primary transition-colors">Startseite</a></li>
+                    <li class="flex items-center gap-2">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <a href="/hilfe" class="hover:text-primary transition-colors">Hilfe-Center</a>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <span class="text-text font-medium">Kaufen</span>
+                    </li>
+                </ol>
+            </nav>
+
+            <!-- Header -->
+            <div class="mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold text-primary mb-3">Sicher kaufen</h1>
+                <p class="text-text-secondary text-lg max-w-2xl">
+                    Auf Ehren-Deal kaufst du immer mit Treuhand-Schutz. Hier erfaehrst du, wie der Kaufprozess funktioniert und was du beachten solltest.
+                </p>
+            </div>
+
+            <!-- Info Box -->
+            <div class="info-box p-5 flex items-start gap-4 mb-10">
+                <svg class="w-5 h-5 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                <div>
+                    <p class="text-sm text-text font-medium mb-1">Dein Geld ist geschuetzt</p>
+                    <p class="text-sm text-text-secondary">Bei jedem Kauf ueber Ehren-Deal liegt dein Geld sicher auf einem Treuhandkonto. Erst wenn du den Erhalt bestaetigst, wird der Verkaeufer ausgezahlt.</p>
+                </div>
+            </div>
+
+            <!-- FAQ Accordion -->
+            <div class="space-y-4" id="faq-accordion">
+
+                <!-- FAQ 1 -->
+                <div class="card overflow-hidden">
+                    <button class="faq-toggle w-full flex items-center justify-between p-5 text-left" aria-expanded="false">
+                        <span class="text-sm font-semibold text-text pr-4">Wie kaufe ich sicher auf Ehren-Deal?</span>
+                        <svg class="faq-chevron w-5 h-5 text-text-muted flex-shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <div class="text-sm text-text-secondary leading-relaxed space-y-3 border-t border-border pt-4">
+                            <p>Der Kaufprozess auf Ehren-Deal ist einfach und sicher gestaltet:</p>
+                            <ol class="list-decimal list-inside space-y-2 pl-1">
+                                <li><strong>Artikel finden:</strong> Durchsuche den Marktplatz oder nutze die Kategorie-Filter, um das passende Angebot zu finden.</li>
+                                <li><strong>Verkaeufer pruefen:</strong> Schau dir den Trust-Score, die Bewertungen und den Verifizierungsstatus des Verkaeufers an.</li>
+                                <li><strong>Nachricht schreiben:</strong> Stelle vorab Fragen zum Artikel, um sicherzugehen, dass alles passt.</li>
+                                <li><strong>Deal starten:</strong> Klicke auf "Kaufen" und starte den Treuhand-Prozess.</li>
+                                <li><strong>Bezahlen:</strong> Zahle den Betrag sicher ueber die Plattform. Dein Geld wird treuheanderisch verwahrt.</li>
+                                <li><strong>Ware erhalten und pruefen:</strong> Pruefe den Artikel gruendlich nach Erhalt.</li>
+                                <li><strong>Erhalt bestaetigen:</strong> Bestaetige den Empfang, um den Deal abzuschliessen.</li>
+                            </ol>
+                            <p><strong>Tipp:</strong> Achte auf Verkaeufer mit hohem Trust-Score und Verifiziert-Badge fuer maximale Sicherheit.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 2 -->
+                <div class="card overflow-hidden">
+                    <button class="faq-toggle w-full flex items-center justify-between p-5 text-left" aria-expanded="false">
+                        <span class="text-sm font-semibold text-text pr-4">Was passiert mit meinem Geld nach der Zahlung?</span>
+                        <svg class="faq-chevron w-5 h-5 text-text-muted flex-shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <div class="text-sm text-text-secondary leading-relaxed space-y-3 border-t border-border pt-4">
+                            <p>Dein Geld wird bei einer Zahlung nicht direkt an den Verkaeufer ueberwiesen. Stattdessen wird es sicher auf einem <strong>Treuhandkonto</strong> verwahrt, das ueber unseren Zahlungspartner Mangopay verwaltet wird.</p>
+                            <p><strong>So laeuft der Geldfluss:</strong></p>
+                            <ul class="list-disc list-inside space-y-2 pl-1">
+                                <li>Du zahlst den Kaufpreis plus eine Kaeuferschutzgebuehr von <strong>0,50 Euro</strong>.</li>
+                                <li>Das Geld liegt sicher auf dem Treuhandkonto, bis du den Warenerhalt bestaetigst.</li>
+                                <li>Erst nach deiner Bestaetigung wird der Betrag (abzueglich der Verkaeufergebuehr) an den Verkaeufer ausgezahlt.</li>
+                            </ul>
+                            <p>Sollte es Probleme geben (Ware nicht erhalten, falsche Ware), erhaeltst du eine <strong>vollstaendige Rueckerstattung</strong>.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 3 -->
+                <div class="card overflow-hidden">
+                    <button class="faq-toggle w-full flex items-center justify-between p-5 text-left" aria-expanded="false">
+                        <span class="text-sm font-semibold text-text pr-4">Wie bestaetige ich den Erhalt einer Ware?</span>
+                        <svg class="faq-chevron w-5 h-5 text-text-muted flex-shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <div class="text-sm text-text-secondary leading-relaxed space-y-3 border-t border-border pt-4">
+                            <p>Nachdem du die Ware erhalten und geprueft hast, bestaetigst du den Erhalt wie folgt:</p>
+                            <ol class="list-decimal list-inside space-y-2 pl-1">
+                                <li>Gehe zu deinem <a href="/dashboard/deals" class="text-primary hover:underline">Dashboard</a> unter "Meine Deals".</li>
+                                <li>Waehle den entsprechenden Deal aus.</li>
+                                <li>Klicke auf <strong>"Erhalt bestaetigen"</strong>.</li>
+                                <li>Bestaetigung erfolgt ueber den <strong>Ehren-Handschlag</strong> - den digitalen Handschlag zwischen Kaeufer und Verkaeufer.</li>
+                            </ol>
+                            <p><strong>Wichtig:</strong> Pruefe die Ware gruendlich, bevor du bestaetigst. Nach der Bestaetigung wird der Verkaeufer ausgezahlt und der Deal ist abgeschlossen.</p>
+                            <p>Du hast nach Erhalt der Ware <strong>48 Stunden</strong> Zeit, den Empfang zu bestaetigen oder ein Problem zu melden. Danach wird der Deal automatisch als abgeschlossen markiert.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 4 -->
+                <div class="card overflow-hidden">
+                    <button class="faq-toggle w-full flex items-center justify-between p-5 text-left" aria-expanded="false">
+                        <span class="text-sm font-semibold text-text pr-4">Was mache ich bei Problemen mit einem Kauf?</span>
+                        <svg class="faq-chevron w-5 h-5 text-text-muted flex-shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <div class="text-sm text-text-secondary leading-relaxed space-y-3 border-t border-border pt-4">
+                            <p>Wenn es ein Problem mit deinem Kauf gibt, stehen dir mehrere Optionen zur Verfuegung:</p>
+                            <p><strong>Ware nicht erhalten:</strong></p>
+                            <ul class="list-disc list-inside space-y-2 pl-1">
+                                <li>Kontaktiere zunaechst den Verkaeufer ueber den <a href="/nachrichten" class="text-primary hover:underline">Chat</a> und frage nach dem Versandstatus.</li>
+                                <li>Falls keine Loesung gefunden wird, melde das Problem ueber den Deal-Bereich in deinem Dashboard.</li>
+                                <li>Unser Support prueft den Fall und veranlasst gegebenenfalls eine Rueckerstattung.</li>
+                            </ul>
+                            <p><strong>Ware entspricht nicht der Beschreibung:</strong></p>
+                            <ul class="list-disc list-inside space-y-2 pl-1">
+                                <li>Dokumentiere die Abweichungen mit Fotos.</li>
+                                <li>Melde das Problem innerhalb von 48 Stunden nach Erhalt.</li>
+                                <li>Unser Streitschlichtungsteam prueft deinen Fall und entscheidet fair.</li>
+                            </ul>
+                            <p>In jedem Fall ist dein Geld durch den Treuhand-Schutz abgesichert, solange der Deal noch nicht abgeschlossen wurde. Wende dich bei Fragen jederzeit an unseren <a href="/kontakt" class="text-primary hover:underline">Support</a>.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Back to Hilfe-Center -->
+            <div class="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+                <a href="/hilfe" class="text-sm text-primary hover:underline flex items-center gap-2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    Zurueck zum Hilfe-Center
+                </a>
+                <a href="/kontakt" class="btn btn-outline text-sm px-5">Kontakt aufnehmen</a>
+            </div>
+
+        </div>
+    </main>
+    <Footer />
+</BaseLayout>
+
+<script>
+    document.querySelectorAll('.faq-toggle').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            btn.setAttribute('aria-expanded', String(!expanded));
+            const content = btn.nextElementSibling as HTMLElement | null;
+            const chevron = btn.querySelector('.faq-chevron') as HTMLElement | null;
+            if (content) content.classList.toggle('hidden', expanded);
+            if (chevron) chevron.style.transform = expanded ? '' : 'rotate(180deg)';
+        });
+    });
+</script>

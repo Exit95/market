@@ -1,0 +1,275 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+
+const title = "Sicher online kaufen — 10 Tipps f\u00fcr den gebrauchten Marktplatz";
+const description = "Lerne die 10 wichtigsten Tipps, um auf Online-Marktpl\u00e4tzen sicher gebrauchte Artikel zu kaufen. Von Verk\u00e4ufer-Checks bis zur sicheren Bezahlung.";
+const publishDate = "2026-03-28";
+const readingTime = "8 Min.";
+const siteUrl = "https://ehren-deal.de";
+
+const relatedArticles = [
+  { slug: "betrug-erkennen", title: "Betrug erkennen und vermeiden", excerpt: "Vorkasse-Betrug, Fake-Inserate und Phishing — so erkennst du die h\u00e4ufigsten Maschen." },
+  { slug: "treuhand-erklaert", title: "Treuhand-Zahlung erkl\u00e4rt", excerpt: "Wie der Zahlungsschutz bei Ehren-Deal funktioniert und warum er sicherer ist." },
+  { slug: "tipps-fuer-verkaeufer", title: "Erfolgreich verkaufen", excerpt: "Bessere Fotos, faire Preise und mehr Verk\u00e4ufe — unsere besten Tipps." },
+];
+
+const tocItems = [
+  { id: "verkaeuferprofil", label: "1. Verk\u00e4uferprofil pr\u00fcfen" },
+  { id: "bewertungen", label: "2. Bewertungen lesen" },
+  { id: "angebot-pruefen", label: "3. Angebot genau pr\u00fcfen" },
+  { id: "kommunikation", label: "4. Auf der Plattform kommunizieren" },
+  { id: "treuhand", label: "5. Treuhand-Zahlung nutzen" },
+  { id: "vorkasse", label: "6. Keine Vorkasse leisten" },
+  { id: "persoenliche-abholung", label: "7. Pers\u00f6nliche Abholung absichern" },
+  { id: "preisvergleich", label: "8. Preisvergleich durchf\u00fchren" },
+  { id: "daten-schuetzen", label: "9. Pers\u00f6nliche Daten sch\u00fctzen" },
+  { id: "bauchgefuehl", label: "10. Auf dein Bauchgef\u00fchl h\u00f6ren" },
+];
+---
+
+<BaseLayout
+  title={`${title} | Ehren-Deal Ratgeber`}
+  description={description}
+  canonicalPath="/ratgeber/sicher-online-kaufen"
+>
+  <Header />
+  <main id="main-content" class="min-h-screen">
+
+    <!-- Article Header -->
+    <section class="bg-gradient-to-br from-primary to-navy text-white py-14 sm:py-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="text-sm text-white/50 mb-6" aria-label="Breadcrumb">
+          <ol class="flex items-center gap-1.5 flex-wrap">
+            <li><a href="/" class="hover:text-white/80 transition-colors">Startseite</a></li>
+            <li>/</li>
+            <li><a href="/ratgeber" class="hover:text-white/80 transition-colors">Ratgeber</a></li>
+            <li>/</li>
+            <li class="text-white/80">Sicher online kaufen</li>
+          </ol>
+        </nav>
+        <div class="max-w-3xl">
+          <span class="text-xs font-semibold bg-white/20 text-white px-3 py-1 rounded-full mb-4 inline-block">Sicherheit</span>
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight mb-4">
+            {title}
+          </h1>
+          <div class="flex flex-wrap items-center gap-4 text-sm text-white/60">
+            <span>Ehren-Deal Redaktion</span>
+            <span>&middot;</span>
+            <time datetime={publishDate}>
+              {new Date(publishDate).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}
+            </time>
+            <span>&middot;</span>
+            <span>{readingTime} Lesezeit</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Article Content -->
+    <section class="py-10 sm:py-14">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col lg:flex-row gap-10">
+
+          <!-- Sidebar TOC -->
+          <aside class="lg:w-72 flex-shrink-0 order-2 lg:order-1">
+            <div class="lg:sticky lg:top-8">
+              <nav class="card p-5" aria-label="Inhaltsverzeichnis">
+                <h2 class="text-sm font-semibold text-text mb-3 uppercase tracking-wide">Inhaltsverzeichnis</h2>
+                <ol class="flex flex-col gap-2">
+                  {tocItems.map((item) => (
+                    <li>
+                      <a href={`#${item.id}`} class="text-sm text-text-secondary hover:text-primary transition-colors leading-snug block">
+                        {item.label}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+
+              <!-- Share -->
+              <div class="card p-5 mt-4">
+                <h2 class="text-sm font-semibold text-text mb-3 uppercase tracking-wide">Teilen</h2>
+                <div class="flex gap-2">
+                  <a href={`https://www.facebook.com/sharer/sharer.php?u=${siteUrl}/ratgeber/sicher-online-kaufen`} target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary transition-colors" aria-label="Auf Facebook teilen">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                  </a>
+                  <a href={`https://twitter.com/intent/tweet?url=${siteUrl}/ratgeber/sicher-online-kaufen&text=${encodeURIComponent(title)}`} target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary transition-colors" aria-label="Auf X teilen">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 01-3.14 1.53A4.48 4.48 0 0012 7.5v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5 0-.28-.03-.56-.08-.83A7.72 7.72 0 0023 3z"/></svg>
+                  </a>
+                  <a href={`mailto:?subject=${encodeURIComponent(title)}&body=${siteUrl}/ratgeber/sicher-online-kaufen`} class="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary transition-colors" aria-label="Per E-Mail teilen">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <!-- Main Article -->
+          <article class="flex-grow order-1 lg:order-2 max-w-3xl">
+            <div class="prose-custom">
+
+              <p class="text-lg text-text-secondary leading-relaxed mb-6">
+                Online-Marktpl\u00e4tze bieten fantastische M\u00f6glichkeiten, gebrauchte Artikel g\u00fcnstig zu erwerben. Doch wo Geld im Spiel ist, gibt es auch Risiken. Ob Smartphone, M\u00f6bel oder Kleidung — mit diesen zehn Tipps kaufst du sicher und vermeidest b\u00f6se \u00dcberraschungen.
+              </p>
+
+              <h2 id="verkaeuferprofil" class="text-xl font-bold text-text mt-10 mb-3">1. Verk\u00e4uferprofil sorgf\u00e4ltig pr\u00fcfen</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Bevor du einen Kauf t\u00e4tigst, wirf einen genauen Blick auf das Profil des Verk\u00e4ufers. Achte auf folgende Punkte:
+              </p>
+              <ul class="list-disc pl-5 text-text-secondary leading-relaxed mb-4 flex flex-col gap-1.5">
+                <li><strong class="text-text">Registrierungsdatum:</strong> Wie lange ist der Account aktiv? Frische Accounts ohne Historie k\u00f6nnen ein Warnsignal sein.</li>
+                <li><strong class="text-text">Verifizierungsstatus:</strong> Auf Ehren-Deal erkennst du verifizierte Verk\u00e4ufer am Trust-Score und dem Verifizierungs-Badge. Eine abgeschlossene KYC-Pr\u00fcfung bedeutet, dass die Identit\u00e4t best\u00e4tigt wurde.</li>
+                <li><strong class="text-text">Bisherige Inserate:</strong> Hat der Verk\u00e4ufer bereits erfolgreich Artikel verkauft? Mehrere abgeschlossene Deals sind ein gutes Zeichen.</li>
+              </ul>
+
+              <h2 id="bewertungen" class="text-xl font-bold text-text mt-10 mb-3">2. Bewertungen anderer K\u00e4ufer lesen</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Bewertungen sind dein wichtigstes Werkzeug zur Einsch\u00e4tzung eines Verk\u00e4ufers. Lies nicht nur die Sternebewertung, sondern auch die Kommentare. Achte auf wiederkehrende Kritikpunkte wie versp\u00e4teten Versand oder Artikel, die nicht der Beschreibung entsprechen. Auf Ehren-Deal sind Bewertungen an abgeschlossene Deals gekn\u00fcpft und k\u00f6nnen nicht gef\u00e4lscht werden.
+              </p>
+
+              <h2 id="angebot-pruefen" class="text-xl font-bold text-text mt-10 mb-3">3. Das Angebot genau pr\u00fcfen</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Ein zu guter Preis sollte dich stutzig machen. Wenn ein aktuelles iPhone f\u00fcr 100 Euro angeboten wird, stimmt etwas nicht. Pr\u00fcfe die Fotos: Sind es echte Bilder oder Stockfotos? Stimmt die Beschreibung mit den Bildern \u00fcberein? Fordere bei hochpreisigen Artikeln zus\u00e4tzliche Fotos an — etwa mit einem Zettel mit aktuellem Datum neben dem Artikel.
+              </p>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                <strong class="text-text">Red Flag:</strong> Wenn ein Verk\u00e4ufer keine weiteren Fotos liefern kann oder will, ist Vorsicht geboten.
+              </p>
+
+              <h2 id="kommunikation" class="text-xl font-bold text-text mt-10 mb-3">4. Immer auf der Plattform kommunizieren</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Seri\u00f6se Verk\u00e4ufer haben kein Problem damit, \u00fcber die Plattform-Nachrichten zu kommunizieren. Wenn jemand dich sofort auf WhatsApp, Telegram oder E-Mail umleiten m\u00f6chte, sei vorsichtig. Innerhalb der Plattform sind deine Gespr\u00e4che dokumentiert, was im Streitfall entscheidend sein kann. Bei Ehren-Deal ist der gesamte Chatverlauf gespeichert und kann bei Problemen als Nachweis dienen.
+              </p>
+
+              <h2 id="treuhand" class="text-xl font-bold text-text mt-10 mb-3">5. Treuhand-Zahlung nutzen</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Die Treuhand-Zahlung ist der sicherste Weg, online zu bezahlen. Dein Geld wird auf einem gesch\u00fctzten Konto verwahrt und erst an den Verk\u00e4ufer freigegeben, wenn du den Erhalt und den Zustand der Ware best\u00e4tigt hast. Bei Ehren-Deal ist Treuhand-Schutz direkt in den Kaufprozess integriert — kein zus\u00e4tzlicher Aufwand f\u00fcr dich.
+              </p>
+              <div class="bg-primary-light/40 border border-primary/20 rounded-lg p-4 mb-4">
+                <p class="text-sm text-text font-medium">
+                  Tipp: Achte auf das gr\u00fcne &bdquo;Treuhand-Schutz&ldquo;-Badge bei Inseraten. Es zeigt dir, dass der Verk\u00e4ufer die sichere Bezahlung unterst\u00fctzt.
+                </p>
+              </div>
+
+              <h2 id="vorkasse" class="text-xl font-bold text-text mt-10 mb-3">6. Keine Vorkasse per \u00dcberweisung leisten</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Die direkte Bank\u00fcberweisung an Fremde ist das gr\u00f6\u00dfte Risiko beim Online-Kauf. Einmal \u00fcberwiesen, ist das Geld in der Regel unwiederbringlich verloren. Betr\u00fcger bevorzugen diese Methode, weil sie nicht r\u00fcckg\u00e4ngig gemacht werden kann. Nutze stattdessen immer gesch\u00fctzte Zahlungsmethoden wie die Treuhand-Zahlung.
+              </p>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Gleiches gilt f\u00fcr Zahlungen per Geschenkkarte, Kryptow\u00e4hrung oder Western Union. Kein seri\u00f6ser Verk\u00e4ufer wird auf diesen Zahlungswegen bestehen.
+              </p>
+
+              <h2 id="persoenliche-abholung" class="text-xl font-bold text-text mt-10 mb-3">7. Pers\u00f6nliche Abholung richtig absichern</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Wer einen Artikel pers\u00f6nlich abholt, kann ihn vor Ort pr\u00fcfen — ein gro\u00dfer Vorteil. Dabei solltest du jedoch einige Regeln beachten:
+              </p>
+              <ul class="list-disc pl-5 text-text-secondary leading-relaxed mb-4 flex flex-col gap-1.5">
+                <li>Triff dich an einem <strong class="text-text">\u00f6ffentlichen Ort</strong> — zum Beispiel vor einem Supermarkt oder Caf\u00e9.</li>
+                <li>Nimm im Zweifelsfall eine <strong class="text-text">Begleitperson</strong> mit.</li>
+                <li>Teste den Artikel vor Ort gr\u00fcndlich, bevor du bezahlst.</li>
+                <li>Bei teuren Artikeln: Nutze trotzdem die Treuhand-Zahlung \u00fcber die App und best\u00e4tige den Deal vor Ort per <strong class="text-text">QR-Code</strong>.</li>
+              </ul>
+
+              <h2 id="preisvergleich" class="text-xl font-bold text-text mt-10 mb-3">8. Preisvergleich durchf\u00fchren</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Recherchiere, was der Artikel gebraucht und neu kostet. So erkennst du unrealistische Angebote und kannst besser einsch\u00e4tzen, ob der Preis fair ist. Vergleiche \u00e4hnliche Inserate auf Ehren-Deal und anderen Plattformen. Ein guter Gebrauchtpreis liegt in der Regel bei 40\u201370 % des Neupreises, je nach Zustand und Alter.
+              </p>
+
+              <h2 id="daten-schuetzen" class="text-xl font-bold text-text mt-10 mb-3">9. Pers\u00f6nliche Daten sch\u00fctzen</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Gib nur die Daten preis, die f\u00fcr den Kauf notwendig sind. Deine Adresse teilst du erst, wenn der Deal zustande kommt — und nur \u00fcber die gesch\u00fctzte Plattform-Kommunikation. Teile niemals Passw\u00f6rter, Bankdaten (au\u00dfer IBAN f\u00fcr die Zahlung) oder Ausweiskopien direkt mit anderen Nutzern. Bei Ehren-Deal l\u00e4uft die Verifizierung ausschlie\u00dflich \u00fcber den offiziellen KYC-Prozess.
+              </p>
+
+              <h2 id="bauchgefuehl" class="text-xl font-bold text-text mt-10 mb-3">10. Auf dein Bauchgef\u00fchl h\u00f6ren</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Wenn sich etwas falsch anf\u00fchlt, brich den Kauf ab. Seri\u00f6se Verk\u00e4ufer verstehen das. Typische Warnsignale sind:
+              </p>
+              <ul class="list-disc pl-5 text-text-secondary leading-relaxed mb-4 flex flex-col gap-1.5">
+                <li>Extremer Zeitdruck (&bdquo;Nur noch heute!&ldquo;)</li>
+                <li>Ungew\u00f6hnliche Zahlungsforderungen</li>
+                <li>Weigerung, den Artikel vorher zu zeigen oder zu testen</li>
+                <li>Ausweichen auf externe Kommunikationskan\u00e4le</li>
+                <li>Widerspr\u00fcchliche Angaben in Beschreibung und Bildern</li>
+              </ul>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Im Zweifel kannst du das Inserat auf Ehren-Deal melden. Unser Team pr\u00fcft jede Meldung und entfernt betr\u00fcgerische Angebote.
+              </p>
+
+              <h2 class="text-xl font-bold text-text mt-10 mb-3">Fazit: Sicher kaufen ist kein Zufall</h2>
+              <p class="text-text-secondary leading-relaxed mb-4">
+                Mit etwas Aufmerksamkeit und den richtigen Werkzeugen kannst du das Risiko beim Online-Kauf auf ein Minimum reduzieren. Pr\u00fcfe den Verk\u00e4ufer, nutze die Treuhand-Zahlung und vertraue deinem Bauchgef\u00fchl. Ehren-Deal bietet dir genau die Sicherheitsinfrastruktur, die du f\u00fcr vertrauensvolle Deals brauchst — von der Identit\u00e4tspr\u00fcfung \u00fcber den Treuhand-Schutz bis zum Support im Streitfall.
+              </p>
+
+            </div>
+
+            <!-- Author -->
+            <div class="flex items-center gap-4 mt-10 pt-8 border-t border-border">
+              <div class="w-12 h-12 rounded-full bg-primary-light text-primary flex items-center justify-center text-lg font-bold flex-shrink-0">E</div>
+              <div>
+                <div class="font-semibold text-text">Ehren-Deal Redaktion</div>
+                <div class="text-sm text-text-secondary">Unser Redaktionsteam schreibt \u00fcber sicheres Handeln, Verbraucherschutz und alles rund um den digitalen Marktplatz.</div>
+              </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="bg-gradient-to-br from-navy to-primary-dark rounded-lg p-6 sm:p-8 mt-10 text-center">
+              <h2 class="text-xl font-bold text-white mb-2">Sicher kaufen auf Ehren-Deal</h2>
+              <p class="text-white/70 mb-5 max-w-md mx-auto text-sm">Registriere dich jetzt und profitiere vom Treuhand-Schutz bei jedem Kauf. Kostenlos und ohne versteckte Geb\u00fchren.</p>
+              <a href="/anmelden" class="btn-primary px-8">Jetzt registrieren</a>
+            </div>
+
+            <!-- Related Articles -->
+            <div class="mt-12">
+              <h2 class="text-h3 mb-6">Weitere Artikel</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {relatedArticles.map((article) => (
+                  <a href={`/ratgeber/${article.slug}`} class="card p-5 hover:border-primary transition-colors group">
+                    <h3 class="font-semibold text-text text-sm mb-2 group-hover:text-primary transition-colors">{article.title}</h3>
+                    <p class="text-caption text-text-secondary leading-relaxed">{article.excerpt}</p>
+                  </a>
+                ))}
+              </div>
+            </div>
+
+          </article>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  <Footer />
+
+  <!-- JSON-LD Article -->
+  <script is:inline type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": title,
+    "description": description,
+    "datePublished": publishDate,
+    "dateModified": publishDate,
+    "author": {
+      "@type": "Organization",
+      "name": "Ehren-Deal Redaktion",
+      "url": siteUrl
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Ehren-Deal",
+      "url": siteUrl,
+      "logo": { "@type": "ImageObject", "url": `${siteUrl}/logo.png` }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `${siteUrl}/ratgeber/sicher-online-kaufen`
+    },
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Startseite", "item": siteUrl },
+        { "@type": "ListItem", "position": 2, "name": "Ratgeber", "item": `${siteUrl}/ratgeber` },
+        { "@type": "ListItem", "position": 3, "name": "Sicher online kaufen" }
+      ]
+    }
+  })} />
+</BaseLayout>

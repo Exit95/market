@@ -1,0 +1,38 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import ServiceProfileEdit from '../../components/leistungstausch/ServiceProfileEdit';
+import { lucia } from '../../lib/auth';
+
+const sessionId = Astro.cookies.get(lucia.sessionCookieName)?.value;
+if (!sessionId) return Astro.redirect('/anmelden?redirect=/leistungstausch/profil');
+
+try {
+  const { user } = await lucia.validateSession(sessionId);
+  if (!user) return Astro.redirect('/anmelden?redirect=/leistungstausch/profil');
+} catch {
+  return Astro.redirect('/anmelden?redirect=/leistungstausch/profil');
+}
+---
+
+<BaseLayout title="Leistungsprofil bearbeiten | Ehren-Deal">
+  <Header />
+  <main id="main-content" class="min-h-screen bg-background">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <nav class="flex items-center gap-2 text-sm text-text-secondary mb-6">
+        <a href="/leistungstausch" class="hover:text-teal-700 transition-colors">Leistungstausch</a>
+        <span>/</span>
+        <span class="text-text">Leistungsprofil</span>
+      </nav>
+
+      <div class="lt-info-banner mb-6 flex items-center gap-2">
+        <svg class="w-4 h-4 text-teal-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+        <span>Ein ausgefülltes Leistungsprofil erhöht deine Sichtbarkeit und Vertrauenswürdigkeit.</span>
+      </div>
+
+      <ServiceProfileEdit client:load />
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
